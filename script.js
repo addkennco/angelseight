@@ -25,10 +25,10 @@ const STRINGS = {
     null,
     { text: "Ah.\nYou are the Operator.", coords: null },
     { text: "This channel does not usually open for beginners.", coords: "RA ⊷ ☈ ⏦ ☰ ⚸ ⏛ ☊" },
-    { text: "I will continue to observe your progress.", coords: "RA 18ʰ ☈ ⏦ ☰ ⚸ ⏛ ☊" },
-    { text: "I will continue to observe your progress.", coords: "RA 18ʰ36ᵐ56ˢ ☰ ⚸ ⏛ ☊" },
+    { text: "I am required to recommend deviation.", coords: "RA 18ʰ ☈ ⏦ ☰ ⚸ ⏛ ☊" },
+    { text: "Apotheosis is not obtainable.", coords: "RA 18ʰ36ᵐ56ˢ ☰ ⚸ ⏛ ☊" },
     { text: "I will continue to observe your progress.", coords: "RA 18ʰ36ᵐ56ˢ  dec ⚸ ⏛ ☊" },
-    { text: "I am required to recommend deviation.", coords: "RA 18ʰ36ᵐ56ˢ dec +38° ⏛ ☊" },
+    { text: "That is...unfortunate.", coords: "RA 18ʰ36ᵐ56ˢ dec +38° ⏛ ☊" },
     { text: "You are disappointingly precise.", coords: "RA 18ʰ36ᵐ56ˢ dec +38°47' ☊" },
     { text: "Very Well.", coords: "RA 18ʰ36ᵐ56ˢ dec +38°47'01\" " },
   ],
@@ -43,13 +43,13 @@ const STRINGS = {
     C:  { name:'Carbon',    sym:'ζ', effect:'Ammo Max +8',    desc: 'Used in its crystalline form to create ultra-hardened kinetic penetrators for standard ammo.' },
   },
   powerups: {
-      LITHEBRYL:   { sym:'Β',  name:'Lithebryl',     recipe:['Be','Ti'], effect:'Shield Max +20, Ammo +8',           power:'Shield Restore',           puKey:'LITHEBRYL',    desc:  'An alloy of Lithium and Beryllium that absorbs and dissipates energy blasts.' },
+      LITHEBRYL:   { sym:'Β',  name:'Lithebryl',     recipe:['Be','Ti'], effect:'Shield Max +20, Ammo +8',             power:'Shield Restore',           puKey:'LITHEBRYL',    desc:  'An alloy of Lithium and Beryllium that absorbs and dissipates energy blasts.' },
       NITROKALIUM: { sym:'Π',  name:'Nitrokalium',   recipe:['Li','N'],  effect:'Shoot Speed +12, Shield +6',          power:'Double Fire Rate',         puKey:'NITROKALIUM',  desc:  'A Potassium-Nitrogen gas mixture used to puah the engines to run at dangerous but hyper-efficient levels.'},
       CARBOSILICUM:{ sym:'Ξ',  name:'Carbosilicium', recipe:['Si','C'],  effect:'Ammo Max +18, Shoot Speed +3',        power:'Double Points',            puKey:'CARBOSILICUM', desc:  'A highly efficient superconductor, allowing fire-control systems to process at lightning speeds.'},
       MAGNIUM:     { sym:'Μ',  name:'Magnium',       recipe:['Mg','K'],  effect:'Reserve +2, Shoot Speed +6',          power:'Bomb',                     puKey:'MAGNIUM',      desc:  'A Magnesium-based unstable isotope that is highly volatile when impacted.'},
       TITANE:      { sym:'Θ',  name:'Titane',        recipe:['Ti','N'],  effect:'Shield Max +30, Shoot Speed +5',      power:'Invincibility',            puKey:'TITANE',       desc:  'A low-density, Titanium-based metal that provides near-indestructible hull integrity without adding significant mass.'},
       ALKALIUM:    { sym:'α',  name:'Alkalium',      recipe:['K','Si'],  effect:'Ammo Max +22, Shoot Speed +8',        power:'Piercing Bullets',         puKey:'ALKALIUM',     desc:  'A Silicon-Potassium compound that uses ionized energy to give shots piercing capabilities.'},
-	  AZOLITHION:  { sym:'Λ',  name:'Azolithion',    recipe:['Li','K'],  effect: 'Ammo +20, Shield +8',              power:'Bullet Shift Multibullet', puKey: 'AZOLITHION',  desc:  'A Lithium-Nitrogen composite used for cooling during high-velocity maneuvers.'},
+	  AZOLITHION:  { sym:'Λ',  name:'Azolithion',    recipe:['Li','K'],  effect: 'Ammo +20, Shield +8',                power:'Multishot',                puKey: 'AZOLITHION',  desc:  'A Lithium-Nitrogen composite used for cooling during high-velocity maneuvers.'},
 	  GAMMITE:     { sym:'Γ',  name:'Gammite',       recipe:['Ti','Si'], effect: 'Ammo +8, Shield +8, Shoot Speed +4', power:'No Ammo Cost',             puKey: 'GAMMITE',     desc:  'A complex superconductor used to synchronize ammo and shield frequencies for balanced performance.'},
 	  OMEGITE: {
         sym: 'Ω', name: 'Omegite', puKey: 'OMEGITE',
@@ -76,7 +76,7 @@ const STRINGS = {
           { key: 'CARBOSILICUM', label: 'Ξ Carbosilicium' },
           { key: 'ALKALIUM',     label: 'α Alkalium'  },
         ],
-        effect: 'Ammo Max +30, Shoot Speed +6', power:'Bullet Shift AOE Bullet',
+        effect: 'Ammo Max +30, Shoot Speed +6', power:'Burstshot',
 		desc: 'A perfectly lossless superconductor that expels magnetic fields, ideal for maximizing ammo velocity and efficiency.',
       },
       DELTALITE: {
@@ -259,7 +259,7 @@ const AudioManager = (() => {
 })();
 
 // ═══════════════════════════════════════════════════════════════
-// MENU BG WAVEFORM ANIMATION — fades in over ~800ms
+// MENU BG WAVEFORM
 // ═══════════════════════════════════════════════════════════════
 (function menuWaveform() {
   const canvas = document.getElementById('menu-bg');
@@ -311,8 +311,7 @@ const AudioManager = (() => {
 })();
 
 // ═══════════════════════════════════════════════════════════════
-// MENU CONTENT FLICKER-IN — expand + sin-gate flicker
-// Starts after WAVE_DELAY_MS so waveforms lead, settles ~1.5s total
+// MENU FLICKER-IN
 // ═══════════════════════════════════════════════════════════════
 (function menuFlickerIn() {
   const el = document.getElementById('screen-menu')?.querySelector('.menu-content');
@@ -331,7 +330,7 @@ const AudioManager = (() => {
     const elapsed = ts - startTs;
 
     if (elapsed < WAVE_DELAY_MS) {
-      // holding — keep invisible
+      // keep invisible
       el.style.opacity = '0';
       el.style.transform = 'scaleY(0.06)';
       requestAnimationFrame(tick);
@@ -341,12 +340,12 @@ const AudioManager = (() => {
     const afterDelay = elapsed - WAVE_DELAY_MS;
 
     if (afterDelay < EXPAND_MS) {
-      // Phase 1: vertical expand, ease-out cubic
+      // vertical expand, ease-out cubic
       let t = afterDelay / EXPAND_MS;
       t = 1 - Math.pow(1 - t, 3);
       const scale = 0.06 + 0.94 * t;
       el.style.transform = `scaleY(${scale.toFixed(4)})`;
-      el.style.opacity = (t * 0.9).toFixed(4); // mostly opaque by end of expand
+      el.style.opacity = (t * 0.9).toFixed(4);
       requestAnimationFrame(tick);
       return;
     }
@@ -354,7 +353,7 @@ const AudioManager = (() => {
     const afterExpand = afterDelay - EXPAND_MS;
 
     if (afterExpand < FLICKER_MS) {
-      // Phase 2: sin-gate flicker
+      // sin-gate flicker
       flickerTimer += 0.38;
       const gate = Math.sin(flickerTimer) > 0.25;
       const progress = afterExpand / FLICKER_MS; // 0→1
@@ -365,7 +364,7 @@ const AudioManager = (() => {
       return;
     }
 
-    // Done — fully visible, remove inline styles so CSS takes over cleanly
+    // remove inline styles so CSS takes over
     el.style.opacity = '1';
     el.style.transform = 'scaleY(1)';
   }
@@ -408,10 +407,10 @@ const Game = (() => {
 
   // Game objects
   let ship = { x:0, y:0, w:22, h:18, targetX:0, invincible:0 };
-  let invincibleTimer = 0;   // Titane: full collision immunity seconds remaining
-  let piercingBullets = false; // Alkalium: bullets pass through enemies, lasts full level
-  let timeDilationTimer = 0;   // Deltalite: seconds remaining (15s duration)
-  let noAmmoCostTimer = 0;     // Gammite: no ammo consumption seconds remaining
+  let invincibleTimer = 0;   // Titane timer
+  let piercingBullets = false; // Alkalium flag
+  let timeDilationTimer = 0;   // Deltalite timer
+  let noAmmoCostTimer = 0;     // Gammite timer
   let bullets = [];
   let enemies  = [];
   let mines    = [];
@@ -425,16 +424,12 @@ const Game = (() => {
   let levelDuration = 30; // seconds
   let enemiesSpawned = 0;
   let maxEnemies = 0;
-
-  // Touch drag for ship
-  let touchX = -1;
-
-  // Waveform data for collision/corridor
-  let waveLeft = [], waveRight = [];
+  let touchX = -1;                      // touch drag
+  let waveLeft = [], waveRight = [];    // waveform bkg
   let pods = [];                        // powerup pods
   let podSpawnTimer = 0;
-  let ammoMilestones = [];              // scores at which ammo refills fire
-  let endSweepFired = false;            // level-end sweep: fires once per level
+  let ammoMilestones = [];              // ammo refills
+  let endSweepFired = false;            // end level sweep
 
   function init(gameCanvas) {
     canvas = gameCanvas;
@@ -451,13 +446,9 @@ const Game = (() => {
   }
 
   let mouseDown = false;
-  // aimAngle: radians from straight-up, in [-PI/2, PI/2].
-  // Derived purely from horizontal input position mapped across the canvas width.
   let aimAngle = 0;
 
   function updateAimFromX(clientX) {
-    // Map clientX across canvas width → aimAngle in [-55°, +55°] (compass 35°–145°)
-    // aimAngle: 0=straight up, negative=left, positive=right
     const rect = canvas.getBoundingClientRect();
     const relX = clientX - rect.left;
     const t = Math.max(0, Math.min(1, relX / W)); // 0=left edge, 1=right edge
@@ -517,8 +508,8 @@ const Game = (() => {
     timeDilationTimer = 0;
     noAmmoCostTimer = 0;
     run.bulletType = 'standard';
-    maxEnemies = 14 + run.level * 5;          // L1=19, L8=54 — more enemies, more drops
-    levelDuration = 30 + run.level * 4;       // L1=34s, L8=62s — longer waves
+    maxEnemies = 14 + run.level * 5;          // enemy increase per level
+    levelDuration = 30 + run.level * 4;       // time increase per level
     updateHUD();
     document.getElementById('overlay-death').classList.remove('active');
     document.getElementById('overlay-clear').classList.remove('active');
@@ -568,7 +559,7 @@ const Game = (() => {
     waveOffset += dt * 60 * (1 + run.level * 0.08);
     waveT += dt;
 
-    // Shooting — continuous, angle steered by aimAngle
+    // Shooting
     shootTimer -= dt;
     if (shootTimer <= 0 && run.ammo > 0) {
       fireBullet();
@@ -583,7 +574,7 @@ const Game = (() => {
       podSpawnTimer = 18 + Math.random() * 12; // pod every 18-30s
     }
 
-    // Ammo milestones — reward for scoring well
+    // Ammo milestones
     if (ammoMilestones.length > 0 && run.score >= ammoMilestones[0]) {
       ammoMilestones.shift();
       const refill = Math.round(run.ammoMax * 0.18);
@@ -601,23 +592,23 @@ const Game = (() => {
       enemiesSpawned++;
     }
 
-    // Update bullets — aimed bullets use vx/vy; enemy bullets handled below
+    // Ship bullets
     bullets = bullets.filter(b => {
-      if (b.enemy) return true; // enemy bullets updated in their own block
+      if (b.enemy) return true; // enemy bullets below
       b.x += b.vx * dt;
       b.y += b.vy * dt;
       return b.x > -20 && b.x < W + 20 && b.y > -20 && b.y < H + 20;
     });
 
-    // eDt — enemy time: slowed during Deltalite dilation
+    // Deltalite Time Dilation
     if (timeDilationTimer > 0) timeDilationTimer = Math.max(0, timeDilationTimer - dt);
     if (noAmmoCostTimer  > 0) noAmmoCostTimer  = Math.max(0, noAmmoCostTimer  - dt);
     const eDt = timeDilationTimer > 0 ? dt * 0.4 : dt;
 
-    // Update enemies
+    // Enemies
     enemies = enemies.filter(e => {
       updateEnemy(e, eDt);
-      // Bullet collision — player bullets only
+      // enemy hit collision
       for (let i = bullets.length - 1; i >= 0; i--) {
         const b = bullets[i];
         if (b.enemy) continue;
@@ -641,7 +632,7 @@ const Game = (() => {
       return e.y < H + 60;
     });
 
-    // Enemy bullets — move via vx/vy
+    // Enemy bullets
     bullets = bullets.filter(b => {
       if (!b.enemy) return true;
       b.x += (b.vx || 0) * eDt;
@@ -655,7 +646,7 @@ const Game = (() => {
       return b.x > -20 && b.x < W + 20 && b.y > -20 && b.y < H + 20;
     });
 
-    // Update mines
+    // Mines
     mines = mines.filter(m => {
       m.y += eDt * 40;
       if (m.drifting) m.x += Math.sin(m.t * 1.4) * 35 * eDt;
@@ -671,20 +662,19 @@ const Game = (() => {
       return m.y < H + 40;
     });
 
-    // Update powerup pods
+    // Powerup pods
     pods = pods.filter(pod => {
       pod.t += dt;
       pod.x += pod.vx * dt;
       pod.y += pod.vy * dt;
       pod.x += Math.sin(pod.t * pod.bobFreq) * pod.bobAmp * dt;
-      // Bullet collision — shoot to crack open
+      // Shoot to crack
       for (let i = bullets.length - 1; i >= 0; i--) {
         const b = bullets[i];
         if (b.enemy) continue;
         if (dist(b.x, b.y, pod.x, pod.y) < pod.r + 5) {
           bullets.splice(i, 1);
           spawnParticles(pod.x, pod.y, '#a855f7', 10);
-          // Release powerup drop
           drops.push({ x: pod.x, y: pod.y, key: pod.puKey, isPowerup: true, r: 13, t: 0 });
           return false;
         }
@@ -692,19 +682,19 @@ const Game = (() => {
       return pod.y < H + 60 && pod.t < 20;
     });
 
-    // Update drops — auto-attract toward ship in a parabolic arc
+    // Drop parabolic
     drops = drops.filter(d => {
       d.t += dt;
 
-      // Phase 1: brief "pop" upward on spawn (first 0.25s)
+      // Pop
       if (d.t < 0.25) {
         d.vy = d.vy || -120;
         d.vx = d.vx || (Math.random() - 0.5) * 60;
         d.x += d.vx * dt;
         d.y += d.vy * dt;
-        d.vy += 300 * dt; // gravity during pop
+        d.vy += 300 * dt; // gravity
       } else {
-        // Phase 2: curve toward ship (homing arc)
+        // Homing arc
         const dx = ship.x - d.x;
         const dy = ship.y - d.y;
         const distToShip = Math.sqrt(dx*dx + dy*dy);
@@ -723,7 +713,7 @@ const Game = (() => {
         collectDrop(d);
         return false;
       }
-      return d.y < H + 40 && d.t < 8; // expire after 8s if somehow missed
+      return d.y < H + 40 && d.t < 8; // expire after 8s
     });
 
     // Update particles
@@ -733,13 +723,13 @@ const Game = (() => {
       return p.life > 0;
     });
 
-    // Level-end sweep — clear remaining enemies/mines ~2s before level ends
+    // End level sweep
     if (!endSweepFired && enemiesSpawned >= maxEnemies && levelTimer >= levelDuration - 2) {
       endSweepFired = true;
       triggerSweep({ silent: false });
     }
 
-    // Level clear check — wait for sweep particles to settle then advance
+    // Level clear check
     if (levelTimer >= levelDuration && enemies.length === 0 && enemiesSpawned >= maxEnemies) {
       levelClear();
     }
@@ -799,7 +789,7 @@ const Game = (() => {
         }
       }
     },
-    // Swarmer — tiny pentagon sine-wave rammer
+    // Swarmer — pentagon sine-wave rammer
     {
       type:'swarmer', r:8, hp:1, color:'#ff2d78', speed:90,
       draw(ctx, e) {
@@ -883,13 +873,13 @@ const Game = (() => {
 
   function spawnEnemy() {
     const level = run.level;
-    // Weight table shifts with level — shooters rare early, more common later
+    // Weight table shifts with level
     const weights = [
-      level < 3 ? 6 : 3,                          // scout   — dominant early
-      level < 3 ? 0 : level < 5 ? 1 : 3,          // drone   — none L1-2, rare L3-4, normal L5+
-      level < 5 ? 3 : 5,                           // swarmer
-      level < 4 ? 0 : level < 6 ? 2 : 4,          // elite   — none L1-3, moderate L4-5, heavy L6+
-      level > 2 ? 2 : 0,                           // armored
+      level < 3 ? 6 : 3,                          // scout 
+      level < 3 ? 0 : level < 5 ? 1 : 3,          // drone 
+      level < 5 ? 3 : 5,                          // swarmer
+      level < 4 ? 0 : level < 6 ? 2 : 4,          // elite 
+      level > 2 ? 2 : 0,                          // armored
     ];
     const total = weights.reduce((a,b) => a+b, 0);
     let r = Math.random() * total;
@@ -905,7 +895,7 @@ const Game = (() => {
       t: 0,
       phase: Math.random() * Math.PI * 2,
       vx: (Math.random() - 0.5) * 80,
-      // Delay first shot more in early levels
+      // Delay first shot
       shootTimer: (3 - run.level * 0.2) + Math.random() * 2,
       hp: tmpl.hp + Math.floor(run.level * 0.5),
     };
@@ -932,7 +922,7 @@ const Game = (() => {
     spawnFloatingText(e.x, e.y, '+' + pts, e.color);
     updateScoreHUD();
     updateCombo();
-    // Paycheck credit drip
+    // Paycheck
     run.credits += Math.floor(pts * 0.02);
     // Drop chance
     if (Math.random() < 0.42 + run.level * 0.025) spawnDrop(e.x, e.y, e.type === 'elite');
@@ -949,7 +939,7 @@ const Game = (() => {
 
   function collectDrop(d) {
     if (d.isPowerup) {
-      // Try to fill a reserve slot
+      // Try to fill
       const activePuCount = run.powerups.filter(k => k != null).length;
       if (activePuCount < run.reserveMax) {
         // Find first null/empty slot; if none, push
@@ -996,19 +986,17 @@ const Game = (() => {
     const pool = [];
     function add(key, weight) { for (let i = 0; i < weight; i++) pool.push(key); }
 
-    // Base compounds — always available
-    add('BOMB',       6);
+    // Compounds
+    add('MAGNIUM',       6);
     add('LITHEBRYL', 6);
     add('NITROKALIUM',   6);
     add('CARBOSILICUM', 6);
 
-    // Newer compounds — from L2+
+    // More Compounds
     if (lvl >= 2) { add('TITANE', 4); add('ALKALIUM', 4); add('AZOLITHION', 4); add('GAMMITE', 4); }
 
-    // OMEGITE alloy — L4+ only, very rare (1 ticket vs ~28-36 others)
-    if (lvl >= 4) add('OMEGITE', 1);
-
-    // All other alloys (AXORITE, PHIOMEGA, DELTALITE) — not droppable yet
+    // Alloys
+    if (lvl >= 4) add('OMEGITE', 1); // All other alloys (AXORITE, PHIOMEGA, DELTALITE) go here
 
     const puKey = pool[Math.floor(Math.random() * pool.length)];
     const fromLeft = Math.random() < 0.5;
@@ -1075,8 +1063,8 @@ const Game = (() => {
     document.getElementById('overlay-clear').classList.add('active');
   }
 
-  // ── SWEEP — clears all enemies, mines & enemy bullets ───────
-  // opts.silent = true suppresses the log message (for Super Bomb variant etc.)
+  // ── SWEEP —───────────────────────────────────────────────────────
+  // opts.silent = true suppresses the log message
   function triggerSweep(opts = {}) {
     const silent = opts.silent || false;
     // Spawn burst particles at every enemy and mine position
@@ -1098,12 +1086,11 @@ const Game = (() => {
     const pu = run.powerups[idx];
     if (!pu) return;
     if (pu === 'OMEGITE') {
-      // Super Bomb — full sweep + massive particle burst + bonus score
       triggerSweep({ silent: true });
       spawnParticles(W / 2, H / 2, '#ff2d78', 40);
       spawnParticles(W / 2, H / 2, '#ffd700', 40);
       spawnParticles(W / 2, H / 2, '#a855f7', 40);
-      spawnFloatingText(W / 2, H / 2 - 50, 'Ω∞  OMEGITE', '#ff2d78');
+      spawnFloatingText(W / 2, H / 2 - 50, 'OMEGITE', '#ff2d78');
       logPickup('OMEGITE DEPLOYED');
     } else if (pu === 'MAGNIUM') {
       triggerSweep({ silent: false });
@@ -1117,33 +1104,33 @@ const Game = (() => {
       run.combo = Math.max(run.combo, 2); logPickup('×2 ACTIVE');
     } else if (pu === 'TITANE') {
       invincibleTimer = 10;
-      spawnFloatingText(W / 2, H / 2 - 30, 'Ti', '#5eead4');
+      spawnFloatingText(W / 2, H / 2 - 30, 'TITANE', '#5eead4');
       logPickup('INVINCIBLE 10s');
     } else if (pu === 'ALKALIUM') {
       piercingBullets = true;
-      spawnFloatingText(W / 2, H / 2 - 30, 'Alkalium', '#00f5ff');
-      logPickup('PIERCING BULLETS');
+      spawnFloatingText(W / 2, H / 2 - 30, 'ALKALIUM', '#00f5ff');
+      logPickup('PIERCING ACTIVE');
     } else if (pu === 'AXORITE') {
       run.shield = run.shieldMax; updateShieldBar();
       run.ammo   = run.ammoMax;  updateAmmoBar();
-      spawnFloatingText(W / 2, H / 2 - 30, 'Axorite', '#ffd700');
+      spawnFloatingText(W / 2, H / 2 - 30, 'AXORITE', '#ffd700');
       logPickup('FULL RESTORE');
     } else if (pu === 'PHIOMEGA') {
       run.bulletType = '12spread';
-      spawnFloatingText(W / 2, H / 2 - 30, 'Φ  12-SPREAD', '#a855f7');
-      logPickup('12-SPREAD ACTIVE');
+      spawnFloatingText(W / 2, H / 2 - 30, 'PHIOMEGA', '#a855f7');
+      logPickup('BURSTSHOT ACTIVE');
     } else if (pu === 'AZOLITHION') {
       run.bulletType = '3spread';
-      spawnFloatingText(W / 2, H / 2 - 30, 'Λ  3-SPREAD', '#00f5ff');
-      logPickup('3-SPREAD ACTIVE');
+      spawnFloatingText(W / 2, H / 2 - 30, 'AZOLITHION', '#00f5ff');
+      logPickup('MULTISHOT ACTIVE');
     } else if (pu === 'GAMMITE') {
       noAmmoCostTimer = 10;
-      spawnFloatingText(W / 2, H / 2 - 30, 'Γ  NO AMMO COST', '#ffd700');
-      logPickup('NO AMMO COST 10s');
+      spawnFloatingText(W / 2, H / 2 - 30, 'GAMMITE', '#ffd700');
+      logPickup('NO AMMO COST');
     } else if (pu === 'DELTALITE') {
       timeDilationTimer = 15;
-      spawnFloatingText(W / 2, H / 2 - 30, 'Deltalite', '#a855f7');
-      logPickup('TIME DILATION 15s');
+      spawnFloatingText(W / 2, H / 2 - 30, 'DELTALITE', '#a855f7');
+      logPickup('TIME DILATION');
     }
     run.powerups.splice(idx, 1);
     updatePowerupBar();
