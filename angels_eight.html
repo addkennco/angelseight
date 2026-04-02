@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Angel's Eight</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Monoton&family=VT323&family=Mrs+Saint+Delafield&display=swap');
+
+  :root {
+    --bg:       #050510;
+    --bg2:      #0a0a20;
+    --pink:     #ff2d78;
+    --cyan:     #00f5ff;
+    --purple:   #a855f7;
+    --gold:     #ffd700;
+    --dim:      #ffffff22;
+    --mono:     'VT323', monospace;
+    --display:  'Monoton', sans-serif;
+    --cursive:  'Mrs Saint Delafield', cursive;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    width:100%; height:100%;
+    background: var(--bg);
+    color: #fff;
+    font-family: var(--mono);
+    overflow: hidden;
+    touch-action: none;
+  }
+
+  /* ── SCREENS ── */
+  .screen { position:absolute; inset:0; display:none; flex-direction:column; align-items:center; justify-content:center; overflow:visible; }
+  .screen.active { display:flex; }
+
+  /* ── SCANLINE OVERLAY ── */
+  body::after {
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:999;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px);
+  }
+
+  /* ════════════════════════════════════
+     MAIN MENU
+  ════════════════════════════════════ */
+  #screen-menu {
+    background: radial-gradient(ellipse at 50% 30%, #1a0a3a 0%, #050510 70%);
+  }
+
+  .menu-bg-canvas {
+    position: absolute; inset:0; opacity: 0.35;
+  }
+
+  .menu-content {
+    position: relative; z-index:10;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 0;
+  }
+
+  .menu-eyebrow {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.4em;
+    color: var(--cyan);
+    opacity: 0.7;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+
+  .menu-title-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 6px;
+  }
+
+  .menu-title {
+    font-family: var(--display);
+    font-size: clamp(42px, 12vw, 88px);
+    font-weight: 900;
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    text-align: center;
+    background: linear-gradient(135deg, var(--cyan) 0%, var(--purple) 50%, var(--pink) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 40px rgba(168,85,247,0.4));
+    padding: 12px 16px;
+    margin-bottom: 0px;
+  }
+
+  .menu-cursive {
+    font-family: var(--cursive);
+    font-size: clamp(38px, 8.5vw, 72px);
+    color: var(--pink);
+    letter-spacing: 0.01em;
+    text-shadow: 0 0 24px rgba(255,45,120,0.8), 0 0 60px rgba(168,85,247,0.5);
+    line-height: 1;
+    position: absolute;
+    z-index: 2;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  .menu-sub {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    color: rgba(255,255,255,0.35);
+    margin-bottom: 52px;
+  }
+
+  .menu-score-block {
+    display: flex; flex-direction: column; align-items: center;
+    margin-bottom: 40px;
+    border: 1px solid var(--dim);
+    padding: 12px 32px;
+    position: relative;
+  }
+  .menu-score-block::before {
+    content: 'HIGH SCORE';
+    position: absolute; top:-8px; left:50%; transform:translateX(-50%);
+    background: var(--bg); padding: 0 8px;
+    font-size: 9px; letter-spacing: 0.3em; color: var(--cyan); opacity: 0.6;
+  }
+  .menu-score-val {
+    font-family: var(--display);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--gold);
+  }
+
+  .menu-coords {
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: rgba(255,255,255,0.2);
+    margin-bottom: 48px;
+    min-height: 14px;
+  }
+
+  .btn-primary {
+    font-family: var(--display);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--bg);
+    background: linear-gradient(135deg, var(--cyan), var(--purple));
+    border: none;
+    padding: 16px 48px;
+    cursor: pointer;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    transition: filter 0.2s, transform 0.1s;
+    margin-bottom: 16px;
+  }
+  .btn-primary:active { transform: scale(0.97); filter: brightness(0.85); }
+
+  /* ── LAUNCH sweep button ── */
+  .btn-launch {
+    font-family: var(--display);
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 0.2em;
+    color: var(--cyan);
+    border: 2px solid var(--cyan);
+    padding: 16px 48px;
+    cursor: pointer;
+    background: transparent;
+    position: relative;
+    transition: all 1s;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .btn-launch:hover { color: var(--bg); }
+  .btn-launch::before {
+    content: "";
+    position: absolute;
+    height: 100%;
+    width: 0%;
+    top: 0;
+    left: -40px;
+    transform: skewX(45deg);
+    background-color: var(--cyan);
+    z-index: -1;
+    transition: all 1s;
+  }
+  .btn-launch:hover::before { width: 160%; }
+  .btn-launch:active { transform: scale(0.97); }
+
+  .btn-secondary {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.4);
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.12);
+    padding: 10px 28px;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .btn-secondary:active { color: var(--cyan); border-color: var(--cyan); }
+
+  /* ════════════════════════════════════
+     GAME SCREEN
+  ════════════════════════════════════ */
+  #screen-game {
+    background: var(--bg);
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  #game-canvas {
+    display: block;
+    touch-action: none;
+    cursor: none;
+  }
+
+  /* HUD overlay */
+  #hud {
+    position: absolute;
+    top:0; left:0; right:0;
+    padding: 10px 14px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .hud-left, .hud-right { display:flex; flex-direction:column; gap:4px; }
+  .hud-center { display:flex; flex-direction:column; align-items:center; gap:3px; }
+
+  .hud-label {
+    font-size: 8px; letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.3); text-transform:uppercase;
+  }
+  .hud-value {
+    font-family: var(--display);
+    font-size: 18px; font-weight:700;
+    color: var(--cyan);
+    line-height:1;
+  }
+  .hud-value.gold { color: var(--gold); }
+  .hud-value.pink { color: var(--pink); }
+
+  .hud-bar-wrap { width: 90px; }
+  .hud-bar {
+    height: 4px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 3px;
+  }
+  .hud-bar-fill {
+    height:100%; border-radius:2px;
+    transition: width 0.15s;
+  }
+  .shield-fill { background: linear-gradient(90deg, var(--cyan), var(--purple)); }
+  .ammo-fill   { background: linear-gradient(90deg, var(--pink), var(--gold)); }
+
+  /* Combo */
+  .hud-combo {
+    font-family: var(--display);
+    font-size: 11px; font-weight:700;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .hud-combo.active { opacity:1; }
+
+  /* Radio tuner */
+  #radio-tuner {
+    position: absolute;
+    bottom: 110px; right: 14px;
+    z-index: 20;
+    pointer-events: all;
+    display: flex; flex-direction:column; align-items:center; gap:4px;
+    touch-action: none;
+  }
+  .radio-label { font-size:7px; letter-spacing:0.25em; color:rgba(255,255,255,0.3); }
+  .radio-dial {
+    width: 44px; height: 44px;
+    border: 1px solid rgba(0,245,255,0.3);
+    border-radius: 50%;
+    display: flex; align-items:center; justify-content:center;
+    position: relative;
+    background: rgba(0,245,255,0.04);
+  }
+  .radio-needle {
+    position:absolute;
+    width:2px; height:14px;
+    background: var(--cyan);
+    top: 5px; left: 50%; transform-origin: bottom center;
+    transform: translateX(-50%) rotate(0deg);
+    transition: transform 0.2s;
+    border-radius: 1px;
+  }
+  .radio-track-name {
+    font-size: 8px; color: var(--cyan); opacity:0.7;
+    letter-spacing:0.1em; max-width:60px; text-align:center;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  /* Powerup slots */
+  .pu-slot {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(255,255,255,0.15);
+    display: flex; align-items:center; justify-content:center;
+    font-size: 8px; letter-spacing:0.05em;
+    color: rgba(255,255,255,0.5);
+    clip-path: polygon(5px 0%, 100% 0%, calc(100% - 5px) 100%, 0% 100%);
+    background: rgba(255,255,255,0.03);
+    cursor: pointer;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .pu-slot.filled {
+    border-color: rgba(168,85,247,0.6);
+    background: rgba(168,85,247,0.1);
+    color: #fff;
+  }
+  .pu-slot-sym { font-family: var(--display); font-size:11px; font-weight:700; color: var(--purple); }
+  .pu-slot-name { font-size: 5px; letter-spacing:0.05em; color:rgba(255,255,255,0.4); text-align:center; line-height:1.2; }
+
+  /* Powerup bar wrapper */
+  #powerup-bar {
+    position: absolute;
+    bottom: 14px; left:50%; transform:translateX(-50%);
+    display: flex; flex-direction: column; align-items: center;
+    gap: 4px;
+    z-index: 20;
+    pointer-events: all;
+  }
+  #pu-slots { display: flex; gap: 6px; }
+
+  /* Stash box */
+  #pu-stash {
+    width: 122px; height: 20px;
+    border: 1px dashed rgba(168,85,247,0.35);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 6px; letter-spacing: 0.25em;
+    color: rgba(168,85,247,0.45);
+    background: rgba(168,85,247,0.04);
+    clip-path: polygon(4px 0%, 100% 0%, calc(100% - 4px) 100%, 0% 100%);
+    transition: background 0.2s, border-color 0.2s;
+    user-select: none;
+  }
+  #pu-stash.flash {
+    background: rgba(168,85,247,0.28);
+    border-color: rgba(168,85,247,1);
+    color: rgba(168,85,247,1);
+  }
+  #pu-stash.drag-over {
+    background: rgba(168,85,247,0.15);
+    border-color: rgba(168,85,247,0.8);
+    color: rgba(168,85,247,0.9);
+  }
+
+  /* Pickup log */
+  #pickup-log {
+    position: absolute;
+    bottom: 100px; left: 14px;
+    z-index: 10; pointer-events:none;
+    display: flex; flex-direction: column-reverse; gap: 3px;
+  }
+  .pickup-entry {
+    font-size: 9px; letter-spacing:0.1em;
+    color: var(--cyan); opacity:0;
+    animation: fadeLog 3s ease forwards;
+  }
+  @keyframes fadeLog {
+    0%   { opacity:0; transform:translateX(-6px); }
+    10%  { opacity:1; transform:translateX(0); }
+    70%  { opacity:1; }
+    100% { opacity:0; }
+  }
+
+  /* Pause / death overlays */
+  .game-overlay {
+    position: absolute; inset:0;
+    background: rgba(5,5,16,0.88);
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    z-index: 50; gap:16px;
+    display:none;
+  }
+  .game-overlay.active { display:flex; }
+  .overlay-title {
+    font-family: var(--display);
+    font-size: clamp(28px, 8vw, 52px);
+    font-weight:900; letter-spacing:0.05em;
+  }
+  .overlay-sub { font-size:11px; letter-spacing:0.2em; color:rgba(255,255,255,0.4); }
+  .overlay-score { font-family:var(--mono); font-size:20px; color:var(--gold); }
+
+  /* ════════════════════════════════════
+     SHOP SCREEN
+  ════════════════════════════════════ */
+  #screen-shop {
+    background:
+      linear-gradient(rgba(0,245,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,245,255,0.04) 1px, transparent 1px),
+      radial-gradient(ellipse at 50% 0%, #0f0525 0%, #050510 60%);
+    background-size: 40px 40px, 40px 40px, 100% 100%;
+    justify-content: flex-start;
+    align-items: stretch;
+    overflow: hidden;
+  }
+
+  /* ── header ── */
+  .shop-header {
+    width:100%; padding: 12px 14px 10px;
+    display:flex; align-items:center; justify-content:space-between;
+    border-bottom: 1px solid var(--dim);
+    flex-shrink:0;
+  }
+  .shop-title { font-family:var(--display); font-size:14px; font-weight:700; color:var(--purple); letter-spacing:0.1em; }
+  .shop-credits { font-family:var(--display); font-size:13px; color:var(--gold); }
+  .shop-level-badge { font-size:8px; letter-spacing:0.2em; color:rgba(255,255,255,0.3); }
+
+  /* ── 70s Supergraphic ── */
+  .supergraphic {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    gap: 0;
+    line-height: 0;
+    font-size: 0;
+  }
+  .sg-orange { background: #e8600a; height: 5px; }
+  .sg-pink   { background: #d42b6a; height: 7px; }
+  .sg-purple { background: #5b1a8a; height: 10px; }
+  .sg-black  { background: #0e0b12; height: 15px; }
+
+  /* ── two-column body ── */
+  .shop-layout {
+    flex:1; display:grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  /* LEFT — inventory tabs + scrollable content */
+  .shop-left {
+    display:flex; flex-direction:column;
+    border-right: 1px solid var(--dim);
+    overflow: hidden;
+  }
+  .shop-tabs {
+    display:flex; flex-shrink:0;
+    border-bottom: 1px solid var(--dim);
+  }
+  .shop-tab-btn {
+    flex:1; padding:9px 0;
+    font-family:var(--mono); font-size:8px; letter-spacing:0.18em;
+    color:rgba(255,255,255,0.35);
+    background:transparent; border:none; cursor:pointer;
+    text-transform:uppercase; transition:color 0.15s;
+  }
+  .shop-tab-btn.active { color:var(--cyan); border-bottom:2px solid var(--cyan); margin-bottom:-1px; }
+  .shop-scroll {
+    flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;
+    padding: 10px 10px 16px;
+    display:flex; flex-direction:column; gap:10px;
+  }
+
+  .shop-section-label {
+    font-size:7px; letter-spacing:0.35em; color:rgba(255,255,255,0.3);
+    text-transform:uppercase; margin-bottom:4px;
+  }
+  .shop-grid { display:grid; grid-template-columns: repeat(2,1fr); gap:6px; }
+  .shop-card {
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 8px 6px;
+    display:flex; flex-direction:column; gap:3px;
+    cursor:pointer;
+    background: rgba(255,255,255,0.02);
+    transition: border-color 0.15s, background 0.15s;
+    position:relative;
+  }
+  .shop-card:active { border-color: var(--purple); background: rgba(168,85,247,0.08); }
+  .shop-card-sym { font-family:var(--display); font-size:15px; font-weight:700; color:var(--cyan); }
+  .shop-card-name { font-size:8px; font-weight:700; color:#fff; letter-spacing:0.04em; }
+  .shop-card-effect { font-size:7px; color:rgba(255,255,255,0.4); line-height:1.4; }
+  .shop-card-count { font-size:7px; color:rgba(255,255,255,0.3); }
+  .shop-card-price { font-family:var(--display); font-size:9px; color:var(--gold); margin-top:2px; }
+  .shop-card-corner { position:absolute; top:5px; right:5px; display:flex; flex-direction:column; align-items:flex-end; gap:1px; }
+
+  /* ── Info panel ── */
+  .shop-info {
+    border: 1px solid var(--dim);
+    position: relative;
+    padding: 10px 8px 8px;
+    min-height: 90px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .shop-info::before {
+    content: 'INFO'; position: absolute; top: -7px; left: 8px;
+    background: #0a0a20; padding: 0 5px;
+    font-size: 7px; letter-spacing: 0.3em; color: var(--cyan); opacity: 0.6;
+  }
+  .shop-info-empty {
+    font-size: 8px; letter-spacing: 0.15em;
+    color: rgba(255,255,255,0.15);
+    text-align: center;
+    margin: auto;
+  }
+  .shop-info-sym {
+    font-family: var(--display); font-size: 18px; font-weight: 700;
+    color: var(--cyan); line-height: 1;
+  }
+  .shop-info-sym.compound { color: var(--purple); }
+  .shop-info-sym.alloy    { color: var(--pink); }
+  .shop-info-name {
+    font-size: 9px; font-weight: 700; color: #fff; letter-spacing: 0.06em;
+  }
+  .shop-info-effect {
+    font-size: 7px; color: var(--gold); letter-spacing: 0.04em; line-height: 1.5;
+  }
+  .shop-info-recipe {
+    font-size: 7px; color: rgba(255,255,255,0.35); letter-spacing: 0.04em; line-height: 1.5;
+  }
+  .shop-info-desc {
+    font-size: 7px; color: rgba(255,255,255,0.4); line-height: 1.5;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding-top: 4px; margin-top: 2px;
+  }
+  .shop-info-price {
+    font-family: var(--display); font-size: 8px; color: var(--gold);
+    margin-top: auto;
+  }
+
+  /* ── Action box stand-in ── */
+  .shop-action-box {
+    border: 1px dashed rgba(255,255,255,0.12);
+    display: flex; align-items: center; justify-content: center;
+    height: 36px;
+    font-size: 7px; letter-spacing: 0.3em;
+    color: rgba(255,255,255,0.18);
+    flex-shrink: 0;
+  }
+  .shop-action-box.buy-box    { border-color: rgba(0,245,255,0.2);   color: rgba(0,245,255,0.3); }
+  .shop-action-box.sell-box   { border-color: rgba(255,45,120,0.2);  color: rgba(255,45,120,0.3); }
+  .shop-action-box.craft-box  { border-color: rgba(168,85,247,0.2);  color: rgba(168,85,247,0.3); }
+  .shop-action-box.drag-over  { background: rgba(255,255,255,0.06); border-style: solid; color: #fff; }
+
+  /* Stripped card — no effect text, tighter */
+  .shop-card.slim {
+    padding: 6px 6px;
+    gap: 1px;
+  }
+  .shop-card.slim .shop-card-sym { font-size: 13px; }
+  .shop-card.slim .shop-card-name { font-size: 7px; }
+  .shop-card.slim.selected {
+    border-color: var(--cyan);
+    background: rgba(0,245,255,0.06);
+  }
+  .shop-card.slim.selected .shop-card-sym { color: var(--gold); }
+
+  /* Stash inventory states */
+  .shop-card.stash-empty {
+    background: rgba(255,255,255,0.008);
+    border-color: rgba(255,255,255,0.05);
+    cursor: default;
+  }
+  .shop-card.stash-empty .shop-card-sym  { color: rgba(255,255,255,0.15); }
+  .shop-card.stash-empty .shop-card-name { color: rgba(255,255,255,0.18); }
+  .shop-card.stash-empty .shop-card-effect { color: rgba(255,255,255,0.1); }
+  .shop-card.stash-empty .stash-count    { color: rgba(255,255,255,0.18); }
+  .shop-card.stash-has .stash-count {
+    font-family: var(--display); font-size:13px; font-weight:700;
+    color: var(--cyan);
+  }
+  .shop-card.stash-has.pu-card .stash-count { color: var(--purple); }
+  .stash-count {
+    position:absolute; top:5px; right:5px;
+    font-size:7px; letter-spacing:0.05em;
+  }
+
+  /* Shop drag states */
+  .shop-card.drag-source {
+    opacity: 0.45;
+    border-color: var(--purple);
+  }
+  .shop-reserve-slot.drag-over {
+    border-color: var(--cyan);
+    background: rgba(0,245,255,0.12);
+  }
+  .shop-reserve-slot.drag-over-full {
+    border-color: var(--pink);
+    background: rgba(255,45,120,0.08);
+  }
+  /* Ghost dragged card */
+  #shop-drag-ghost {
+    position: fixed; pointer-events:none; z-index:9999;
+    opacity: 0.85; transform: translate(-50%,-50%) scale(1.08);
+    border: 1px solid var(--cyan);
+    background: rgba(0,245,255,0.12);
+    padding: 8px 6px; width: 80px;
+    display:flex; flex-direction:column; gap:3px;
+    font-family: var(--mono);
+  }
+  #shop-drag-ghost .ghost-sym  { font-family:var(--display); font-size:14px; font-weight:700; color:var(--purple); }
+  #shop-drag-ghost .ghost-name { font-size:7px; color:rgba(255,255,255,0.7); letter-spacing:0.04em; }
+
+  /* RIGHT — stats + reserves + launch */
+  .shop-right {
+    display:flex; flex-direction:column;
+    padding: 10px 10px 10px;
+    gap: 10px;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Stats block */
+  .shop-stats {
+    border: 1px solid var(--dim);
+    position:relative;
+  }
+  .shop-stats::before {
+    content:'STATS — DRAG ELEMENTS TO BUFF'; position:absolute; top:-7px; left:8px;
+    background: #0a0a20; padding:0 5px;
+    font-size:7px; letter-spacing:0.3em; color:var(--cyan); opacity:0.6;
+  }
+  .shop-stats.drag-over {
+    border-color: rgba(0,245,255,0.5);
+    background: rgba(0,245,255,0.04);
+  }
+  .shop-stats.drag-over::before { opacity: 1; }
+  .shop-stat-row {
+    display:flex; justify-content:space-between; align-items:baseline;
+    padding: 6px 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .shop-stat-row:last-child { border-bottom:none; }
+  .shop-stat-label {
+    font-size:7px; letter-spacing:0.15em; color:rgba(255,255,255,0.4);
+    text-transform:uppercase; line-height:1.3;
+  }
+  .shop-stat-val {
+    font-family:var(--display); font-size:13px; font-weight:700; color:var(--cyan);
+  }
+  .shop-stat-max { font-size:6px; color:rgba(255,255,255,0.2); margin-left:3px; }
+  .shop-stat-bar {
+    width:100%; height:2px; background:rgba(255,255,255,0.08);
+    border-radius:1px; margin-top:3px; overflow:hidden;
+  }
+  .shop-stat-bar-fill { height:100%; border-radius:1px; background: linear-gradient(90deg,var(--cyan),var(--purple)); }
+
+  /* Reserves block */
+  .shop-reserves {
+    border: 1px solid var(--dim);
+    position:relative; padding: 10px 8px 8px;
+  }
+  .shop-reserves::before {
+    content:'RESERVES'; position:absolute; top:-7px; left:8px;
+    background: #0a0a20; padding:0 5px;
+    font-size:7px; letter-spacing:0.3em; color:var(--purple); opacity:0.6;
+  }
+  .shop-reserve-slots {
+    display:flex; flex-wrap:wrap; gap:5px;
+  }
+  .shop-reserve-slot {
+    width:32px; height:32px;
+    border:1px solid rgba(168,85,247,0.25);
+    display:flex; align-items:center; justify-content:center;
+    clip-path: polygon(4px 0%,100% 0%,calc(100% - 4px) 100%,0% 100%);
+    background:rgba(168,85,247,0.04);
+    font-size:7px; color:rgba(168,85,247,0.4);
+    flex-direction:column; gap:1px;
+  }
+  .shop-reserve-slot.filled {
+    border-color:rgba(168,85,247,0.7); background:rgba(168,85,247,0.12);
+  }
+  .shop-reserve-sym { font-family:var(--display); font-size:12px; font-weight:700; color:var(--purple); }
+  .shop-reserve-name { font-size:5px; letter-spacing:0.04em; color:rgba(255,255,255,0.35); text-align:center; }
+
+  /* Launch button */
+  .shop-launch {
+    font-family: var(--display); font-size: 12px; font-weight: bold;
+    letter-spacing: 0.18em; color: var(--cyan);
+    border: 2px solid var(--cyan); padding: 13px 0; cursor: pointer;
+    background: transparent;
+    position: relative;
+    transition: all 1s;
+    overflow: hidden;
+    margin-top: auto;
+  }
+  .shop-launch:hover { color: var(--bg); }
+  .shop-launch::before {
+    content: "";
+    position: absolute;
+    height: 100%;
+    width: 0%;
+    top: 0;
+    left: -40px;
+    transform: skewX(45deg);
+    background-color: var(--cyan);
+    z-index: -1;
+    transition: all 1s;
+  }
+  .shop-launch:hover::before { width: 160%; }
+  .shop-launch:active { transform: scale(0.97); }
+
+  /* Stash button */
+  .shop-stash-btn {
+    font-family:var(--mono); font-size:8px; letter-spacing:0.2em;
+    color:rgba(255,255,255,0.4); background:transparent;
+    border:1px solid rgba(255,255,255,0.12); padding:9px 0;
+    cursor:pointer; transition:color 0.2s,border-color 0.2s;
+  }
+  .shop-stash-btn:active { color:var(--purple); border-color:var(--purple); }
+
+  /* Story screen */
+  #screen-story {
+    background: var(--bg);
+    text-align:center;
+    padding: 40px 32px;
+    gap:24px;
+  }
+  .story-level { font-size:9px; letter-spacing:0.4em; color:rgba(255,255,255,0.2); }
+  .story-text {
+    font-family:var(--mono); font-size:15px; line-height:1.8;
+    color:rgba(255,255,255,0.7);
+    max-width:280px;
+    animation: fadeIn 1.2s ease;
+  }
+  .story-coords { font-size:11px; color:var(--cyan); opacity:0.5; letter-spacing:0.2em; min-height:18px; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     MAIN MENU
+══════════════════════════════════════ -->
+<div id="screen-menu" class="screen active">
+  <canvas class="menu-bg-canvas" id="menu-bg"></canvas>
+  <div class="menu-content">
+    <div class="menu-eyebrow">TRANSMISSION INCOMING</div>
+    <div class="menu-title-wrap">
+      <div class="menu-title"><br>EIGHT</div>
+      <div class="menu-cursive">Angel's</div>
+    </div>
+    <div class="menu-sub"> </div>
+    <div class="menu-score-block">
+      <div class="menu-score-val" id="menu-highscore">000000</div>
+    </div>
+    <div class="menu-coords" id="menu-coords"> ∅ ⊷ ☈ ⏦ ☰ ⚸ ⏛ ☊ </div>
+    <button class="btn-launch" id="btn-start">LAUNCH</button>
+    <button class="btn-secondary" id="btn-shop-menu">SHOP / CUSTOMIZE</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     GAME SCREEN
+══════════════════════════════════════ -->
+<div id="screen-game" class="screen">
+  <canvas id="game-canvas"></canvas>
+
+  <!-- HUD -->
+  <div id="hud">
+    <div class="hud-left">
+      <div class="hud-label">SCORE</div>
+      <div class="hud-value" id="hud-score">0</div>
+      <div class="hud-combo" id="hud-combo">× 1</div>
+    </div>
+    <div class="hud-center">
+      <div class="hud-label">LEVEL</div>
+      <div class="hud-value" id="hud-level">1</div>
+    </div>
+    <div class="hud-right">
+      <div class="hud-label">BEST</div>
+      <div class="hud-value gold" id="hud-best">0</div>
+      <div style="margin-top:6px">
+        <div class="hud-label">SHIELD</div>
+        <div class="hud-bar-wrap">
+          <div class="hud-bar"><div class="hud-bar-fill shield-fill" id="shield-bar" style="width:100%"></div></div>
+        </div>
+      </div>
+      <div style="margin-top:4px">
+        <div class="hud-label">AMMO</div>
+        <div class="hud-bar-wrap">
+          <div class="hud-bar"><div class="hud-bar-fill ammo-fill" id="ammo-bar" style="width:100%"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Radio -->
+  <div id="radio-tuner">
+    <div class="radio-label">RADIO</div>
+    <div class="radio-dial">
+      <div class="radio-needle" id="radio-needle"></div>
+    </div>
+    <div class="radio-track-name" id="radio-track-name">TRACK 1</div>
+  </div>
+
+  <!-- Powerup bar -->
+  <div id="powerup-bar">
+    <div id="pu-slots">
+      <div class="pu-slot" id="pu-0"><span class="pu-slot-name">EMPTY</span></div>
+      <div class="pu-slot" id="pu-1"><span class="pu-slot-name">EMPTY</span></div>
+      <div class="pu-slot" id="pu-2"><span class="pu-slot-name">EMPTY</span></div>
+    </div>
+    <div id="pu-stash">STASH</div>
+  </div>
+
+  <!-- Pickup log -->
+  <div id="pickup-log"></div>
+
+  <!-- Death overlay -->
+  <div class="game-overlay" id="overlay-death">
+    <div class="overlay-title" style="color:var(--pink)">SIGNAL LOST</div>
+    <div class="overlay-sub">RUN TERMINATED</div>
+    <div class="overlay-score" id="death-score"></div>
+    <button class="btn-primary" id="btn-retry" style="margin-top:8px">TRY AGAIN</button>
+    <button class="btn-secondary" id="btn-menu-from-death" style="margin-top:4px">MAIN MENU</button>
+  </div>
+
+  <!-- Level clear overlay -->
+  <div class="game-overlay" id="overlay-clear">
+    <div class="overlay-title" style="color:var(--cyan)">SECTOR CLEAR</div>
+    <div class="overlay-sub" id="clear-sub">LEVEL 1 COMPLETE</div>
+    <div class="overlay-score" id="clear-score"></div>
+    <button class="btn-primary" id="btn-to-story">CONTINUE</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     STORY SCREEN
+══════════════════════════════════════ -->
+<div id="screen-story" class="screen">
+  <div class="story-level" id="story-level-label">LEVEL 1 COMPLETE</div>
+  <div class="story-text" id="story-text"></div>
+  <div class="story-coords" id="story-coords"></div>
+  <button class="btn-launch" id="btn-to-shop" style="margin-top:8px">ENTER SHOP</button>
+  <button class="btn-launch" id="btn-story-launch" style="margin-top:8px">LAUNCH ›</button>
+</div>
+
+<!-- ══════════════════════════════════════
+     SHOP SCREEN
+══════════════════════════════════════ -->
+<div id="screen-shop" class="screen">
+
+  <!-- Header -->
+  <div class="shop-header">
+    <div>
+      <div class="shop-title">FUSION SHOP</div>
+      <div class="shop-level-badge" id="shop-level-badge">AFTER LEVEL 1</div>
+    </div>
+    <div style="text-align:right">
+      <div style="font-size:7px;letter-spacing:0.2em;color:rgba(255,255,255,0.3)">CREDITS</div>
+      <div class="shop-credits" id="shop-credits">0</div>
+    </div>
+  </div>
+
+  <!-- 70s Supergraphic -->
+  <div class="supergraphic">
+    <div class="sg-orange"></div>
+    <div class="sg-pink"></div>
+    <div class="sg-purple"></div>
+    <div class="sg-black"></div>
+  </div>
+
+  <!-- Two-column body -->
+  <div class="shop-layout">
+
+    <!-- LEFT — inventory -->
+    <div class="shop-left">
+      <div class="shop-tabs">
+        <button class="shop-tab-btn active" id="tab-buy"   onclick="shopTab('buy')">BUY</button>
+        <button class="shop-tab-btn"        id="tab-sell"  onclick="shopTab('sell')">SELL</button>
+        <button class="shop-tab-btn"        id="tab-craft" onclick="shopTab('craft')">CRAFT</button>
+        <button class="shop-tab-btn"        id="tab-stash" onclick="shopTab('stash')">STASH</button>
+      </div>
+      <div class="shop-scroll" id="shop-body"></div>
+    </div>
+
+    <!-- RIGHT — stats + reserves + launch -->
+    <div class="shop-right">
+
+      <!-- Stats block -->
+      <div class="shop-stats" id="shop-stats-block">
+        <div class="shop-stat-row">
+          <div>
+            <div class="shop-stat-label">SHOOT SPEED</div>
+            <div class="shop-stat-bar"><div class="shop-stat-bar-fill" id="stat-bar-speed" style="width:25%"></div></div>
+          </div>
+          <div style="text-align:right">
+            <span class="shop-stat-val" id="stat-val-speed">3</span>
+            <span class="shop-stat-max">/s</span>
+          </div>
+        </div>
+        <div class="shop-stat-row">
+          <div>
+            <div class="shop-stat-label">AMMO MAX</div>
+            <div class="shop-stat-bar"><div class="shop-stat-bar-fill" id="stat-bar-ammo" style="width:25%"></div></div>
+          </div>
+          <div style="text-align:right">
+            <span class="shop-stat-val" id="stat-val-ammo">50</span>
+            <span class="shop-stat-max">/200</span>
+          </div>
+        </div>
+        <div class="shop-stat-row">
+          <div>
+            <div class="shop-stat-label">SHIELD MAX</div>
+            <div class="shop-stat-bar"><div class="shop-stat-bar-fill" id="stat-bar-shield" style="width:20%"></div></div>
+          </div>
+          <div style="text-align:right">
+            <span class="shop-stat-val" id="stat-val-shield">10</span>
+            <span class="shop-stat-max">/50</span>
+          </div>
+        </div>
+        <div class="shop-stat-row">
+          <div>
+            <div class="shop-stat-label">RESERVES</div>
+            <div class="shop-stat-bar"><div class="shop-stat-bar-fill" id="stat-bar-reserve" style="width:37%"></div></div>
+          </div>
+          <div style="text-align:right">
+            <span class="shop-stat-val" id="stat-val-reserve">3</span>
+            <span class="shop-stat-max">/8</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info panel -->
+      <div class="shop-info" id="shop-info-panel">
+        <div class="shop-info-empty">TAP ANY CARD FOR INFO</div>
+      </div>
+
+      <!-- Action box (stand-in — tab-aware label, no logic yet) -->
+      <div class="shop-action-box buy-box" id="shop-action-box">DRAG TO BUY</div>
+
+      <!-- Reserves block -->
+      <div class="shop-reserves">
+        <div class="shop-reserve-slots" id="shop-reserve-slots"></div>
+      </div>
+
+      <!-- Launch -->
+      <button class="shop-launch" id="btn-shop-launch" onclick="shopContinue()">LAUNCH ›</button>
+
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script> 
+</body>
+</html>
+
