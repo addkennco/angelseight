@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Angel's Eight</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Monoton&family=VT323&family=Mrs+Saint+Delafield&display=swap');
+
+  :root {
+    --bg:       #050510;
+    --bg2:      #0a0a20;
+    --pink:     #ff2d78;
+    --cyan:     #00f5ff;
+    --purple:   #a855f7;
+    --gold:     #ffd700;
+    --dim:      #ffffff22;
+    --mono:     'VT323', monospace;
+    --display:  'Monoton', sans-serif;
+    --cursive:  'Mrs Saint Delafield', cursive;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    width:100%; height:100%;
+    background: var(--bg);
+    color: #fff;
+    font-family: var(--mono);
+    overflow: hidden;
+    touch-action: none;
+  }
+
+  /* ── SCREENS ── */
+  .screen { position:absolute; inset:0; display:none; flex-direction:column; align-items:center; justify-content:center; overflow:visible; }
+  .screen.active { display:flex; }
+
+  /* ── SCANLINE OVERLAY ── */
+  body::after {
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:999;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px);
+  }
+
+  /* ════════════════════════════════════
+     MAIN MENU
+  ════════════════════════════════════ */
+  #screen-menu {
+    background: radial-gradient(ellipse at 50% 30%, #1a0a3a 0%, #050510 70%);
+  }
+
+  .menu-bg-canvas {
+    position: absolute; inset:0; opacity: 0.35;
+  }
+
+  /* Canvas for scanimate text effect */
+  #scanimate-canvas {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    pointer-events: none;
+  }
+
+  .menu-content {
+    position: relative; z-index:10;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 0;
+  }
+
+  .menu-title-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 6px;
+  }
+
+  /* Hidden reference for sizing — rendered to canvas instead */
+  .menu-title {
+    font-family: var(--display);
+    font-size: clamp(42px, 12vw, 88px);
+    font-weight: 900;
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    text-align: center;
+    background: linear-gradient(135deg, var(--cyan) 0%, var(--purple) 50%, var(--pink) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 40px rgba(168,85,247,0.4));
+    padding: 12px 16px;
+    margin-bottom: 0px;
+    visibility: hidden; /* hidden — canvas draws it */
+  }
+
+  .menu-cursive {
+    font-family: var(--cursive);
+    font-size: clamp(38px, 8.5vw, 72px);
+    color: var(--pink);
+    letter-spacing: 0.01em;
+    text-shadow: 0 0 24px rgba(255,45,120,0.8), 0 0 60px rgba(168,85,247,0.5);
+    line-height: 1;
+    position: absolute;
+    z-index: 2;
+    pointer-events: none;
+    white-space: nowrap;
+    visibility: hidden; /* hidden — canvas draws it */
+  }
+</style>
+</head>
+<body>
+
+  <div id="screen-menu" class="screen active">
+    <canvas class="menu-bg-canvas" id="menu-bg"></canvas>
+    <canvas id="scanimate-canvas"></canvas>
+
+    <!-- These exist only for layout reference / font loading -->
+    <div class="menu-content">
+      <div class="menu-title-wrap">
+        <div class="menu-title" id="title-ref"><br>EIGHT</div>
+        <div class="menu-cursive" id="cursive-ref">Angel's</div>
+      </div>
+    </div>
+  </div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// GHOST TESSERACT BACKGROUND
+// ═══════════════════════════════════════════════════════════════
+(function ghostTesseract() {
+  const canvas = document.getElementById('menu-bg');
+  const ctx = canvas.getContext('2d');
+
+  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+  resize(); window.addEventListener('resize', resize);
+
+  // 16 vertices of a tesseract: all (±1,±1,±1,±1)
+  const BASE_VERTS = Array.from({ length: 16 }, (_, i) => [
+    (i & 1) ? 1 : -1,
+    (i & 2) ? 1 : -1,
+    (i & 4) ? 1 : -1,
+    (i & 8) ? 1 : -1,
+  ]);
+
+  // 32 edges: vertices differing by exactly 1 bit
+  const EDGES = [];
+  for (let i = 0; i < 16; i++)
+    for (let j = i + 1; j < 16; j++)
+      if (Number.isInteger(Math.log2(i ^ j))) EDGES.push([i, j]);
+
+  function rot4(v, a, b, angle) {
+    const r = [...v];
+    const cos = Math.cos(angle), sin = Math.sin(angle);
+    r[a] =  v[a] * cos - v[b] * sin;
+    r[b] =  v[a] * sin + v[b] * cos;
+    return r;
+  }
+
+  function proj4to3(v, wDist = 2.2) {
+    const w = wDist / (wDist - v[3]);
+    return [v[0] * w, v[1] * w, v[2] * w];
+  }
+
+  function proj3to2(v, zDist = 3.5, scale, cx, cy) {
+    const z = zDist / (zDist - v[2]);
+    return [v[0] * z * scale + cx, v[1] * z * scale + cy];
+  }
+
+  // Slow, dreamy rotation speeds
+  const rot = { xy:0, xz:0, xw:0, yz:0, yw:0, zw:0 };
+  const rotSpeed = { xy:0.0018, xz:0.0031, xw:0.0047, yz:0.0024, yw:0.0039, zw:0.0033 };
+
+  // Breathe scale + wall-clock start
+  let t = 0;
+  let startTs = null;
+
+  // Synced to scanimate timeline (seconds)
+  const GLITCH_START  = 3.0;  // spin-up & edge flicker begins
+  const FADE_START    = 3.4;  // master alpha starts dropping
+  const FADE_END      = 4.4;  // fully gone
+
+  // Per-edge glitch offsets so each one breaks differently
+  const edgeSeeds = EDGES.map(() => Math.random() * Math.PI * 2);
+
+  function draw(ts) {
+    if (!startTs) startTs = ts;
+    const elapsed = (ts - startTs) / 1000;
+
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+
+    // ── Exit alpha ──────────────────────────────────────────────
+    let masterAlpha = 1;
+    if (elapsed >= FADE_START) {
+      masterAlpha = 1 - Math.min(1, (elapsed - FADE_START) / (FADE_END - FADE_START));
+    }
+    if (masterAlpha <= 0) { requestAnimationFrame(draw); return; }
+
+    // ── Glitch intensity (0→1 from GLITCH_START to FADE_END) ───
+    const glitchAmt = elapsed < GLITCH_START ? 0
+      : Math.min(1, (elapsed - GLITCH_START) / (FADE_END - GLITCH_START));
+
+    // ── Rotation — spins up during glitch phase ─────────────────
+    const spinMul = 1 + glitchAmt * 9;
+    Object.keys(rot).forEach(k => rot[k] += rotSpeed[k] * spinMul);
+    t += 0.008 * spinMul;
+
+    // ── Scale — expands slightly as it disintegrates ─────────────
+    const breathe   = 1 + Math.sin(t * 0.7) * 0.04;
+    const explode   = 1 + glitchAmt * 0.18;
+    const scale     = Math.min(W, H) * 0.34 * breathe * explode;
+    const cx = W / 2;
+    const cy = H / 2 + Math.sin(t * 0.4) * 8;
+
+    // ── Project all vertices ─────────────────────────────────────
+    const verts2D = BASE_VERTS.map(v => {
+      let p = [...v];
+      p = rot4(p, 0, 1, rot.xy);
+      p = rot4(p, 0, 2, rot.xz);
+      p = rot4(p, 0, 3, rot.xw);
+      p = rot4(p, 1, 2, rot.yz);
+      p = rot4(p, 1, 3, rot.yw);
+      p = rot4(p, 2, 3, rot.zw);
+      const p3 = proj4to3(p);
+      return { pt: proj3to2(p3, 3.5, scale, cx, cy), z: p3[2] };
+    });
+
+    // ── Depth-sort edges ─────────────────────────────────────────
+    const sortedEdges = EDGES.map(([a, b], i) => {
+      let pa = [...BASE_VERTS[a]];
+      pa = rot4(pa,0,1,rot.xy); pa = rot4(pa,0,2,rot.xz); pa = rot4(pa,0,3,rot.xw);
+      pa = rot4(pa,1,2,rot.yz); pa = rot4(pa,1,3,rot.yw); pa = rot4(pa,2,3,rot.zw);
+      let pb = [...BASE_VERTS[b]];
+      pb = rot4(pb,0,1,rot.xy); pb = rot4(pb,0,2,rot.xz); pb = rot4(pb,0,3,rot.xw);
+      pb = rot4(pb,1,2,rot.yz); pb = rot4(pb,1,3,rot.yw); pb = rot4(pb,2,3,rot.zw);
+      const za = proj4to3(pa)[2], zb = proj4to3(pb)[2];
+      return { a, b, z: (za + zb) / 2, i };
+    }).sort((x, y) => x.z - y.z);
+
+    // ── Draw edges ───────────────────────────────────────────────
+    sortedEdges.forEach(({ a, b, z, i }) => {
+      let [x1, y1] = verts2D[a].pt;
+      let [x2, y2] = verts2D[b].pt;
+      const depthPct = (z + 1.5) / 3;
+
+      // Glitch: each edge gets an independent horizontal jitter
+      if (glitchAmt > 0) {
+        const jitter = Math.sin(edgeSeeds[i] + elapsed * 18) * glitchAmt * 28;
+        const flicker = Math.sin(edgeSeeds[i] * 3.7 + elapsed * 31) > (1 - glitchAmt * 0.7);
+        if (flicker) return; // some edges blink out entirely
+        x1 += jitter; x2 += jitter * 0.6;
+        y1 += Math.cos(edgeSeeds[i] + elapsed * 12) * glitchAmt * 14;
+        y2 += Math.cos(edgeSeeds[i] * 2 + elapsed * 9) * glitchAmt * 14;
+      }
+
+      // Colour: hot pink / white flash as glitch intensifies
+      let rC, gC, bC;
+      if (glitchAmt > 0.4 && Math.sin(edgeSeeds[i] + elapsed * 22) > 0.6) {
+        // flash white-pink
+        rC = 255; gC = Math.round(45 * (1 - glitchAmt)); bC = Math.round(120 + glitchAmt * 135);
+      } else {
+        rC = Math.round(depthPct * 255);
+        gC = Math.round((1 - depthPct) * 245 * 0.4);
+        bC = Math.round(255 - depthPct * 80);
+      }
+
+      const alpha = (0.04 + depthPct * 0.13) * masterAlpha;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.strokeStyle = `rgba(${rC},${gC},${bC},${alpha})`;
+      ctx.lineWidth   = (0.6 + depthPct * 0.8) * (1 + glitchAmt * 0.8);
+      ctx.shadowColor = glitchAmt > 0.3 ? `rgba(255,45,120,${alpha * 2})` : `rgba(168,85,247,${alpha * 1.5})`;
+      ctx.shadowBlur  = 18 + glitchAmt * 24;
+      ctx.stroke();
+    });
+
+    // ── Vertex nodes ─────────────────────────────────────────────
+    verts2D.forEach(({ pt: [x, y], z }, i) => {
+      const depthPct = (z + 1.5) / 3;
+      // Nodes scatter outward during glitch
+      const scatter = glitchAmt * (Math.sin(i * 2.3 + elapsed * 14) * 30);
+      const scatterY = glitchAmt * (Math.cos(i * 1.7 + elapsed * 11) * 20);
+      const alpha = (0.06 + depthPct * 0.18) * masterAlpha;
+      ctx.beginPath();
+      ctx.arc(x + scatter, y + scatterY, (1.2 + depthPct * 0.8) * (1 + glitchAmt), 0, Math.PI * 2);
+      ctx.fillStyle   = glitchAmt > 0.5 ? `rgba(255,45,120,${alpha})` : `rgba(168,85,247,${alpha})`;
+      ctx.shadowColor = ctx.fillStyle;
+      ctx.shadowBlur  = 10 + glitchAmt * 20;
+      ctx.fill();
+    });
+
+    // ── Second ghost tesseract ───────────────────────────────────
+    const ghostScale = scale * 0.62;
+    const gVerts2D = BASE_VERTS.map(v => {
+      let p = [...v];
+      p = rot4(p, 0, 3, -rot.xw * 1.3);
+      p = rot4(p, 1, 3, -rot.yw * 1.1);
+      p = rot4(p, 2, 3,  rot.zw * 0.7);
+      const p3 = proj4to3(p);
+      return proj3to2(p3, 3.5, ghostScale,
+        cx + Math.sin(t * 0.5) * (10 + glitchAmt * 35),
+        cy + Math.cos(t * 0.35) * (7 + glitchAmt * 25));
+    });
+    EDGES.forEach(([a, b], i) => {
+      // Inner ghost flickers out faster
+      if (glitchAmt > 0.3 && Math.sin(edgeSeeds[i] * 2 + elapsed * 25) > (0.3 - glitchAmt)) return;
+      ctx.beginPath();
+      ctx.moveTo(gVerts2D[a][0], gVerts2D[a][1]);
+      ctx.lineTo(gVerts2D[b][0], gVerts2D[b][1]);
+      ctx.strokeStyle = `rgba(255,45,120,${0.04 * masterAlpha})`;
+      ctx.lineWidth   = 0.5;
+      ctx.shadowBlur  = 0;
+      ctx.stroke();
+    });
+
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+})();
+
+
+// ═══════════════════════════════════════════════════════════════
+// SCANIMATE TEXT ANIMATION
+// ═══════════════════════════════════════════════════════════════
+(function scanimateText() {
+  const canvas = document.getElementById('scanimate-canvas');
+  const ctx    = canvas.getContext('2d');
+
+  function resize() {
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // ── Timeline (seconds) ───────────────────────────────────────
+  //  0.0  both fade in together
+  //  1.0  fade-in complete, hold clean
+  //  1.6  Angel's starts scanimate
+  //  2.4  EIGHT joins scanimate (0.8s offset)
+  //  3.4  fade-out begins (mid-wiggle)
+  //  4.4  fully gone → redirect
+  const T = {
+    FADE_IN_START:     0.0,
+    FADE_IN_END:       1.0,
+    HOLD_END:          1.6,
+    ANGELS_SCAN_START: 1.6,
+    EIGHT_SCAN_START:  2.4,   // offset
+    SCAN_END:          3.8,   // both fully distorted by here
+    FADE_OUT_START:    3.4,
+    FADE_OUT_END:      4.4,
+  };
+
+  let startTime = null;
+  let done      = false;
+
+  // ── Typography sizes ─────────────────────────────────────────
+  function getTitleSize()   { return Math.min(Math.max(42, window.innerWidth * 0.12), 88); }
+  function getCursiveSize() { return Math.min(Math.max(38, window.innerWidth * 0.085), 72); }
+
+  // ── Build an offscreen canvas for a single text element ──────
+  function buildAngelsCanvas() {
+    const W = canvas.width, H = canvas.height;
+    const off = document.createElement('canvas');
+    off.width = W; off.height = H;
+    const oc  = off.getContext('2d');
+    const titleSize   = getTitleSize();
+    const cursiveSize = getCursiveSize();
+    const cx = W / 2, cy = H / 2;
+
+    oc.save();
+    oc.font          = `${cursiveSize}px 'Mrs Saint Delafield', cursive`;
+    oc.textAlign     = 'center';
+    oc.textBaseline  = 'middle';
+    oc.fillStyle     = '#ff2d78';
+    oc.shadowColor   = 'rgba(255,45,120,0.85)';
+    oc.shadowBlur    = 28;
+    oc.fillText("Angel's", cx, cy - titleSize * 0.08);
+    oc.restore();
+    return off;
+  }
+
+  function buildEightCanvas() {
+    const W = canvas.width, H = canvas.height;
+    const off = document.createElement('canvas');
+    off.width = W; off.height = H;
+    const oc  = off.getContext('2d');
+    const titleSize = getTitleSize();
+    const cx = W / 2, cy = H / 2;
+
+    oc.save();
+    oc.font          = `900 ${titleSize}px 'Monoton', sans-serif`;
+    oc.textAlign     = 'center';
+    oc.textBaseline  = 'middle';
+    const grad = oc.createLinearGradient(cx - titleSize * 2, 0, cx + titleSize * 2, 0);
+    grad.addColorStop(0,   '#00f5ff');
+    grad.addColorStop(0.5, '#a855f7');
+    grad.addColorStop(1,   '#ff2d78');
+    oc.fillStyle   = grad;
+    oc.shadowColor = 'rgba(168,85,247,0.7)';
+    oc.shadowBlur  = 32;
+    oc.fillText('EIGHT', cx, cy + titleSize * 0.55);
+    oc.restore();
+    return off;
+  }
+
+  // ── Scanimate-distort one source canvas onto ctx ─────────────
+  function drawDistorted(src, scanAmt, t, alpha) {
+    const W = canvas.width, H = canvas.height;
+    const sliceH   = 3;
+    const rows     = Math.ceil(H / sliceH);
+    const speed    = t * 4.5;
+    const maxShift = scanAmt * 38;
+    const warpFreq = 0.06 + scanAmt * 0.08;
+
+    ctx.save();
+    ctx.globalAlpha = alpha;
+
+    for (let r = 0; r < rows; r++) {
+      const sy = r * sliceH;
+      if (sy >= H) break;
+      const wave =
+        Math.sin(r * warpFreq + speed * 0.9)   * maxShift * 0.7 +
+        Math.sin(r * warpFreq * 2.1 + speed * 1.3) * maxShift * 0.2 +
+        Math.sin(r * warpFreq * 0.4 + speed * 0.5) * maxShift * 0.1;
+      const glitchBand = (Math.sin(r * 0.7 + speed * 2.2) > 0.88) ? maxShift * 0.4 : 0;
+      const dx = wave + glitchBand;
+      ctx.drawImage(src, 0, sy, W, sliceH, dx, sy, W, sliceH);
+    }
+
+    // Chromatic aberration
+    if (scanAmt > 0.25) {
+      const aberAmt = scanAmt * 5;
+      ctx.globalAlpha = alpha * scanAmt * 0.35;
+      ctx.globalCompositeOperation = 'screen';
+      ctx.filter = 'saturate(3) hue-rotate(330deg)';
+      ctx.drawImage(src, -aberAmt, 0);
+      ctx.filter = 'saturate(3) hue-rotate(150deg)';
+      ctx.drawImage(src,  aberAmt, 0);
+      ctx.filter = 'none';
+      ctx.globalCompositeOperation = 'source-over';
+    }
+
+    ctx.restore();
+  }
+
+  // ── Draw one element: clean or distorted ─────────────────────
+  function drawElement(src, scanAmt, alpha) {
+    if (scanAmt <= 0) {
+      ctx.save();
+      ctx.globalAlpha = alpha;
+      ctx.drawImage(src, 0, 0);
+      ctx.restore();
+    } else {
+      drawDistorted(src, scanAmt, elapsed, alpha);
+    }
+  }
+
+  // ── Interpolate 0→1 within a window ──────────────────────────
+  function progress(t, start, end) {
+    return Math.min(1, Math.max(0, (t - start) / (end - start)));
+  }
+
+  let elapsed = 0;
+
+  // ── Main render ───────────────────────────────────────────────
+  function render(ts) {
+    if (done) return;
+    if (!startTime) startTime = ts;
+    elapsed = (ts - startTime) / 1000;
+
+    // Redirect once fully faded
+    if (elapsed >= T.FADE_OUT_END) {
+      done = true;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      window.location.href = 'angels_eight.html';
+      return;
+    }
+
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+
+    const t = elapsed;
+
+    // Master alpha (fade in / fade out)
+    let masterAlpha;
+    if (t < T.FADE_IN_END) {
+      masterAlpha = progress(t, T.FADE_IN_START, T.FADE_IN_END);
+    } else if (t < T.FADE_OUT_START) {
+      masterAlpha = 1;
+    } else {
+      masterAlpha = 1 - progress(t, T.FADE_OUT_START, T.FADE_OUT_END);
+    }
+
+    if (masterAlpha <= 0) { requestAnimationFrame(render); return; }
+
+    // Per-element scanimate amounts
+    const angelsScan = progress(t, T.ANGELS_SCAN_START, T.SCAN_END);
+    const eightScan  = progress(t, T.EIGHT_SCAN_START,  T.SCAN_END);
+
+    // Build fresh offscreen canvases each frame (cheap at this scale)
+    const angelsCanvas = buildAngelsCanvas();
+    const eightCanvas  = buildEightCanvas();
+
+    // Draw Angel's first (behind), then EIGHT on top
+    drawElement(angelsCanvas, angelsScan, masterAlpha);
+    drawElement(eightCanvas,  eightScan,  masterAlpha);
+
+    // Scan bar — rides across the whole composition
+    const maxScan = Math.max(angelsScan, eightScan);
+    if (maxScan > 0) {
+      const barY = ((t * 0.55) % 1) * H;
+      const barGrad = ctx.createLinearGradient(0, barY - 40, 0, barY + 40);
+      barGrad.addColorStop(0,    'rgba(0,245,255,0)');
+      barGrad.addColorStop(0.45, 'rgba(0,245,255,0.07)');
+      barGrad.addColorStop(0.5,  'rgba(0,245,255,0.18)');
+      barGrad.addColorStop(0.55, 'rgba(0,245,255,0.07)');
+      barGrad.addColorStop(1,    'rgba(0,245,255,0)');
+      ctx.save();
+      ctx.globalAlpha = masterAlpha * maxScan;
+      ctx.fillStyle   = barGrad;
+      ctx.fillRect(0, barY - 40, W, 80);
+      ctx.restore();
+    }
+
+    requestAnimationFrame(render);
+  }
+
+  // Wait for fonts before first frame
+  document.fonts.ready.then(() => requestAnimationFrame(render));
+})();
+</script>
+</body>
+</html>
