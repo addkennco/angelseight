@@ -24,13 +24,13 @@ const STRINGS = {
   story: [
     null,
     { text: "Ah.\nYou are the Operator.", coords: null },
-    { text: "Oscillation detected.\nSource: interior.", coords: "17° ⊷ ☈ ⏦ ☰ ⚸ ⏛ ☊" },
-    { text: "Readback. \nOver.", coords: "17°44' ☈ ⏦ ☰ ⚸ ⏛ ☊" },
-    { text: "They flow from form to form \nand nothing stands, they move like mists the solid lands \nlike clouds they shape themselves and go", coords: "17°44'12\" N ☰ ⚸ ⏛ ☊" },
-    { text: "s(t) = 2 ∙ 𝑓 ∙(t (mod1)) - 1", coords: "17°44'12\" N  091° ⚸ ⏛ ☊" },
-    { text: "Quaternion Integral Operator \n0xE2 0xA8 0x96 \n0x2A16 \n0x00002A16", coords: "17°44'12\" N  091°22' ⏛ ☊" },
-    { text: "⌧⌧⌧⌧⌧⌧⌧⌧⌧⌧⌧⌧⌧⌧⌧⌧⌧⌧⌧⌧", coords: "17°44'12\" N  091°22'18\" ☊" },
-    { text: "Very Well.", coords: "17°44'12\" N  091°22'18\" W" },
+    { text: "This channel does not usually open for beginners.", coords: "RA ⊷ ☈ ⏦ ☰ ⚸ ⏛ ☊" },
+    { text: "I will continue to observe your progress.", coords: "RA 18ʰ ☈ ⏦ ☰ ⚸ ⏛ ☊" },
+    { text: "I will continue to observe your progress.", coords: "RA 18ʰ36ᵐ56ˢ ☰ ⚸ ⏛ ☊" },
+    { text: "I will continue to observe your progress.", coords: "RA 18ʰ36ᵐ56ˢ  dec ⚸ ⏛ ☊" },
+    { text: "I am required to recommend deviation.", coords: "RA 18ʰ36ᵐ56ˢ dec +38° ⏛ ☊" },
+    { text: "You are disappointingly precise.", coords: "RA 18ʰ36ᵐ56ˢ dec +38°47' ☊" },
+    { text: "Very Well.", coords: "RA 18ʰ36ᵐ56ˢ dec +38°47'01\" " },
   ],
   items: {
     Be: { name:'Beryllium', sym:'β', effect:'Shield Max +6',  desc: 'A rare, thermal-resistant material used for shielding components that must withstand extreme reentry heat.' },
@@ -43,49 +43,49 @@ const STRINGS = {
     C:  { name:'Carbon',    sym:'ζ', effect:'Ammo Max +8',    desc: 'Used in its crystalline form to create ultra-hardened kinetic penetrators for standard ammo.' },
   },
   powerups: {
-      LITHEBRYL:   { sym:'Β',  name:'Lithebryl',     recipe:['Be','Ti'], effect:'Shield Max +20, Ammo +8 — Shield Restore',             puKey:'LITHEBRYL',    desc:  'An alloy of Lithium and Beryllium that absorbs and dissipates energy blasts.' },
-      NITROKALIUM: { sym:'Π',  name:'Nitrokalium',   recipe:['Li','N'],  effect:'Shoot Spd +12, Shield +6 — Double Fire Rate 8s',       puKey:'NITROKALIUM',  desc:  'A Potassium-Nitrogen gas mixture used to puah the engines to run at dangerous but hyper-efficient levels.'},
-      CARBOSILICUM:{ sym:'Ξ',  name:'Carbosilicium', recipe:['Si','C'],  effect:'Ammo Max +18, Shoot Spd +3 — Double Points 15s',       puKey:'CARBOSILICUM', desc:  'A highly efficient superconductor, allowing fire-control systems to process at lightning speeds.'},
-      MAGNIUM:     { sym:'Μ',  name:'Magnium',       recipe:['Mg','K'],  effect:'Reserve +2, Shoot Spd +6 — Bomb',                      puKey:'MAGNIUM',      desc:  'A Magnesium-based unstable isotope that is highly volatile when impacted.'},
-      TITANE:      { sym:'Θ',  name:'Titane',        recipe:['Ti','N'],  effect:'Shield Max +30, Shoot Spd +5 — Invincibility 10s',     puKey:'TITANE',       desc:  'A low-density, Titanium-based metal that provides near-indestructible hull integrity without adding significant mass.'},
-      ALKALIUM:    { sym:'α',  name:'Alkalium',      recipe:['K','Si'],  effect:'Ammo Max +22, Shoot Spd +8 — Piercing Bullets',        puKey:'ALKALIUM',     desc:  'A Silicon-Potassium compound that uses ionized energy to give shots piercing capabilities.'},
-	  AZOLITHION:  { sym:'Λ',  name:'Azolithion',    recipe:['Li','K'],  effect: 'Ammo +20, Shield +8 — Bullet Shift 15s',              puKey: 'AZOLITHION',  desc:  'A Lithium-Nitrogen composite used for cooling during high-velocity maneuvers.'},
-	  GAMMITE:     { sym:'Γ',  name:'Gammite',       recipe:['Ti','Si'], effect: 'Ammo +8, Shield +8, Shoot Spd +4 — No Ammo Cost 10s', puKey: 'GAMMITE',     desc:  'A complex superconductor used to synchronize ammo and shield frequencies for balanced performance.'},
+      LITHEBRYL:   { sym:'Β',  name:'Lithebryl',     recipe:['Be','Ti'], effect:'Shield Max +20, Ammo +8',           power:'Shield Restore',           puKey:'LITHEBRYL',    desc:  'An alloy of Lithium and Beryllium that absorbs and dissipates energy blasts.' },
+      NITROKALIUM: { sym:'Π',  name:'Nitrokalium',   recipe:['Li','N'],  effect:'Shoot Speed +12, Shield +6',          power:'Double Fire Rate',         puKey:'NITROKALIUM',  desc:  'A Potassium-Nitrogen gas mixture used to puah the engines to run at dangerous but hyper-efficient levels.'},
+      CARBOSILICUM:{ sym:'Ξ',  name:'Carbosilicium', recipe:['Si','C'],  effect:'Ammo Max +18, Shoot Speed +3',        power:'Double Points',            puKey:'CARBOSILICUM', desc:  'A highly efficient superconductor, allowing fire-control systems to process at lightning speeds.'},
+      MAGNIUM:     { sym:'Μ',  name:'Magnium',       recipe:['Mg','K'],  effect:'Reserve +2, Shoot Speed +6',          power:'Bomb',                     puKey:'MAGNIUM',      desc:  'A Magnesium-based unstable isotope that is highly volatile when impacted.'},
+      TITANE:      { sym:'Θ',  name:'Titane',        recipe:['Ti','N'],  effect:'Shield Max +30, Shoot Speed +5',      power:'Invincibility',            puKey:'TITANE',       desc:  'A low-density, Titanium-based metal that provides near-indestructible hull integrity without adding significant mass.'},
+      ALKALIUM:    { sym:'α',  name:'Alkalium',      recipe:['K','Si'],  effect:'Ammo Max +22, Shoot Speed +8',        power:'Piercing Bullets',         puKey:'ALKALIUM',     desc:  'A Silicon-Potassium compound that uses ionized energy to give shots piercing capabilities.'},
+	  AZOLITHION:  { sym:'Λ',  name:'Azolithion',    recipe:['Li','K'],  effect: 'Ammo +20, Shield +8',              power:'Bullet Shift Multibullet', puKey: 'AZOLITHION',  desc:  'A Lithium-Nitrogen composite used for cooling during high-velocity maneuvers.'},
+	  GAMMITE:     { sym:'Γ',  name:'Gammite',       recipe:['Ti','Si'], effect: 'Ammo +8, Shield +8, Shoot Speed +4', power:'No Ammo Cost',             puKey: 'GAMMITE',     desc:  'A complex superconductor used to synchronize ammo and shield frequencies for balanced performance.'},
 	  OMEGITE: {
         sym: 'Ω', name: 'Omegite', puKey: 'OMEGITE',
         recipe: [
-          { key: 'MAGNIUM',     label: 'Μ Magnium'   },
+          { key: 'MAGNIUM',  label: 'Μ Magnium'   },
           { key: 'ALKALIUM', label: 'α Alkalium'  },
-          { key: 'TITANE', label: 'Θ Titane'  },
+          { key: 'TITANE',   label: 'Θ Titane'  },
         ],
-        effect: 'Reserve +3, All Stats +3 — Super Bomb',
+        effect: 'Reserve +3, Shield Max +10, Shoot Speed +10, Ammo Max +10', power:'Super Bomb',
 		desc: 'A terrifyingly unstable material that exists in a state of constant decay.',
       },
       AXORITE: {
         sym: 'Χ', name: 'Axorite', puKey: 'AXORITE',
         recipe: [
-          { key: 'MAGNIUM',     label: 'Μ Magnium'  },
-          { key: 'TITANE', label: 'Θ Titane' },
+          { key: 'MAGNIUM', label: 'Μ Magnium'  },
+          { key: 'TITANE',  label: 'Θ Titane' },
         ],
-        effect: 'Shield Max +25, Reserve +2 — Full Restore',
+        effect: 'Shield Max +25, Reserve +2', power:'Full Restore',
 		desc: 'A highly versatile multi-application metal alloy that is used in both defense and munitions.',
       },
       PHIOMEGA: {
         sym: 'Φ', name: 'PhiOmega', puKey: 'PHIOMEGA',
         recipe: [
           { key: 'CARBOSILICUM', label: 'Ξ Carbosilicium' },
-          { key: 'ALKALIUM',   label: 'α Alkalium'  },
+          { key: 'ALKALIUM',     label: 'α Alkalium'  },
         ],
-        effect: 'Ammo Max +30, Shoot Spd +6 — Bullet Shift',
+        effect: 'Ammo Max +30, Shoot Speed +6', power:'Bullet Shift AOE Bullet',
 		desc: 'A perfectly lossless superconductor that expels magnetic fields, ideal for maximizing ammo velocity and efficiency.',
       },
       DELTALITE: {
         sym: '∇', name: 'Deltalite', puKey: 'DELTALITE',
         recipe: [
-          { key: 'LITHEBRYL', label: 'Β Lithebryl' },
+          { key: 'LITHEBRYL',     label: 'Β Lithebryl' },
           { key: 'NITROKALIUM',   label: 'Π Nitrokalium'  },
         ],
-        effect: 'Shield Max +20, Shoot Spd +10 — Time Dilation',
+        effect: 'Shield Max +20, Shoot Speed +10', power:'Time Dilation',
 		desc: 'A sophisticated Beryllium-based metal that can survive the friction of warp-speed travel.',
       },	  
   }
@@ -547,7 +547,7 @@ const Game = (() => {
       state = 'playing';
       lastTime = performance.now(); // reset to avoid dt spike after unpause
       document.getElementById('overlay-pause').classList.remove('active');
-      document.getElementById('btn-pause').textContent = '❙❙ PAUSE';
+      document.getElementById('btn-pause').textContent = '⏻';
     }
   }
 
@@ -2071,6 +2071,7 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   document.getElementById('btn-pause').onclick = () => Game.togglePause();
+  document.getElementById('btn-resume').onclick = () => Game.togglePause();
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' || e.key === 'p' || e.key === 'P') Game.togglePause();
   });

@@ -98,7 +98,7 @@
   .menu-cursive {
     font-family: var(--cursive);
     font-size: clamp(38px, 8.5vw, 72px);
-    color: var(--pink);
+    color: var(--gold);
     letter-spacing: 0.01em;
     text-shadow: 0 0 24px rgba(255,45,120,0.8), 0 0 60px rgba(168,85,247,0.5);
     line-height: 1;
@@ -172,7 +172,7 @@
     cursor: pointer;
     background: transparent;
     position: relative;
-    transition: all 1s;
+    transition: 0.2s;
     overflow: hidden;
     margin-bottom: 16px;
   }
@@ -187,7 +187,7 @@
     transform: skewX(45deg);
     background-color: var(--cyan);
     z-index: -1;
-    transition: all 1s;
+    transition: 0.2s;
   }
   .btn-launch.sweeping::before { width: 160%; }
   .btn-launch:active { transform: scale(0.97); }
@@ -384,11 +384,11 @@
   /* Pause button */
   #btn-pause {
     position: absolute;
-    top: 10px; left: 50%; transform: translateX(-50%);
+    top: 10px; left: 95%; transform: translateX(-50%);
     font-family: var(--mono);
-    font-size: 9px; letter-spacing: 0.25em;
-    color: rgba(255,255,255,0.3);
-    background: transparent; border: 1px solid rgba(255,255,255,0.1);
+    font-size: 14px; letter-spacing: 0.25em;
+    color: var(--purple);
+    background: transparent; border: 1px solid var(--purple);
     padding: 4px 12px; cursor: pointer;
     pointer-events: all;
     z-index: 20;
@@ -396,7 +396,7 @@
   }
   #btn-pause:active { color: var(--cyan); border-color: var(--cyan); }
 
-  /* Pause / death overlays */
+  /* Death / clear overlays — full screen */
   .game-overlay {
     position: absolute; inset:0;
     background: rgba(5,5,16,0.88);
@@ -406,6 +406,22 @@
     display:none;
   }
   .game-overlay.active { display:flex; }
+
+  /* Pause overlay — small pop-up, not full-screen */
+  #overlay-pause {
+    position: absolute;
+    inset: auto;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(5,5,16,0.96);
+    border: 1px solid var(--purple);
+    box-shadow: 0 0 32px rgba(168,85,247,0.25), 0 0 0 1px rgba(168,85,247,0.1);
+    padding: 28px 36px 24px;
+    min-width: 200px;
+    gap: 18px;
+    display: none;
+  }
+  #overlay-pause.active { display:flex; }
   .overlay-title {
     font-family: var(--display);
     font-size: clamp(28px, 8vw, 52px);
@@ -785,9 +801,6 @@
 <div id="screen-game" class="screen">
   <canvas id="game-canvas"></canvas>
 
-  <!-- Pause button (sits above HUD, pointer-events all) -->
-  <button id="btn-pause">❙❙ PAUSE</button>
-
   <!-- HUD -->
   <div id="hud">
     <div class="hud-left">
@@ -795,6 +808,7 @@
       <div class="hud-value" id="hud-score">0</div>
       <div class="hud-combo" id="hud-combo">× 1</div>
     </div>
+	<button id="btn-pause">⏻</button>
     <div class="hud-center">
       <div class="hud-label">LEVEL</div>
       <div class="hud-value" id="hud-level">1</div>
@@ -848,9 +862,19 @@
     <button class="btn-secondary" id="btn-menu-from-death" style="margin-top:4px">MAIN MENU</button>
   </div>
 
+  <!-- Level clear overlay -->
+  <div class="game-overlay" id="overlay-clear">
+    <div class="overlay-title" style="color:var(--cyan)">SECTOR CLEAR</div>
+    <div class="overlay-sub" id="clear-sub">LEVEL 1 COMPLETE</div>
+    <div class="overlay-score" id="clear-score"></div>
+    <button class="btn-primary" id="btn-to-story">CONTINUE</button>
+  </div>
+</div>
+
   <!-- Pause overlay -->
   <div class="game-overlay" id="overlay-pause">
     <div class="overlay-title" style="color:var(--cyan)">PAUSED</div>
+    <button class="btn-primary" id="btn-resume" style="margin-top:4px">▶ RESUME</button>
   </div>
 </div>
 
@@ -989,4 +1013,3 @@
 </script>
 </body>
 </html>
-
