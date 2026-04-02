@@ -259,17 +259,25 @@ const AudioManager = (() => {
 })();
 
 // ═══════════════════════════════════════════════════════════════
-// MENU BG WAVEFORM ANIMATION (original)
+// MENU BG WAVEFORM ANIMATION — fades in over ~800ms
 // ═══════════════════════════════════════════════════════════════
 (function menuWaveform() {
   const canvas = document.getElementById('menu-bg');
   const ctx = canvas.getContext('2d');
   let t = 0;
+  let startTs = null;
+  const WAVE_FADE_MS = 800; // waveform fades in over this window
 
   function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
   resize(); window.addEventListener('resize', resize);
 
-  function draw() {
+  function draw(ts) {
+    if (!startTs) startTs = ts;
+    const elapsed = ts - startTs;
+    // ease-out quad fade: 0→1 over WAVE_FADE_MS
+    const fadeIn = Math.min(1, elapsed / WAVE_FADE_MS);
+    const masterAlpha = fadeIn * fadeIn * (3 - 2 * fadeIn); // smoothstep
+
     const W = canvas.width, H = canvas.height;
     ctx.clearRect(0,0,W,H);
     const rows = 28;
@@ -283,6 +291,7 @@ const AudioManager = (() => {
       const rVal = Math.round(0 + pct * 168);
       const gVal = Math.round(245 - pct * 160);
       const bVal = Math.round(255 - pct * 8);
+      const lineAlpha = (0.15 + pct * 0.3) * masterAlpha;
       ctx.beginPath();
       for (let x = 0; x <= W; x += 3) {
         const noise = Math.sin(x * freq + phase) * amp
@@ -291,14 +300,77 @@ const AudioManager = (() => {
         const py = y - noise;
         x === 0 ? ctx.moveTo(x, py) : ctx.lineTo(x, py);
       }
-      ctx.strokeStyle = `rgba(${rVal},${gVal},${bVal},${0.15 + pct * 0.3})`;
+      ctx.strokeStyle = `rgba(${rVal},${gVal},${bVal},${lineAlpha})`;
       ctx.lineWidth = 0.8;
       ctx.stroke();
     }
     t += 0.016;
     requestAnimationFrame(draw);
   }
-  draw();
+  requestAnimationFrame(draw);
+})();
+
+// ═══════════════════════════════════════════════════════════════
+// MENU CONTENT FLICKER-IN — expand + sin-gate flicker
+// Starts after WAVE_DELAY_MS so waveforms lead, settles ~1.5s total
+// ═══════════════════════════════════════════════════════════════
+(function menuFlickerIn() {
+  const el = document.getElementById('screen-menu')?.querySelector('.menu-content');
+  if (!el) return;
+
+  const WAVE_DELAY_MS = 380;  // head start for waveforms
+  const EXPAND_MS     = 550;  // vertical expand duration
+  const FLICKER_MS    = 380;  // flicker phase after expand
+  const TOTAL_MS      = WAVE_DELAY_MS + EXPAND_MS + FLICKER_MS;
+
+  let startTs = null;
+  let flickerTimer = 0;
+
+  function tick(ts) {
+    if (!startTs) startTs = ts;
+    const elapsed = ts - startTs;
+
+    if (elapsed < WAVE_DELAY_MS) {
+      // holding — keep invisible
+      el.style.opacity = '0';
+      el.style.transform = 'scaleY(0.06)';
+      requestAnimationFrame(tick);
+      return;
+    }
+
+    const afterDelay = elapsed - WAVE_DELAY_MS;
+
+    if (afterDelay < EXPAND_MS) {
+      // Phase 1: vertical expand, ease-out cubic
+      let t = afterDelay / EXPAND_MS;
+      t = 1 - Math.pow(1 - t, 3);
+      const scale = 0.06 + 0.94 * t;
+      el.style.transform = `scaleY(${scale.toFixed(4)})`;
+      el.style.opacity = (t * 0.9).toFixed(4); // mostly opaque by end of expand
+      requestAnimationFrame(tick);
+      return;
+    }
+
+    const afterExpand = afterDelay - EXPAND_MS;
+
+    if (afterExpand < FLICKER_MS) {
+      // Phase 2: sin-gate flicker
+      flickerTimer += 0.38;
+      const gate = Math.sin(flickerTimer) > 0.25;
+      const progress = afterExpand / FLICKER_MS; // 0→1
+      const baseAlpha = 0.9 + 0.1 * progress;   // ramps to 1
+      el.style.opacity = (gate ? baseAlpha : baseAlpha * 0.65).toFixed(4);
+      el.style.transform = 'scaleY(1)';
+      requestAnimationFrame(tick);
+      return;
+    }
+
+    // Done — fully visible, remove inline styles so CSS takes over cleanly
+    el.style.opacity = '1';
+    el.style.transform = 'scaleY(1)';
+  }
+
+  requestAnimationFrame(tick);
 })();
 
 // ═══════════════════════════════════════════════════════════════
@@ -463,6 +535,20 @@ const Game = (() => {
     }
     render();
     animId = requestAnimationFrame(loop);
+  }
+
+  function togglePause() {
+    if (state === 'dead' || state === 'clear') return;
+    if (state === 'playing') {
+      state = 'paused';
+      document.getElementById('overlay-pause').classList.add('active');
+      document.getElementById('btn-pause').textContent = '▶ RESUME';
+    } else if (state === 'paused') {
+      state = 'playing';
+      lastTime = performance.now(); // reset to avoid dt spike after unpause
+      document.getElementById('overlay-pause').classList.remove('active');
+      document.getElementById('btn-pause').textContent = '❙❙ PAUSE';
+    }
   }
 
   // ── UPDATE ────────────────────────────────────────────────────
@@ -1461,6 +1547,7 @@ const Game = (() => {
   function dist(x1,y1,x2,y2) { const dx=x2-x1,dy=y2-y1; return Math.sqrt(dx*dx+dy*dy); }
 
   return { init, startLevel, resize, triggerPowerup,
+           togglePause,
            triggerSweepPublic: triggerSweep,
            logPickupPublic: logPickup,
            flashStashPublic: flashStash,
@@ -1622,10 +1709,6 @@ function renderShopBody() {
         document.querySelectorAll('.shop-card.slim.selected').forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
         showItemInfo(key, 'element');
-        if (!run || run.credits < price) return;
-        run.credits -= price;
-        run.inventory[key] = Math.min(99, (run.inventory[key]||0)+1);
-        renderShopBody();
       };
       grid.appendChild(card);
     });
@@ -1646,15 +1729,6 @@ function renderShopBody() {
         document.querySelectorAll('.shop-card.slim.selected').forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
         showItemInfo(key, 'compound');
-        if (!run || run.credits < price) return;
-        const activePuCount = run.powerups.filter(k => k != null).length;
-        if (activePuCount >= run.reserveMax) return;
-        run.credits -= price;
-        // Place in first empty slot or push
-        const emptyIdx = run.powerups.indexOf(null);
-        if (emptyIdx >= 0) run.powerups[emptyIdx] = key;
-        else run.powerups.push(key);
-        renderShopBody();
       };
       grid2.appendChild(card);
     });
@@ -1670,10 +1744,10 @@ function renderShopBody() {
       card.dataset.cardKey = key; card.dataset.cardTier = tier || 'element'; card.dataset.cardPrice = price; card.dataset.draggable = '1';
       card.innerHTML = `<div class="shop-card-sym">${sym}</div><div class="shop-card-name">${name}</div><div class="shop-card-corner"><div class="shop-card-count">${qty}</div><div class="shop-card-price">SELL ${price}¢</div></div>`;
       card.onclick = () => {
+        const alreadySelected = card.classList.contains('selected');
         document.querySelectorAll('.shop-card.slim.selected').forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
         showItemInfo(key, tier || 'element');
-        run.inventory[key]--; run.credits += price; renderShopBody();
       };
       return card;
     }
@@ -1765,17 +1839,6 @@ function renderShopBody() {
         document.querySelectorAll('.shop-card.slim.selected').forEach(el => el.classList.remove('selected'));
         card.classList.add('selected');
         showItemInfo(c.puKey, 'compound');
-        if (!canCraft || !run) return;
-        c.recipe.forEach(r => run.inventory[r]--);
-        const activePuCount = run.powerups.filter(k => k != null).length;
-        if (activePuCount < run.reserveMax) {
-          const emptyIdx = run.powerups.indexOf(null);
-          if (emptyIdx >= 0) run.powerups[emptyIdx] = c.puKey;
-          else run.powerups.push(c.puKey);
-        } else {
-          run.inventory[c.puKey] = Math.min(99, (run.inventory[c.puKey] || 0) + 1);
-        }
-        renderShopBody();
       };
       grid.appendChild(card);
     });
@@ -1842,17 +1905,6 @@ function renderShopBody() {
         document.querySelectorAll('.shop-card.slim.selected').forEach(el => el.classList.remove('selected'));
         card.classList.add('selected');
         showItemInfo(a.puKey, 'alloy');
-        if (!canCraft || !run) return;
-        a.recipe.forEach(r => { run.inventory[r.key] = Math.max(0, (run.inventory[r.key] || 0) - 1); });
-        const activePuCount = run.powerups.filter(k => k != null).length;
-        if (activePuCount < run.reserveMax) {
-          const emptyIdx = run.powerups.indexOf(null);
-          if (emptyIdx >= 0) run.powerups[emptyIdx] = a.puKey;
-          else run.powerups.push(a.puKey);
-        } else {
-          run.inventory[a.puKey] = Math.min(99, (run.inventory[a.puKey] || 0) + 1);
-        }
-        renderShopBody();
       };
       gridAlloy.appendChild(card);
     });
@@ -2017,6 +2069,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('overlay-clear').classList.remove('active');
     showStory(run.level);
   };
+
+  document.getElementById('btn-pause').onclick = () => Game.togglePause();
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' || e.key === 'p' || e.key === 'P') Game.togglePause();
+  });
 
   document.getElementById('btn-to-shop').onclick = () => {
     shopMode = 'buy';
@@ -2283,12 +2340,8 @@ function setupShopDrag() {
     } else if (tier === 'compound') {
       const price = 150;
       if (run.credits < price) return;
-      const activePuCount = run.powerups.filter(k => k != null).length;
-      if (activePuCount >= run.reserveMax) return;
       run.credits -= price;
-      const emptyIdx = run.powerups.indexOf(null);
-      if (emptyIdx >= 0) run.powerups[emptyIdx] = key;
-      else run.powerups.push(key);
+      run.inventory[key] = Math.min(99, (run.inventory[key] || 0) + 1);
     }
     refresh();
   }
@@ -2462,7 +2515,19 @@ function setupShopDrag() {
 
   function onEnd(x, y) {
     if (!dragKey) return;
-    if (dragging) commitDrop(x, y);
+    if (dragging) {
+      commitDrop(x, y);
+    } else {
+      // Tap — show info only, no action
+      const tier = dragSource === 'reserve' ? 'compound'
+                 : dragTier || 'element';
+      showItemInfo(dragKey, tier);
+      // Keep selection highlight on the source card
+      if (dragEl) {
+        document.querySelectorAll('.shop-card.slim.selected').forEach(c => c.classList.remove('selected'));
+        dragEl.classList.add('selected');
+      }
+    }
     reset();
   }
 

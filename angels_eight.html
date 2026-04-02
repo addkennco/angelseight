@@ -20,7 +20,7 @@
     --cursive:  'Mrs Saint Delafield', cursive;
   }
 
-  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
 
   html, body {
     width:100%; height:100%;
@@ -56,6 +56,9 @@
     position: relative; z-index:10;
     display: flex; flex-direction: column; align-items: center;
     gap: 0;
+    opacity: 0;
+    transform: scaleY(0.06);
+    transform-origin: center center;
   }
 
   .menu-eyebrow {
@@ -173,7 +176,7 @@
     overflow: hidden;
     margin-bottom: 16px;
   }
-  .btn-launch:hover { color: var(--bg); }
+  .btn-launch.sweeping { color: var(--bg); }
   .btn-launch::before {
     content: "";
     position: absolute;
@@ -186,7 +189,7 @@
     z-index: -1;
     transition: all 1s;
   }
-  .btn-launch:hover::before { width: 160%; }
+  .btn-launch.sweeping::before { width: 160%; }
   .btn-launch:active { transform: scale(0.97); }
 
   .btn-secondary {
@@ -377,6 +380,21 @@
     70%  { opacity:1; }
     100% { opacity:0; }
   }
+
+  /* Pause button */
+  #btn-pause {
+    position: absolute;
+    top: 10px; left: 50%; transform: translateX(-50%);
+    font-family: var(--mono);
+    font-size: 9px; letter-spacing: 0.25em;
+    color: rgba(255,255,255,0.3);
+    background: transparent; border: 1px solid rgba(255,255,255,0.1);
+    padding: 4px 12px; cursor: pointer;
+    pointer-events: all;
+    z-index: 20;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  #btn-pause:active { color: var(--cyan); border-color: var(--cyan); }
 
   /* Pause / death overlays */
   .game-overlay {
@@ -694,7 +712,7 @@
     overflow: hidden;
     margin-top: auto;
   }
-  .shop-launch:hover { color: var(--bg); }
+  .shop-launch.sweeping { color: var(--bg); }
   .shop-launch::before {
     content: "";
     position: absolute;
@@ -707,7 +725,7 @@
     z-index: -1;
     transition: all 1s;
   }
-  .shop-launch:hover::before { width: 160%; }
+  .shop-launch.sweeping::before { width: 160%; }
   .shop-launch:active { transform: scale(0.97); }
 
   /* Stash button */
@@ -766,6 +784,9 @@
 ══════════════════════════════════════ -->
 <div id="screen-game" class="screen">
   <canvas id="game-canvas"></canvas>
+
+  <!-- Pause button (sits above HUD, pointer-events all) -->
+  <button id="btn-pause">❙❙ PAUSE</button>
 
   <!-- HUD -->
   <div id="hud">
@@ -827,12 +848,9 @@
     <button class="btn-secondary" id="btn-menu-from-death" style="margin-top:4px">MAIN MENU</button>
   </div>
 
-  <!-- Level clear overlay -->
-  <div class="game-overlay" id="overlay-clear">
-    <div class="overlay-title" style="color:var(--cyan)">SECTOR CLEAR</div>
-    <div class="overlay-sub" id="clear-sub">LEVEL 1 COMPLETE</div>
-    <div class="overlay-score" id="clear-score"></div>
-    <button class="btn-primary" id="btn-to-story">CONTINUE</button>
+  <!-- Pause overlay -->
+  <div class="game-overlay" id="overlay-pause">
+    <div class="overlay-title" style="color:var(--cyan)">PAUSED</div>
   </div>
 </div>
 
@@ -953,7 +971,22 @@
   </div>
 </div>
 
-<script src="script.js"></script> 
+<script src="script.js"></script>
+<script>
+// Sweep animation: fires on click/touch, not hover
+(function() {
+  function triggerSweep(btn) {
+    btn.classList.remove('sweeping');
+    void btn.offsetWidth; // force reflow to restart transition
+    btn.classList.add('sweeping');
+    setTimeout(() => btn.classList.remove('sweeping'), 1100);
+  }
+  document.addEventListener('pointerdown', e => {
+    const btn = e.target.closest('.btn-launch, .shop-launch');
+    if (btn) triggerSweep(btn);
+  });
+})();
+</script>
 </body>
 </html>
 
