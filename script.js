@@ -18,7 +18,7 @@ const STRINGS = {
     empty: 'EMPTY',
     credits: 'CREDITS',
     fusionShop: 'FUSION SHOP',
-    afterLevel: (n) => `AFTER LEVEL ${n}`,
+    afterLevel: (n) => `MODE: IN TRANSIT | LOCATION: SECTOR ${n}`,
     buy: 'BUY', sell: 'SELL', craft: 'CRAFT', launch: 'LAUNCH ›',
   },
   story: [
@@ -31,6 +31,7 @@ const STRINGS = {
     { text: "That is...unfortunate.", coords: "RA 18ʰ36ᵐ56ˢ dec +38° ⏛ ☊" },
     { text: "You are disappointingly precise.", coords: "RA 18ʰ36ᵐ56ˢ dec +38°47' ☊" },
     { text: "Very Well.", coords: "RA 18ʰ36ᵐ56ˢ dec +38°47'01\" " },
+    { text: "", coords: "" },  // index 9 — silent. level 8 complete, boss approach
   ],
   items: {
     Be: { name:'Beryllium', sym:'β', effect:'Shield Max +6',  desc: 'A rare, thermal-resistant material used for shielding components that must withstand extreme reentry heat.' },
@@ -431,6 +432,241 @@ const Game = (() => {
   let ammoMilestones = [];              // ammo refills
   let endSweepFired = false;            // end level sweep
 
+  // ═══════════════════════════════════════════════════════════════
+  // TESSERACT — 4D → 2D PROJECTION
+  // ═══════════════════════════════════════════════════════════════
+  // 16 vertices: all combinations of (±1, ±1, ±1, ±1)
+  const BASE_VERTS = Array.from({ length: 16 }, (_, i) => [
+    (i & 1) ? 1 : -1,
+    (i & 2) ? 1 : -1,
+    (i & 4) ? 1 : -1,
+    (i & 8) ? 1 : -1,
+  ]);
+
+  // 32 edges: connect vertices differing by exactly 1 bit
+  const EDGES = [];
+  for (let i = 0; i < 16; i++)
+    for (let j = i + 1; j < 16; j++)
+      if (Number.isInteger(Math.log2(i ^ j))) EDGES.push([i, j]);
+
+  // Rotation in a 4D plane (indices a, b into the 4-vector)
+  function rot4(v, a, b, angle) {
+    const r = [...v];
+    const cos = Math.cos(angle), sin = Math.sin(angle);
+    r[a] =  v[a] * cos - v[b] * sin;
+    r[b] =  v[a] * sin + v[b] * cos;
+    return r;
+  }
+
+  // 4D → 3D perspective projection (from w-axis)
+  function proj4to3(v, wDist = 2) {
+    const w = wDist / (wDist - v[3]);
+    return [v[0] * w, v[1] * w, v[2] * w];
+  }
+
+  // 3D → 2D perspective projection (from z-axis)
+  function proj3to2(v, zDist = 4, scale = 1, cx = 0, cy = 0) {
+    const z = zDist / (zDist - v[2]);
+    return [v[0] * z * scale + cx, v[1] * z * scale + cy];
+  }
+
+  // Apply all current boss rotations to a vertex (used for depth sorting)
+  function applyRots(v) {
+    let p = [...v];
+    p = rot4(p, 0, 1, boss.rot.xy);
+    p = rot4(p, 0, 2, boss.rot.xz);
+    p = rot4(p, 0, 3, boss.rot.xw);
+    p = rot4(p, 1, 2, boss.rot.yz);
+    p = rot4(p, 1, 3, boss.rot.yw);
+    p = rot4(p, 2, 3, boss.rot.zw);
+    return p;
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // BOSS STATE
+  // ═══════════════════════════════════════════════════════════════
+  const BOSS_MAX_HP = 500;
+  const PHASE_NAMES  = ['PHASE I — EMERGENCE', 'PHASE II — RESONANCE', 'PHASE III — COLLAPSE'];
+  const PHASE_COLORS = ['#a855f7', '#ff2d78', '#ffd700'];
+  const ELEMENT_ATTACK_INTERVAL = [8, 5, 3]; // seconds between element attacks per phase
+
+  let bossActive   = false;
+  let bossDefeated = false;
+  let subEnemies   = [];
+  let elementAttackTimer = 0;
+  let bossT        = 0; // independent time counter for boss (mirrors waveT usage in boss.html)
+
+  // Boss object — null until startBoss() initialises it
+  let boss = null;
+
+  function makeBoss() {
+    return {
+      hp:    BOSS_MAX_HP,
+      phase: 1,
+      x: 0, y: 0,   // set in startBoss() once W/H are known
+      scale: 90,
+      rot:      { xy:0, xz:0, xw:0, yz:0, yw:0, zw:0 },
+      rotSpeed: { xy:0.003, xz:0.005, xw:0.008, yz:0.004, yw:0.007, zw:0.006 },
+      shootTimer:  0,
+      mineTimer:   0,
+      spawnTimer:  0,
+      hitFlash:    0,
+      alive:       true,
+    };
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // BOSS FIRE HELPERS
+  // ═══════════════════════════════════════════════════════════════
+  function bossFireAimed(spread = 0) {
+    const dx = ship.x - boss.x, dy = ship.y - boss.y;
+    const len = Math.sqrt(dx*dx + dy*dy) || 1;
+    const base = Math.atan2(dy, dx);
+    [-spread, 0, spread].forEach(off => {
+      const a = base + off;
+      const spd = 120 + boss.phase * 30;
+      bullets.push({ x:boss.x, y:boss.y, vx:Math.cos(a)*spd, vy:Math.sin(a)*spd,
+        speed:spd, dmg:1, enemy:true, r:3, color:PHASE_COLORS[boss.phase - 1] });
+    });
+  }
+
+  function bossFireRing(n = 8) {
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * Math.PI * 2;
+      const spd = 90 + boss.phase * 20;
+      bullets.push({ x:boss.x, y:boss.y, vx:Math.cos(a)*spd, vy:Math.sin(a)*spd,
+        speed:spd, dmg:1, enemy:true, r:3, color:PHASE_COLORS[boss.phase - 1] });
+    }
+  }
+
+  function bossFireSpiral(count = 12, rotOffset = 0) {
+    for (let i = 0; i < count; i++) {
+      const a = (i / count) * Math.PI * 2 + rotOffset;
+      const spd = 110;
+      bullets.push({ x:boss.x, y:boss.y, vx:Math.cos(a)*spd, vy:Math.sin(a)*spd,
+        speed:spd, dmg:1, enemy:true, r:2.5, color:PHASE_COLORS[boss.phase - 1] });
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // SUB-ENEMIES (scouts spawned by boss)
+  // ═══════════════════════════════════════════════════════════════
+  const SUB_TYPES = [
+    // Orbital — circles the boss
+    {
+      type: 'orbital', r: 8, hp: 2, color: '#ff6b35',
+      init(e) {
+        e.orbitAngle = Math.random() * Math.PI * 2;
+        e.orbitR     = 80 + Math.random() * 40;
+        e.orbitSpd   = (Math.random() < 0.5 ? 1 : -1) * (0.8 + Math.random() * 0.6);
+      },
+      update(e, dt) {
+        e.orbitAngle += e.orbitSpd * dt;
+        e.x = boss.x + Math.cos(e.orbitAngle) * e.orbitR;
+        e.y = boss.y + Math.sin(e.orbitAngle) * e.orbitR;
+      },
+    },
+    // Diver — homes toward ship
+    {
+      type: 'diver', r: 9, hp: 1, color: '#a855f7',
+      init(e) { e.vy = 80 + Math.random() * 60; },
+      update(e, dt) {
+        e.y += e.vy * dt;
+        e.x += (ship.x - e.x) * 0.4 * dt;
+      },
+    },
+  ];
+
+  function spawnSubEnemy() {
+    const tmpl = SUB_TYPES[Math.floor(Math.random() * SUB_TYPES.length)];
+    const e = {
+      type:        tmpl.type,
+      r:           tmpl.r,
+      hp:          tmpl.hp,
+      color:       tmpl.color,
+      update:      tmpl.update,
+      x:           boss.x + (Math.random() - 0.5) * 60,
+      y:           boss.y,
+      shootTimer:  2 + Math.random() * 2,
+    };
+    tmpl.init(e);
+    subEnemies.push(e);
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // PHASE TRANSITION
+  // ═══════════════════════════════════════════════════════════════
+  function checkPhase() {
+    const pct = boss.hp / BOSS_MAX_HP;
+    let newPhase = 1;
+    if      (pct < 0.30) newPhase = 3;
+    else if (pct < 0.65) newPhase = 2;
+
+    if (newPhase !== boss.phase) {
+      boss.phase = newPhase;
+      // Speed up all rotation planes
+      Object.keys(boss.rotSpeed).forEach(k => boss.rotSpeed[k] *= 1.6);
+      // Screen flash
+      const flash = document.getElementById('phase-flash');
+      flash.style.opacity = '1';
+      setTimeout(() => flash.style.opacity = '0', 200);
+      // HUD
+      document.getElementById('boss-phase').textContent = PHASE_NAMES[boss.phase - 1];
+      document.getElementById('boss-phase').style.color = PHASE_COLORS[boss.phase - 1];
+      // Particles + floater
+      spawnParticles(boss.x, boss.y, PHASE_COLORS[boss.phase - 1], 80);
+      spawnFloatingText(boss.x, boss.y - 60, PHASE_NAMES[boss.phase - 1], PHASE_COLORS[boss.phase - 1]);
+      logPickup('⚠ ' + PHASE_NAMES[boss.phase - 1]);
+      // Phase 3 surge
+      if (boss.phase === 3) {
+        for (let i = 0; i < 4; i++) spawnSubEnemy();
+      }
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // ELEMENT ATTACKS
+  // Each element maps to a distinct bullet pattern
+  // ═══════════════════════════════════════════════════════════════
+  const ELEMENT_ATTACKS = {
+    Be: () => { bossFireAimed(0); bossFireAimed(0.3); },
+    Li: () => { bossFireRing(6); },
+    Ti: () => { bossFireAimed(0.5); bossFireAimed(-0.5); },
+    N:  () => {
+      bossFireAimed(0);
+      setTimeout(() => bossFireAimed(0.15),  120);
+      setTimeout(() => bossFireAimed(-0.15), 240);
+    },
+    Si: () => { bossFireRing(12); },
+    Mg: () => {
+      for (let i = 0; i < 3; i++) {
+        mines.push({
+          x:        boss.x + (Math.random() - 0.5) * W * 0.6,
+          y:        boss.y + 40,
+          vy:       30 + Math.random() * 20,
+          r:        11, t: 0, drifting: false,
+        });
+      }
+      logPickup('⚠ MAGNESIUM — MINES DEPLOYED');
+    },
+    K:  () => { bossFireSpiral(16, bossT * 0.5); },
+    C:  () => {
+      bossFireSpiral(8, 0);
+      bossFireSpiral(8, Math.PI / 8);
+    },
+  };
+  const ELEMENT_KEYS = Object.keys(ELEMENT_ATTACKS);
+
+  function triggerElementAttack() {
+    const pool = boss.phase === 1 ? ['Be', 'Li', 'N']
+               : boss.phase === 2 ? ['Ti', 'Si', 'Mg', 'K']
+               : ELEMENT_KEYS;
+    const key = pool[Math.floor(Math.random() * pool.length)];
+    ELEMENT_ATTACKS[key]();
+    spawnFloatingText(boss.x, boss.y - 30, key, '#ffffff');
+    logPickup('BOSS — ' + key + ' SEQUENCE');
+  }
+
   function init(gameCanvas) {
     canvas = gameCanvas;
     ctx = canvas.getContext('2d');
@@ -518,6 +754,55 @@ const Game = (() => {
     animId = requestAnimationFrame(loop);
   }
 
+  function startBoss() {
+    state        = 'playing';
+    bossActive   = true;
+    bossDefeated = false;
+    bossT        = 0;
+    boss         = makeBoss();
+    boss.x       = W / 2;
+    boss.y       = H * 0.28;
+
+    // Clear the field — carry over run stats, wipe combat objects
+    bullets    = [];
+    enemies    = [];
+    subEnemies = [];
+    mines      = [];
+    particles  = [];
+    drops      = [];
+    pods       = [];
+    elementAttackTimer = ELEMENT_ATTACK_INTERVAL[0]; // first attack after phase-1 interval
+
+    // Ship stays at bottom centre
+    ship.x = ship.targetX = W / 2;
+    ship.y = H - 130;
+    ship.invincible = 0;
+    shootTimer = 0;
+
+    // Reset per-level power timers (run stats carry over untouched)
+    invincibleTimer   = 0;
+    piercingBullets   = false;
+    timeDilationTimer = 0;
+    noAmmoCostTimer   = 0;
+
+    // Boss HUD — show and reset
+    document.getElementById('boss-hud').classList.add('active');
+    document.getElementById('boss-bar').style.width = '100%';
+    document.getElementById('boss-phase').textContent = PHASE_NAMES[0];
+    document.getElementById('boss-phase').style.color = PHASE_COLORS[0];
+    document.getElementById('hud-level').textContent  = '⬡';
+
+    // Clear any lingering overlays
+    document.getElementById('overlay-death').classList.remove('active');
+    document.getElementById('overlay-clear').classList.remove('active');
+    document.getElementById('overlay-boss-clear').classList.remove('active');
+
+    updateHUD();
+    if (animId) cancelAnimationFrame(animId);
+    lastTime = performance.now();
+    animId = requestAnimationFrame(loop);
+  }
+
   function loop(ts) {
     const dt = Math.min((ts - lastTime) / 1000, 0.05);
     lastTime = ts;
@@ -533,12 +818,12 @@ const Game = (() => {
     if (state === 'playing') {
       state = 'paused';
       document.getElementById('overlay-pause').classList.add('active');
-      document.getElementById('btn-pause').textContent = '▶ RESUME';
+      document.getElementById('btn-pause').textContent = '⏯️';
     } else if (state === 'paused') {
       state = 'playing';
       lastTime = performance.now(); // reset to avoid dt spike after unpause
       document.getElementById('overlay-pause').classList.remove('active');
-      document.getElementById('btn-pause').textContent = '⏻';
+      document.getElementById('btn-pause').textContent = '⏸️';
     }
   }
 
@@ -722,6 +1007,115 @@ const Game = (() => {
       p.life -= dt; p.vy += 60 * dt;
       return p.life > 0;
     });
+
+    // ── BOSS FIGHT UPDATE ─────────────────────────────────────────
+    if (bossActive) {
+      bossT += dt;
+
+      if (boss.alive) {
+        // Rotations
+        Object.keys(boss.rot).forEach(k => boss.rot[k] += boss.rotSpeed[k]);
+        if (boss.hitFlash > 0) boss.hitFlash -= dt;
+
+        // Attack pattern by phase
+        boss.shootTimer -= dt;
+        const shootInterval = [2.8, 1.8, 1.0][boss.phase - 1];
+        if (boss.shootTimer <= 0) {
+          boss.shootTimer = shootInterval;
+          if (boss.phase === 1) bossFireAimed(0.2);
+          if (boss.phase === 2) { bossFireAimed(0.25); bossFireAimed(-0.25); }
+          if (boss.phase === 3) bossFireSpiral(12, bossT * 0.3);
+        }
+
+        // Element attacks
+        elementAttackTimer -= dt;
+        if (elementAttackTimer <= 0) {
+          elementAttackTimer = ELEMENT_ATTACK_INTERVAL[boss.phase - 1];
+          triggerElementAttack();
+        }
+
+        // Sub-enemy spawning
+        boss.spawnTimer -= dt;
+        const spawnInterval = [6, 4, 2.5][boss.phase - 1];
+        if (boss.spawnTimer <= 0) {
+          boss.spawnTimer = spawnInterval;
+          spawnSubEnemy();
+        }
+
+        // Mine drops (phase 2+)
+        if (boss.phase >= 2) {
+          boss.mineTimer -= dt;
+          if (boss.mineTimer <= 0) {
+            boss.mineTimer = 5 - boss.phase;
+            mines.push({
+              x: 30 + Math.random() * (W - 60),
+              y: boss.y + 20,
+              vy: 25 + Math.random() * 15,
+              r: 11, t: 0, drifting: false,
+            });
+          }
+        }
+
+        // Player bullets → boss
+        bullets = bullets.filter(b => {
+          if (b.enemy) return true;
+          b.x += b.vx * dt; b.y += b.vy * dt;
+          if (dist(b.x, b.y, boss.x, boss.y) < boss.scale * 0.55) {
+            boss.hp -= 5;
+            boss.hitFlash = 0.08;
+            run.score += 10;
+            spawnParticles(b.x, b.y, '#ffffff', 3);
+            updateScoreHUD();
+            checkPhase();
+            document.getElementById('boss-bar').style.width =
+              Math.max(0, (boss.hp / BOSS_MAX_HP) * 100) + '%';
+            if (boss.hp <= 0) onBossDefeated();
+            return false;
+          }
+          // Player bullets → sub-enemies
+          for (let i = subEnemies.length - 1; i >= 0; i--) {
+            const e = subEnemies[i];
+            if (dist(b.x, b.y, e.x, e.y) < e.r + 4) {
+              e.hp--;
+              spawnParticles(e.x, e.y, e.color, 5);
+              if (e.hp <= 0) {
+                run.score += 50;
+                spawnParticles(e.x, e.y, e.color, 12);
+                spawnFloatingText(e.x, e.y, '+50', e.color);
+                subEnemies.splice(i, 1);
+                updateScoreHUD();
+              }
+              return false;
+            }
+          }
+          return b.x > -20 && b.x < W + 20 && b.y > -20 && b.y < H + 20;
+        });
+
+        // Sub-enemy movement, shooting, and ship collision
+        subEnemies = subEnemies.filter(e => {
+          e.update(e, eDt);
+          e.shootTimer -= dt;
+          if (e.shootTimer <= 0 && boss.phase >= 2) {
+            e.shootTimer = 3;
+            const dx = ship.x - e.x, dy = ship.y - e.y;
+            const len = Math.sqrt(dx*dx + dy*dy) || 1;
+            bullets.push({ x:e.x, y:e.y, vx:dx/len*90, vy:dy/len*90,
+              speed:90, dmg:1, enemy:true, r:2.5, color:e.color });
+          }
+          if (ship.invincible <= 0 && invincibleTimer <= 0 &&
+              dist(e.x, e.y, ship.x, ship.y) < e.r + 12) {
+            takeDamage(2);
+            ship.invincible = 1.2;
+            spawnParticles(ship.x, ship.y, '#ff2d78', 8);
+            return false;
+          }
+          return e.y < H + 60;
+        });
+      }
+
+      // Skip normal level-clear logic during boss fight
+      return;
+    }
 
     // End level sweep
     if (!endSweepFired && enemiesSpawned >= maxEnemies && levelTimer >= levelDuration - 2) {
@@ -979,25 +1373,25 @@ const Game = (() => {
     });
   }
 
-  function spawnPod() {
+function spawnPod() {
     const lvl = run ? run.level : 1;
-
     // ── Pod drop pool — weighted by level ──────────────────────
     const pool = [];
     function add(key, weight) { for (let i = 0; i < weight; i++) pool.push(key); }
-
     // Compounds
-    add('MAGNIUM',       6);
-    add('LITHEBRYL', 6);
-    add('NITROKALIUM',   6);
+    add('MAGNIUM',      6);
+    add('LITHEBRYL',    6);
+    add('NITROKALIUM',  6);
     add('CARBOSILICUM', 6);
-
     // More Compounds
     if (lvl >= 2) { add('TITANE', 4); add('ALKALIUM', 4); add('AZOLITHION', 4); add('GAMMITE', 4); }
-
     // Alloys
-    if (lvl >= 4) add('OMEGITE', 1); // All other alloys (AXORITE, PHIOMEGA, DELTALITE) go here
-
+    if (lvl >= 4) {
+      add('AXORITE',  3);
+      add('PHIOMEGA', 3);
+      add('DELTALITE', 3);
+      add('OMEGITE',  1);
+    }
     const puKey = pool[Math.floor(Math.random() * pool.length)];
     const fromLeft = Math.random() < 0.5;
     pods.push({
@@ -1061,6 +1455,41 @@ const Game = (() => {
     document.getElementById('clear-sub').textContent = STRINGS.ui.levelComplete(run.level);
     document.getElementById('clear-score').textContent = `SCORE  ${run.score.toLocaleString()}  +${paycheck}¢`;
     document.getElementById('overlay-clear').classList.add('active');
+  }
+
+  function onBossDefeated() {
+    boss.alive   = false;
+    bossDefeated = true;
+    bossActive   = false;
+    state        = 'clear'; // stops update() from running, render() still ticks
+
+    // Explosion cascade — fires over 1.44s while render loop is still alive
+    for (let i = 0; i < 12; i++) {
+      setTimeout(() => {
+        spawnParticles(
+          boss.x + (Math.random() - 0.5) * 120,
+          boss.y + (Math.random() - 0.5) * 80,
+          PHASE_COLORS[Math.floor(Math.random() * 3)], 30
+        );
+      }, i * 120);
+    }
+
+    // Score bonus
+    run.score += 5000;
+    if (run.score > save.highScore) { save.highScore = run.score; writeSave(); }
+
+    // Hide boss HUD
+    document.getElementById('boss-hud').classList.remove('active');
+
+    // Populate and show win overlay — after cascade finishes
+    document.getElementById('boss-clear-score').textContent =
+      'FINAL SCORE  ' + run.score.toLocaleString();
+    setTimeout(() => {
+      document.getElementById('overlay-boss-clear').classList.add('active');
+      cancelAnimationFrame(animId); // now safe to stop the loop
+    }, 1800);
+
+    updateScoreHUD();
   }
 
   // ── SWEEP —───────────────────────────────────────────────────────
@@ -1163,6 +1592,8 @@ const Game = (() => {
     drawMines();
     drawBullets();
     drawEnemies();
+    if (bossActive || bossDefeated) drawBoss();
+    if (bossActive) drawSubEnemies();
     drawShip();
     drawParticles();
     drawFloaters();
@@ -1356,6 +1787,115 @@ const Game = (() => {
     });
   }
 
+  function drawBoss() {
+    if (!boss) return; // not initialised yet
+
+    // Project all 16 vertices through current rotations → screen coords
+    const verts2D = BASE_VERTS.map(v => {
+      let p = [...v];
+      p = rot4(p, 0, 1, boss.rot.xy);
+      p = rot4(p, 0, 2, boss.rot.xz);
+      p = rot4(p, 0, 3, boss.rot.xw);
+      p = rot4(p, 1, 2, boss.rot.yz);
+      p = rot4(p, 1, 3, boss.rot.yw);
+      p = rot4(p, 2, 3, boss.rot.zw);
+      const p3 = proj4to3(p, 2.2);
+      return proj3to2(p3, 3.5, boss.scale, boss.x, boss.y);
+    });
+
+    const phaseColor  = PHASE_COLORS[boss.phase - 1];
+    const flashAlpha  = boss.hitFlash > 0 ? 0.9 : 1;
+    const hpPct       = boss.hp / BOSS_MAX_HP;
+
+    // Depth-sort edges by average 3D z of their midpoint
+    const sortedEdges = EDGES.map(([a, b]) => {
+      const za = proj4to3(applyRots(BASE_VERTS[a]), 2.2)[2];
+      const zb = proj4to3(applyRots(BASE_VERTS[b]), 2.2)[2];
+      return { a, b, z: (za + zb) / 2 };
+    }).sort((x, y) => x.z - y.z);
+
+    ctx.save();
+
+    // Draw edges
+    sortedEdges.forEach(({ a, b, z }) => {
+      const [x1, y1] = verts2D[a];
+      const [x2, y2] = verts2D[b];
+      const depthAlpha = 0.25 + 0.75 * ((z + 1.5) / 3);
+      const alpha = Math.min(1, depthAlpha * flashAlpha) * (0.5 + hpPct * 0.5);
+      ctx.beginPath();
+      ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+      ctx.strokeStyle = boss.hitFlash > 0
+        ? `rgba(255,255,255,${alpha})`
+        : phaseColor + Math.round(alpha * 255).toString(16).padStart(2, '0');
+      ctx.lineWidth   = boss.hitFlash > 0 ? 2 : (0.8 + depthAlpha * 0.8);
+      ctx.shadowColor = phaseColor;
+      ctx.shadowBlur  = 10 + depthAlpha * 8;
+      ctx.stroke();
+    });
+
+    // Draw vertices as bright nodes
+    verts2D.forEach(([x, y]) => {
+      ctx.beginPath();
+      ctx.arc(x, y, 1.8, 0, Math.PI * 2);
+      ctx.fillStyle   = boss.hitFlash > 0 ? '#ffffff' : phaseColor;
+      ctx.shadowColor = phaseColor; ctx.shadowBlur = 12;
+      ctx.fill();
+    });
+
+    // Phase 3: destabilising ghost tesseract, offset and counter-rotating
+    if (boss.phase === 3) {
+      const ghostVerts = BASE_VERTS.map(v => {
+        let p = [...v];
+        p = rot4(p, 0, 3, -boss.rot.xw * 1.4);
+        p = rot4(p, 1, 3, -boss.rot.yw * 1.2);
+        p = rot4(p, 2, 3,  boss.rot.zw * 0.8);
+        const p3 = proj4to3(p, 2.2);
+        return proj3to2(p3, 3.5, boss.scale * 0.7,
+          boss.x + Math.sin(bossT * 0.8) * 15,
+          boss.y + Math.cos(bossT * 0.6) * 10);
+      });
+      EDGES.forEach(([a, b]) => {
+        ctx.beginPath();
+        ctx.moveTo(ghostVerts[a][0], ghostVerts[a][1]);
+        ctx.lineTo(ghostVerts[b][0], ghostVerts[b][1]);
+        ctx.strokeStyle = 'rgba(255,45,120,0.18)';
+        ctx.lineWidth   = 0.6;
+        ctx.shadowBlur  = 0;
+        ctx.stroke();
+      });
+    }
+
+    ctx.restore();
+  }
+
+  function drawSubEnemies() {
+    subEnemies.forEach(e => {
+      ctx.save();
+      ctx.translate(e.x, e.y);
+      ctx.shadowColor = e.color;
+      ctx.shadowBlur  = 10;
+
+      if (e.type === 'orbital') {
+        // Diamond
+        ctx.beginPath();
+        ctx.moveTo(0, -e.r); ctx.lineTo(e.r, 0);
+        ctx.lineTo(0,  e.r); ctx.lineTo(-e.r, 0);
+        ctx.closePath();
+        ctx.strokeStyle = e.color; ctx.lineWidth = 1.5; ctx.stroke();
+      } else {
+        // Diver — downward-pointing triangle
+        ctx.beginPath();
+        ctx.moveTo(0, e.r);
+        ctx.lineTo(-e.r * 0.8, -e.r);
+        ctx.lineTo( e.r * 0.8, -e.r);
+        ctx.closePath();
+        ctx.strokeStyle = e.color; ctx.lineWidth = 1.5; ctx.stroke();
+      }
+
+      ctx.restore();
+    });
+  }
+
   function drawMines() {
     mines.forEach(m => {
       ctx.save(); ctx.translate(m.x, m.y);
@@ -1533,7 +2073,7 @@ const Game = (() => {
 
   function dist(x1,y1,x2,y2) { const dx=x2-x1,dy=y2-y1; return Math.sqrt(dx*dx+dy*dy); }
 
-  return { init, startLevel, resize, triggerPowerup,
+  return { init, startLevel, startBoss, resize, triggerPowerup,
            togglePause,
            triggerSweepPublic: triggerSweep,
            logPickupPublic: logPickup,
@@ -1587,7 +2127,7 @@ function showItemInfo(key, tier) {
   const panel = document.getElementById('shop-info-panel');
   if (!panel) return;
 
-  let sym, name, effect, recipe, desc, price;
+  let sym, name, effect, power, recipe, desc, price;
   const symClass = tier === 'compound' ? 'compound' : tier === 'alloy' ? 'alloy' : '';
 
   if (tier === 'element') {
@@ -1598,7 +2138,7 @@ function showItemInfo(key, tier) {
   } else {
     const pu = STRINGS.powerups[key];
     if (!pu) return;
-    sym = pu.sym; name = pu.name; effect = pu.effect; desc = pu.desc;
+    sym = pu.sym; name = pu.name; effect = pu.effect; power = pu.power; desc = pu.desc;
     // Build recipe string
     if (Array.isArray(pu.recipe)) {
       // simple array of element keys
@@ -1630,7 +2170,8 @@ function showItemInfo(key, tier) {
   panel.innerHTML =
     `<div class="shop-info-sym ${symClass}">${sym}</div>` +
     `<div class="shop-info-name">${name}</div>` +
-    (effect ? `<div class="shop-info-effect">${effect}</div>` : '') +
+    (effect ? `<div class="shop-info-effect">EXPEND: ${effect}</div>` : '') +
+	(power  ? `<div class="shop-info-power">TRIGGER: ${power}</div>` : '') +
     (recipe ? `<div class="shop-info-recipe">RECIPE: ${recipe}</div>` : '') +
     (desc   ? `<div class="shop-info-desc">${desc}</div>` : '') +
     (price  ? `<div class="shop-info-price">${price}</div>` : '');
@@ -1973,27 +2514,45 @@ function renderShopBody() {
 
 function shopContinue() {
   run.level++;
-  if (run.level > 8) { gameWin(); return; }
+  if (run.level === 9) {
+    // Final shop visit done — route to boss fight
+    run.ammo = run.ammoMax; // refill ammo before boss
+    showScreen('game');
+    Game.startBoss();
+    return;
+  }
   run.ammo = run.ammoMax; // refill ammo
   showScreen('game');
   Game.startLevel();
 }
 
-function gameWin() {
-  if (run.score > save.highScore) { save.highScore = run.score; writeSave(); }
-  alert('YOU REACHED ANGEL\'S EIGHT\nFINAL SCORE: ' + run.score.toLocaleString());
-  showScreen('menu');
-  updateMenuUI();
-}
+// NOTE: gameWin() retired — true run completion is handled by
+// Game.startBoss() → onBossDefeated(), which shows #overlay-boss-clear.
 
 // ═══════════════════════════════════════════════════════════════
 // STORY SCREEN
 // ═══════════════════════════════════════════════════════════════
 function showStory(level) {
   const s = STRINGS.story[level] || STRINGS.story[1];
-  document.getElementById('story-level-label').textContent = STRINGS.ui.levelComplete(level);
+  const isBossApproach = level === 9;
+
+  document.getElementById('story-level-label').textContent = isBossApproach
+    ? 'ANGEL\'S EIGHT INCOMING'
+    : STRINGS.ui.levelComplete(level);
   document.getElementById('story-text').textContent = s.text;
   document.getElementById('story-coords').textContent = s.coords || '';
+
+  // Boss approach screen: hide the direct-launch button, rename shop button
+  const btnShop   = document.getElementById('btn-to-shop');
+  const btnLaunch = document.getElementById('btn-story-launch');
+  if (isBossApproach) {
+    btnShop.textContent   = 'ENTER SHOP';
+    btnLaunch.textContent = 'PROCEED';
+  } else {
+    btnShop.textContent   = STRINGS.ui.enterShop;
+    btnLaunch.textContent = STRINGS.ui.launch;
+  }
+
   // Unlock flag
   save.storyFlags = Math.max(save.storyFlags, level);
   writeSave();
@@ -2033,7 +2592,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('btn-shop-menu').onclick = () => {
     if (!run) run = newRun();
-    document.getElementById('shop-level-badge').textContent = 'BROWSING';
+    document.getElementById('shop-level-badge').textContent = 'MODE: STATIONARY';
     showScreen('shop');
     shopTab('buy');
   };
@@ -2048,6 +2607,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('btn-menu-from-death').onclick = () => {
     document.getElementById('overlay-death').classList.remove('active');
+    showScreen('menu');
+    updateMenuUI();
+  };
+
+  document.getElementById('btn-boss-to-menu').onclick = () => {
+    document.getElementById('overlay-boss-clear').classList.remove('active');
+    document.getElementById('boss-hud').classList.remove('active');
     showScreen('menu');
     updateMenuUI();
   };

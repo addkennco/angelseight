@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Angel's Eight</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Monoton&family=VT323&family=Mrs+Saint+Delafield&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Monoton&family=VT323&family=Mrs+Saint+Delafield&family=Noto+Emoji&display=swap');
 
   :root {
     --bg:       #050510;
@@ -144,40 +144,24 @@
     min-height: 14px;
   }
 
-  .btn-primary {
-    font-family: var(--display);
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 0.2em;
-    color: var(--bg);
-    background: linear-gradient(135deg, var(--cyan), var(--purple));
-    border: none;
-    padding: 16px 48px;
-    cursor: pointer;
-    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
-    transition: filter 0.2s, transform 0.1s;
-    margin-bottom: 16px;
-  }
-  .btn-primary:active { transform: scale(0.97); filter: brightness(0.85); }
-
-  /* ── LAUNCH sweep button ── */
-  .btn-launch {
+  /* ── Sweep button ── */
+  .btn-sweep {
     font-family: var(--display);
     font-size: 14px;
     font-weight: bold;
     letter-spacing: 0.2em;
     color: var(--cyan);
     border: 2px solid var(--cyan);
-    padding: 16px 48px;
+    padding: 10px 48px;
     cursor: pointer;
     background: transparent;
     position: relative;
     transition: 0.2s;
     overflow: hidden;
-    margin-bottom: 16px;
+    margin-bottom: 10px;
   }
-  .btn-launch.sweeping { color: var(--bg); }
-  .btn-launch::before {
+  .btn-sweep.sweeping { color: var(--bg); }
+  .btn-sweep::before {
     content: "";
     position: absolute;
     height: 100%;
@@ -189,14 +173,14 @@
     z-index: -1;
     transition: 0.2s;
   }
-  .btn-launch.sweeping::before { width: 160%; }
-  .btn-launch:active { transform: scale(0.97); }
+  .btn-sweep.sweeping::before { width: 160%; }
+  .btn-sweep:active { transform: scale(0.97); }
 
   .btn-secondary {
     font-family: var(--mono);
     font-size: 11px;
     letter-spacing: 0.2em;
-    color: rgba(255,255,255,0.4);
+    color: rgba(255,255,255,0.75);
     background: transparent;
     border: 1px solid rgba(255,255,255,0.12);
     padding: 10px 28px;
@@ -382,19 +366,27 @@
   }
 
   /* Pause button */
+  
+  .pause-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+  
   #btn-pause {
     position: absolute;
     top: 10px; left: 95%; transform: translateX(-50%);
-    font-family: var(--mono);
+    font-family: Noto Emoji;
     font-size: 14px; letter-spacing: 0.25em;
     color: var(--purple);
-    background: transparent; border: 1px solid var(--purple);
-    padding: 4px 12px; cursor: pointer;
+    background: transparent;
+    padding: 4px 8px; cursor: pointer;
     pointer-events: all;
     z-index: 20;
-    transition: color 0.15s, border-color 0.15s;
+    transition: color 0.15s;
   }
-  #btn-pause:active { color: var(--cyan); border-color: var(--cyan); }
+  #btn-pause:active { color: var(--cyan); }
 
   /* Death / clear overlays — full screen */
   .game-overlay {
@@ -407,7 +399,7 @@
   }
   .game-overlay.active { display:flex; }
 
-  /* Pause overlay — small pop-up, not full-screen */
+  /* Pause overlay */
   #overlay-pause {
     position: absolute;
     inset: auto;
@@ -424,11 +416,56 @@
   #overlay-pause.active { display:flex; }
   .overlay-title {
     font-family: var(--display);
-    font-size: clamp(28px, 8vw, 52px);
-    font-weight:900; letter-spacing:0.05em;
+    font-size: clamp(18px, 6vw, 42px);
+    font-weight:400; letter-spacing:0.05em;
   }
   .overlay-sub { font-size:11px; letter-spacing:0.2em; color:rgba(255,255,255,0.4); }
   .overlay-score { font-family:var(--mono); font-size:20px; color:var(--gold); }
+  .volume-sliders {
+    font-family:var(--mono); font-size:15px; line-height:1.8;
+    color:rgba(255,255,255,0.7);
+	}
+  
+     /* Sliders */
+      input[type=range].volume {
+      width: 100%;
+      margin: 6.55px 0;
+      background-color: transparent;
+      -webkit-appearance: none;
+    }
+    input[type=range].volume:focus {
+      outline: none;
+    }
+    input[type=range].volume::-webkit-slider-runnable-track {
+      background: rgba(168, 85, 247, 0.5);
+      border: 0;
+      height: 2.9px;
+      cursor: pointer;
+    }
+    input[type=range].volume::-webkit-slider-thumb {
+      margin-top: -6.55px;
+      width: 22px;
+      height: 16px;
+      background: #00f5ff;
+      border: 2.9px solid #ff2d78;
+      border-radius: 17px;
+      cursor: pointer;
+      -webkit-appearance: none;
+    }
+    input[type=range].volume::-moz-range-track {
+      background: rgba(168, 85, 247, 0.5);
+      border: 0;
+      height: 2.9px;
+      cursor: pointer;
+    }
+    input[type=range].volume::-moz-range-thumb {
+      width: 22px;
+      height: 16px;
+      background: #00f5ff;
+      border: 2.9px solid #ff2d78;
+      border-radius: 17px;
+      cursor: pointer;
+    }
 
   /* ════════════════════════════════════
      SHOP SCREEN
@@ -465,10 +502,10 @@
     line-height: 0;
     font-size: 0;
   }
-  .sg-orange { background: #e8600a; height: 5px; }
-  .sg-pink   { background: #d42b6a; height: 7px; }
-  .sg-purple { background: #5b1a8a; height: 10px; }
-  .sg-black  { background: #0e0b12; height: 15px; }
+  .sg-orange      { background: #e8600a; height: 5px; }
+  .sg-pink        { background: #d42b6a; height: 7px; }
+  .sg-purple      { background: #5b1a8a; height: 10px; }
+  .sg-darkpurple  { background: #0e0b12; height: 15px; }
 
   /* ── two-column body ── */
   .shop-layout {
@@ -557,13 +594,17 @@
     font-size: 9px; font-weight: 700; color: #fff; letter-spacing: 0.06em;
   }
   .shop-info-effect {
-    font-size: 7px; color: var(--gold); letter-spacing: 0.04em; line-height: 1.5;
+    font-size: 10px; color: var(--gold); letter-spacing: 0.04em; line-height: 1.0;
+  }
+  .shop-info-power {
+    font-size: 10px; color: var(--cyan); letter-spacing: 0.04em; line-height: 1.0;
   }
   .shop-info-recipe {
-    font-size: 7px; color: rgba(255,255,255,0.35); letter-spacing: 0.04em; line-height: 1.5;
+    font-size: 10px; color: rgba(255,255,255,0.75); letter-spacing: 0.04em; line-height: 1.0;
   }
   .shop-info-desc {
-    font-size: 7px; color: rgba(255,255,255,0.4); line-height: 1.5;
+    font-size: 8px; color: rgba(255,255,255,0.75); line-height: 1.5;
+	font-style: italic;
     border-top: 1px solid rgba(255,255,255,0.06);
     padding-top: 4px; margin-top: 2px;
   }
@@ -717,33 +758,6 @@
   .shop-reserve-sym { font-family:var(--display); font-size:12px; font-weight:700; color:var(--purple); }
   .shop-reserve-name { font-size:5px; letter-spacing:0.04em; color:rgba(255,255,255,0.35); text-align:center; }
 
-  /* Launch button */
-  .shop-launch {
-    font-family: var(--display); font-size: 12px; font-weight: bold;
-    letter-spacing: 0.18em; color: var(--cyan);
-    border: 2px solid var(--cyan); padding: 13px 0; cursor: pointer;
-    background: transparent;
-    position: relative;
-    transition: all 1s;
-    overflow: hidden;
-    margin-top: auto;
-  }
-  .shop-launch.sweeping { color: var(--bg); }
-  .shop-launch::before {
-    content: "";
-    position: absolute;
-    height: 100%;
-    width: 0%;
-    top: 0;
-    left: -40px;
-    transform: skewX(45deg);
-    background-color: var(--cyan);
-    z-index: -1;
-    transition: all 1s;
-  }
-  .shop-launch.sweeping::before { width: 160%; }
-  .shop-launch:active { transform: scale(0.97); }
-
   /* Stash button */
   .shop-stash-btn {
     font-family:var(--mono); font-size:8px; letter-spacing:0.2em;
@@ -770,6 +784,37 @@
   .story-coords { font-size:11px; color:var(--cyan); opacity:0.5; letter-spacing:0.2em; min-height:18px; }
   @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
 
+  /* ── BOSS HUD ── */
+  #boss-hud {
+    position: fixed; top: 14px; left: 50%; transform: translateX(-50%);
+    display: none; flex-direction: column; align-items: center; gap: 4px;
+    pointer-events: none; z-index: 10;
+  }
+  #boss-hud.active { display: flex; }
+  #boss-name {
+    font-family: var(--display); font-size: 11px; color: var(--pink);
+    letter-spacing: 0.15em; text-shadow: 0 0 12px rgba(255,45,120,0.6);
+  }
+  #boss-bar-wrap {
+    width: 180px; height: 6px; background: rgba(255,255,255,0.08);
+    border-radius: 3px; overflow: hidden;
+  }
+  #boss-bar {
+    height: 100%; width: 100%;
+    background: linear-gradient(90deg, var(--pink), var(--purple));
+    border-radius: 3px; transition: width 0.1s;
+  }
+  #boss-phase {
+    font-size: 8px; letter-spacing: 0.3em; color: rgba(255,45,120,0.5);
+  }
+
+  /* Phase screen flash */
+  #phase-flash {
+    position: fixed; inset: 0; pointer-events: none; z-index: 50;
+    opacity: 0; background: rgba(255,45,120,0.12);
+    transition: opacity 0.08s;
+  }
+
 </style>
 </head>
 <body>
@@ -790,8 +835,8 @@
       <div class="menu-score-val" id="menu-highscore">000000</div>
     </div>
     <div class="menu-coords" id="menu-coords"> ∅ ⊷ ☈ ⏦ ☰ ⚸ ⏛ ☊ </div>
-    <button class="btn-launch" id="btn-start">LAUNCH</button>
-    <button class="btn-secondary" id="btn-shop-menu">SHOP / CUSTOMIZE</button>
+    <button class="btn-sweep" id="btn-start">LAUNCH</button>
+    <button class="btn-secondary" id="btn-shop-menu">FUSION SHOP</button>
   </div>
 </div>
 
@@ -808,7 +853,9 @@
       <div class="hud-value" id="hud-score">0</div>
       <div class="hud-combo" id="hud-combo">× 1</div>
     </div>
-	<button id="btn-pause">⏻</button>
+	<div class="pause-wrapper">
+	<button id="btn-pause">⏸︎</button>
+	<div>
     <div class="hud-center">
       <div class="hud-label">LEVEL</div>
       <div class="hud-value" id="hud-level">1</div>
@@ -853,12 +900,22 @@
   <!-- Pickup log -->
   <div id="pickup-log"></div>
 
+  <!-- Boss HUD (hidden until boss fight) -->
+  <div id="boss-hud">
+    <div id="boss-name">ANGEL'S EIGHT  ⬡</div>
+    <div id="boss-bar-wrap"><div id="boss-bar"></div></div>
+    <div id="boss-phase">PHASE I — EMERGENCE</div>
+  </div>
+
+  <!-- Phase transition screen flash -->
+  <div id="phase-flash"></div>
+
   <!-- Death overlay -->
   <div class="game-overlay" id="overlay-death">
     <div class="overlay-title" style="color:var(--pink)">SIGNAL LOST</div>
     <div class="overlay-sub">RUN TERMINATED</div>
     <div class="overlay-score" id="death-score"></div>
-    <button class="btn-primary" id="btn-retry" style="margin-top:8px">TRY AGAIN</button>
+    <button class="btn-sweep" id="btn-retry" style="margin-top:8px">TRY AGAIN</button>
     <button class="btn-secondary" id="btn-menu-from-death" style="margin-top:4px">MAIN MENU</button>
   </div>
 
@@ -867,14 +924,27 @@
     <div class="overlay-title" style="color:var(--cyan)">SECTOR CLEAR</div>
     <div class="overlay-sub" id="clear-sub">LEVEL 1 COMPLETE</div>
     <div class="overlay-score" id="clear-score"></div>
-    <button class="btn-primary" id="btn-to-story">CONTINUE</button>
+    <button class="btn-sweep" id="btn-to-story">CONTINUE</button>
+  </div>
+
+  <!-- Boss defeated overlay -->
+  <div class="game-overlay" id="overlay-boss-clear">
+    <div class="overlay-title" style="color:var(--gold)">ANGEL'S EIGHT DEFEATED</div>
+    <div class="overlay-sub">RUN COMPLETE</div>
+    <div class="overlay-score" id="boss-clear-score"></div>
+    <button class="btn-sweep" id="btn-boss-to-menu" style="margin-top:8px">MAIN MENU</button>
   </div>
 </div>
 
   <!-- Pause overlay -->
   <div class="game-overlay" id="overlay-pause">
     <div class="overlay-title" style="color:var(--cyan)">PAUSED</div>
-    <button class="btn-primary" id="btn-resume" style="margin-top:4px">▶ RESUME</button>
+	<button class="btn-secondary" id="btn-return" style="margin-top:4px">🢔 ABANDON MISSION</button>
+	<div class="volume-sliders">
+	VOL:<input type="range" id="volume" class="volume" min="0" max="100" value="50">
+	SFX:<input type="range" id="sfxvolume" class="volume" min="0" max="100" value="40">
+	</div>
+    <button class="btn-sweep" id="btn-resume" style="margin-top:4px">🡺 RESUME</button>
   </div>
 </div>
 
@@ -885,8 +955,8 @@
   <div class="story-level" id="story-level-label">LEVEL 1 COMPLETE</div>
   <div class="story-text" id="story-text"></div>
   <div class="story-coords" id="story-coords"></div>
-  <button class="btn-launch" id="btn-to-shop" style="margin-top:8px">ENTER SHOP</button>
-  <button class="btn-launch" id="btn-story-launch" style="margin-top:8px">LAUNCH ›</button>
+  <button class="btn-sweep" id="btn-to-shop" style="margin-top:8px">ENTER SHOP</button>
+  <button class="btn-sweep" id="btn-story-launch" style="margin-top:8px">LAUNCH 🡺</button>
 </div>
 
 <!-- ══════════════════════════════════════
@@ -911,7 +981,7 @@
     <div class="sg-orange"></div>
     <div class="sg-pink"></div>
     <div class="sg-purple"></div>
-    <div class="sg-black"></div>
+    <div class="sg-darkpurple"></div>
   </div>
 
   <!-- Two-column body -->
@@ -989,7 +1059,7 @@
       </div>
 
       <!-- Launch -->
-      <button class="shop-launch" id="btn-shop-launch" onclick="shopContinue()">LAUNCH ›</button>
+      <button class="btn-sweep" id="btn-shop-launch" onclick="shopContinue()">LAUNCH ›</button>
 
     </div>
   </div>
@@ -1006,7 +1076,7 @@
     setTimeout(() => btn.classList.remove('sweeping'), 1100);
   }
   document.addEventListener('pointerdown', e => {
-    const btn = e.target.closest('.btn-launch, .shop-launch');
+    const btn = e.target.closest('.btn-sweep');
     if (btn) triggerSweep(btn);
   });
 })();
