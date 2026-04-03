@@ -368,19 +368,19 @@
   /* Pause button */
   
   .pause-wrapper {
-    display: flex;
+	position: absolute;
+    top: 10px; left: 95%; transform: translateX(-50%);
+	display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
 }
   
   #btn-pause {
-    position: absolute;
-    top: 10px; left: 95%; transform: translateX(-50%);
     font-family: Noto Emoji;
     font-size: 14px; letter-spacing: 0.25em;
     color: var(--purple);
     background: transparent;
+	border: 0px;
     padding: 4px 8px; cursor: pointer;
     pointer-events: all;
     z-index: 20;
