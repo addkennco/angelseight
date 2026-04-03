@@ -372,7 +372,7 @@
     oc.font          = `${cursiveSize}px 'Mrs Saint Delafield', cursive`;
     oc.textAlign     = 'center';
     oc.textBaseline  = 'middle';
-    oc.fillStyle     = '#ff2d78';
+    oc.fillStyle     = '#ffd700';
     oc.shadowColor   = 'rgba(255,45,120,0.85)';
     oc.shadowBlur    = 28;
     oc.fillText("Angel's", cx, cy - titleSize * 0.08);
@@ -502,9 +502,10 @@
     const angelsCanvas = buildAngelsCanvas();
     const eightCanvas  = buildEightCanvas();
 
-    // Draw Angel's first (behind), then EIGHT on top
+    // Draw EIGHT first (behind), then Angel's on top
+	drawElement(eightCanvas,  eightScan,  masterAlpha);
     drawElement(angelsCanvas, angelsScan, masterAlpha);
-    drawElement(eightCanvas,  eightScan,  masterAlpha);
+
 
     // Scan bar — rides across the whole composition
     const maxScan = Math.max(angelsScan, eightScan);
