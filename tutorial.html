@@ -227,7 +227,7 @@
   }
 
   /* ══ SLIDE 2: HUD ══ */
-  #slide-2 { padding: 10px 16px 8px; justify-content: flex-start; gap: 0; }
+  #slide-2 { padding: 10px 16px 8px; gap: 0; }
 
   /* Mock HUD bar */
   .mock-hud {
@@ -441,7 +441,7 @@
   }
 
   /* ══ SLIDE 5: SHOP ══ */
-  #slide-5 { padding: 10px 14px; justify-content: flex-start; }
+  #slide-5 { padding: 10px 14px; }
 
   .mock-shop-header {
     width: 100%;
@@ -930,116 +930,121 @@
   </div>
 
   <!-- ════ SLIDE 6: CRAFTING ════ -->
-  <div class="slide" id="slide-5">
-    <div class="slide-title" style="margin-bottom:4px">THE FUSION SHOP</div>
-    <div class="slide-body" style="margin-bottom:6px;font-size:12px">
-      Opens between levels. Spend credits to upgrade your loadout.
+  <div class="slide" id="slide-6">
+    <div class="slide-title" style="margin-bottom:4px">CRAFTING SYSTEM</div>
+    <div class="slide-body" style="margin-bottom:10px;font-size:12px">
+      Fuse elements and compounds to create powerful materials with unique abilities.
     </div>
 
-    <!-- Mock shop, wrapped for badge overlay -->
-    <div id="mock-shop-wrap">
+    <!-- Mock crafting interface -->
+    <div style="width:100%;max-width:min(360px,96vw);position:relative">
+      
+      <!-- Craft tab visual -->
+      <div style="background:rgba(5,5,16,0.9);border:1px solid rgba(0,245,255,0.2);padding:8px 10px;position:relative">
+        <div style="font-size:7px;letter-spacing:0.2em;color:rgba(255,255,255,0.3);margin-bottom:6px">CRAFT TAB</div>
+        
+        <!-- Example compound card (Lithebryl) with recipe variants -->
+        <div style="border:1px solid rgba(168,85,247,0.3);background:rgba(168,85,247,0.05);padding:8px;margin-bottom:8px;position:relative">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+            <div>
+              <div style="font-family:var(--display);font-size:11px;color:var(--purple);letter-spacing:0.08em">Β LITHEBRYL</div>
+              <div style="font-size:7px;color:rgba(255,255,255,0.4);margin-top:2px">Shield Max +20, Ammo +8</div>
+            </div>
+            <div style="font-size:9px;color:var(--gold)">0/2</div>
+          </div>
+          
+          <!-- Recipe variants displayed -->
+          <div style="font-size:7px;letter-spacing:0.15em;color:rgba(255,255,255,0.3);margin-bottom:3px">RECIPES:</div>
+          <div style="display:flex;flex-direction:column;gap:2px;font-size:8px;color:rgba(0,245,255,0.7)">
+            <div>β Be + τ Ti</div>
+            <div>λ Li + τ Ti</div>
+            <div>β Be + β Be</div>
+          </div>
+          
+          <!-- badge A: recipe info -->
+          <div class="cbadge purple" style="top:-6px;right:-6px">A</div>
+        </div>
 
-      <!-- Header -->
-      <div class="mock-shop-header" style="max-width:min(360px,96vw)">
-        <div>
-          <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--purple);letter-spacing:0.1em">FUSION SHOP</div>
-          <div style="font-size:8px;letter-spacing:0.2em;color:rgba(255,255,255,0.3)">AFTER LEVEL 1</div>
+        <!-- Available ingredient cards -->
+        <div style="border-top:1px solid rgba(255,255,255,0.08);padding-top:8px">
+          <div style="font-size:7px;letter-spacing:0.2em;color:rgba(255,255,255,0.3);margin-bottom:4px">AVAILABLE INGREDIENTS</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px">
+            <div style="border:1px solid rgba(0,245,255,0.25);background:rgba(0,245,255,0.03);padding:4px;text-align:center">
+              <div style="font-size:9px;color:var(--cyan)">β</div>
+              <div style="font-size:6px;color:rgba(255,255,255,0.5);margin-top:1px">Be × 2</div>
+            </div>
+            <div style="border:1px solid rgba(0,245,255,0.25);background:rgba(0,245,255,0.03);padding:4px;text-align:center">
+              <div style="font-size:9px;color:var(--cyan)">τ</div>
+              <div style="font-size:6px;color:rgba(255,255,255,0.5);margin-top:1px">Ti × 1</div>
+            </div>
+            <div style="border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.02);padding:4px;text-align:center;opacity:0.4">
+              <div style="font-size:9px;color:rgba(255,255,255,0.3)">𝜈</div>
+              <div style="font-size:6px;color:rgba(255,255,255,0.3);margin-top:1px">N × 0</div>
+            </div>
+          </div>
         </div>
-        <div style="text-align:right">
-          <div style="font-size:7px;letter-spacing:0.2em;color:rgba(255,255,255,0.3)">CREDITS</div>
-          <div style="font-family:var(--display);font-size:13px;color:var(--gold)">340¢</div>
-        </div>
-      </div>
-      <div class="mock-shop-supergraph" style="max-width:min(360px,96vw)">
-        <div class="sg-o"></div><div class="sg-p"></div><div class="sg-pu"></div><div class="sg-b"></div>
+
+        <!-- badge B: drag ingredients -->
+        <div class="cbadge" style="bottom:-6px;left:50%;transform:translateX(-50%)">B</div>
       </div>
 
-      <!-- Two-column body, position:relative for badges -->
-      <div class="mock-shop-layout" style="max-width:min(360px,96vw);position:relative">
-        <!-- Left -->
-        <div class="mock-shop-left">
-          <div class="mock-shop-tabs">
-            <div class="m-tab active">BUY</div>
-            <div class="m-tab">SELL</div>
-            <div class="m-tab">CRAFT</div>
-            <div class="m-tab">STASH</div>
-          </div>
-          <div class="mock-cards">
-            <div class="mock-card">
-              <div class="mc-sym" style="color:var(--cyan)">β</div>
-              <div class="mc-name">Beryllium</div>
-              <div class="mc-eff">Shield Max +6</div>
-              <div class="mc-price">80¢</div>
-            </div>
-            <div class="mock-card" style="border-color:rgba(0,245,255,0.35);background:rgba(0,245,255,0.04)">
-              <div class="mc-sym" style="color:var(--purple)">Β</div>
-              <div class="mc-name">Lithebryl</div>
-              <div class="mc-eff">Shield +20</div>
-              <div class="mc-price">150¢</div>
-            </div>
-            <div class="mock-card">
-              <div class="mc-sym" style="color:var(--cyan)">𝜈</div>
-              <div class="mc-name">Nitrogen</div>
-              <div class="mc-eff">Shoot Spd +3</div>
-              <div class="mc-price">80¢</div>
-            </div>
-          </div>
-          <!-- badge A: tabs -->
-          <div class="cbadge purple" style="top:-8px;left:50%;transform:translateX(-50%)">A</div>
-          <!-- badge B: cards -->
-          <div class="cbadge" style="bottom:-8px;left:50%;transform:translateX(-50%)">B</div>
-        </div>
-        <!-- Right -->
-        <div class="mock-shop-right">
-          <div class="mock-stats-block">
-            <div class="m-stat-row"><div class="m-stat-label">SHOOT SPD</div><div class="m-stat-val">3/s</div></div>
-            <div class="m-stat-row"><div class="m-stat-label">AMMO MAX</div><div class="m-stat-val">50</div></div>
-            <div class="m-stat-row"><div class="m-stat-label">SHIELD MAX</div><div class="m-stat-val">10</div></div>
-          </div>
-          <div class="mock-reserves">
-            <div class="mock-res-slots">
-              <div class="mock-res-slot filled">Β</div>
-              <div class="mock-res-slot filled">Μ</div>
-              <div class="mock-res-slot"></div>
-            </div>
-          </div>
-          <div class="mock-launch">LAUNCH ›</div>
-          <!-- badge C: stats -->
-          <div class="cbadge gold" style="top:-8px;right:4px">C</div>
-          <!-- badge D: reserves -->
-          <div class="cbadge pink" style="top:60px;right:4px">D</div>
-        </div>
+      <!-- Action indicator -->
+      <div style="margin-top:8px;text-align:center">
+        <svg width="100%" height="30" style="overflow:visible">
+          <defs>
+            <marker id="craft-arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L6,3 z" fill="rgba(0,245,255,0.6)"/>
+            </marker>
+          </defs>
+          <line x1="50%" y1="2" x2="50%" y2="22" stroke="rgba(0,245,255,0.4)" stroke-width="1.5" stroke-dasharray="3 2" marker-end="url(#craft-arrow)"/>
+        </svg>
+        <div style="font-size:7px;letter-spacing:0.2em;color:rgba(0,245,255,0.5)">DRAG TO CRAFT</div>
       </div>
+
+      <!-- Progress tracking box -->
+      <div style="border:1px solid rgba(255,215,0,0.3);background:rgba(255,215,0,0.04);padding:8px;margin-top:6px;position:relative">
+        <div style="font-size:7px;letter-spacing:0.2em;color:rgba(255,215,0,0.7);margin-bottom:4px">CRAFT PROGRESS</div>
+        <div style="display:flex;gap:3px;margin-bottom:4px">
+          <div style="width:10px;height:10px;border-radius:50%;background:rgba(0,245,255,0.6);box-shadow:0 0 4px rgba(0,245,255,0.4)"></div>
+          <div style="width:10px;height:10px;border-radius:50%;background:rgba(0,245,255,0.6);box-shadow:0 0 4px rgba(0,245,255,0.4)"></div>
+          <div style="width:10px;height:10px;border-radius:50%;border:1px solid rgba(255,255,255,0.2);background:rgba(0,0,0,0.3)"></div>
+        </div>
+        <div style="font-size:7px;color:rgba(255,255,255,0.4)">β Be + τ Ti → ready to craft</div>
+        
+        <!-- badge C: progress lights -->
+        <div class="cbadge gold" style="top:-6px;right:-6px">C</div>
+      </div>
+
     </div>
 
     <!-- Legend -->
-    <div class="legend-grid" style="margin-top:12px">
+    <div class="legend-grid" style="margin-top:10px">
       <div class="legend-row">
         <div class="legend-badge purple">A</div>
         <div class="legend-text">
-          <div class="legend-name">Tabs</div>
-          <div class="legend-desc">Buy, Sell, Craft, or view your Stash.</div>
+          <div class="legend-name">Recipe Variants</div>
+          <div class="legend-desc">Tap a compound to see all possible ingredient combos.</div>
         </div>
       </div>
       <div class="legend-row">
         <div class="legend-badge gold">C</div>
         <div class="legend-text">
-          <div class="legend-name">Stats Panel</div>
-          <div class="legend-desc">Current loadout. Drag elements here to apply buffs.</div>
+          <div class="legend-name">Progress Lights</div>
+          <div class="legend-desc">Track which ingredients you've added. Lights fill as you drag.</div>
         </div>
       </div>
       <div class="legend-row">
         <div class="legend-badge">B</div>
         <div class="legend-text">
-          <div class="legend-name">Item Cards</div>
-          <div class="legend-desc">Drag a card to the action box to buy, sell, or craft.</div>
+          <div class="legend-name">Drag to Craft</div>
+          <div class="legend-desc">Drag ingredients to the compound card. Progress fills with each drop.</div>
         </div>
       </div>
       <div class="legend-row">
-        <div class="legend-badge pink">D</div>
+        <div style="width:15px;height:15px;border-radius:50%;border:1.5px solid var(--cyan);background:rgba(0,245,255,0.1);flex-shrink:0;margin-top:1px"></div>
         <div class="legend-text">
-          <div class="legend-name">Reserves</div>
-          <div class="legend-desc">Powerups you carry into battle. Drag to rearrange.</div>
+          <div class="legend-name">Info Cards</div>
+          <div class="legend-desc">Cards show ingredient highlights when a recipe is selected.</div>
         </div>
       </div>
     </div>
@@ -1065,6 +1070,7 @@
   const hint = document.getElementById('click-hint');
 
   function goto(idx){
+    if(idx < 0 || idx >= N) return; // bounds check
     SLIDES[cur].classList.remove('active');
     dots[cur].classList.remove('active');
     cur = idx;
@@ -1078,10 +1084,53 @@
     if(cur===4) startPUDemo();
   }
 
+  // Swipe gesture detection
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchEndX = 0;
+  let touchEndY = 0;
+  const minSwipeDistance = 50; // minimum distance for a swipe
+
+  function handleGesture() {
+    const deltaX = touchEndX - touchStartX;
+    const deltaY = touchEndY - touchStartY;
+    
+    // Only register as swipe if horizontal movement is greater than vertical
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minSwipeDistance) {
+      if (deltaX > 0) {
+        // Swipe right - go to previous slide
+        goto(cur - 1);
+      } else {
+        // Swipe left - go to next slide
+        goto(cur + 1);
+      }
+    }
+  }
+
+  document.addEventListener('touchstart', e => {
+    touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
+  });
+
+  document.addEventListener('touchend', e => {
+    touchEndX = e.changedTouches[0].screenX;
+    touchEndY = e.changedTouches[0].screenY;
+    handleGesture();
+  });
+
+  // Tap to advance (existing functionality)
   document.addEventListener('pointerdown', e=>{
     if(e.target.closest('button')) return;
-    if(cur < N-1) goto(cur+1);
+    // Only advance on tap if it's not part of a swipe gesture
+    // The swipe handler will take care of navigation
+    if(cur < N-1 && e.pointerType !== 'touch') goto(cur+1);
   });
+
+  // Reset to slide 0 when tutorial is opened
+  // This function should be called from the parent context when opening the tutorial
+  window.resetTutorial = function() {
+    goto(0);
+  };
 
   // ──────────────────────────────────
   // SLIDE 1: Movement demo
@@ -1125,7 +1174,7 @@
     ctx.restore();
   }
 
-  let moveRAF=null, moveT=0;
+  let moveRAF=null, moveT=0, shipX=MW/2, targetX=MW/2;
   function startMoveDemo(){
     if(moveRAF) return;
     const MAX_ANGLE = 55 * Math.PI / 180;
@@ -1139,13 +1188,13 @@
         mctx.fillStyle = `rgba(255,255,255,${s.o})`; mctx.fill();
       });
 
-      // Ship Movement
-      const shipX = MW/2 + Math.sin(moveT*0.4)*70;
-      const shipY = MH*0.6 + Math.sin(moveT*0.8)*28;
+      // Ship Movement - horizontal only with smooth interpolation (matches game)
+      const shipY = MH*0.75; // Fixed Y position near bottom
+      targetX = MW/2 + Math.sin(moveT*0.35)*90; // Smooth left-right movement
+      shipX += (targetX - shipX) * 0.18; // Smooth interpolation like the real game
 
-      // Aim Cursor
-      const cursorX = MW/2 + Math.sin(moveT*0.55)*100;
-      const t = Math.max(0, Math.min(1, cursorX / MW));
+      // Aim angle based on ship position
+      const t = Math.max(0, Math.min(1, shipX / MW));
       const aimAngle = (t - 0.5) * 2 * MAX_ANGLE;
 
       // Auto-fire bullet from ship nose
