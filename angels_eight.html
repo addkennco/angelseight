@@ -418,7 +418,13 @@
   /* ── Shop toast notification ── */
   #shop-toast {
     position: absolute;
-    top: 0; left: 0; right: 0;
+    top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	margin-left: auto;
+    margin-right: auto;
+    width: fit-content;
+    max-width: 90%;
     z-index: 50;
     padding: 10px 16px;
     font-family: var(--mono);
@@ -685,12 +691,13 @@
   .shop-action-box {
     border: 1px dashed rgba(255,255,255,0.12);
     display: flex; align-items: center; justify-content: center;
-    height: 36px;
+	width: 75%;
+    height: 56px;
     font-size: 7px; letter-spacing: 0.3em;
     color: rgba(255,255,255,0.18);
     flex-shrink: 0;
   }
-  .shop-action-box.buy-box    { border-color: rgba(0,245,255,0.2);   color: rgba(0,245,255,0.3); }
+  .shop-action-box.buy-box    { border-color: rgba(0,245,255,0.2);   color: rgba(0,245,255,0.3); } 
   .shop-action-box.sell-box   { border-color: rgba(255,45,120,0.2);  color: rgba(255,45,120,0.3); }
   .shop-action-box.craft-box  { border-color: rgba(168,85,247,0.2);  color: rgba(168,85,247,0.3); }
   .shop-action-box.drag-over  { background: rgba(255,255,255,0.06); border-style: solid; color: #fff; }
@@ -1131,8 +1138,11 @@
         <div class="shop-info-empty">TAP ANY CARD FOR INFO</div>
       </div>
 
-      <!-- Action box (stand-in — tab-aware label, no logic yet) -->
-      <div class="shop-action-box buy-box" id="shop-action-box">DRAG TO BUY</div>
+      <!-- Action box  -->
+	     <div style="display: inline-flex; flex-direction: row; flex-wrap: nowrap; justify-content: center; align-items: center; align-content: center; gap: 8px;">
+      <div class="shop-action-box buy-box" id="shop-action-box"> </div> 
+	  <button class="btn-secondary" id="btn-shop-action">GO 🡺</button>
+	     </div>
 
       <!-- Reserves block -->
       <div class="shop-reserves">
@@ -1140,7 +1150,7 @@
       </div>
 
       <!-- Launch -->
-      <button class="btn-sweep" id="btn-shop-launch" onclick="shopContinue()">LAUNCH ›</button>
+      <button class="btn-sweep" id="btn-shop-launch" onclick="shopContinue()">LAUNCH 🡺</button>
 
     </div>
   </div>
