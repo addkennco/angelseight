@@ -107,10 +107,79 @@ loadSave();
 
 // ═══════════════════════════════════════════════════════════════
 // ROUTER
+//
+// showScreen(id) — animated screen transition.
+//
+// Each screen has a designated content element that gets the
+// scaleY treatment. The shop also fades its grid in separately.
+//
+// Animate targets per screen:
+//   menu  → .menu-content   (already has its own boot animation)
+//   game  → .screen-content
+//   story → .screen-content
+//   shop  → .screen-content  + #shop-grid-bg fades in
+//
+// Timings for incoming screens are snappier than the boot
+// (no waveform delay needed mid-session).
 // ═══════════════════════════════════════════════════════════════
+let _transitioning = false;
+
+function getContentEl(screenId) {
+  const screen = document.getElementById('screen-' + screenId);
+  if (!screen) return null;
+  if (screenId === 'menu') return screen.querySelector('.menu-content');
+  return screen.querySelector('.screen-content');
+}
+
 function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-' + id).classList.add('active');
+  if (_transitioning) return;
+
+  // Find the currently active screen's content element to collapse
+  const activeScreen = document.querySelector('.screen.active');
+  const activeId     = activeScreen?.id?.replace('screen-', '');
+  const outEl        = activeId ? getContentEl(activeId) : null;
+
+  function switchAndExpand() {
+    // Switch the visible screen
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    const incoming = document.getElementById('screen-' + id);
+    incoming.classList.add('active');
+
+    const inEl = getContentEl(id);
+
+    // Shop: fade the grid in alongside the expand
+    if (id === 'shop') {
+      const grid = document.getElementById('shop-grid-bg');
+      if (grid) {
+        grid.style.transition = 'opacity 600ms ease';
+        grid.style.opacity    = '0';
+        // Tiny delay so the transition fires after display kicks in
+        requestAnimationFrame(() => { grid.style.opacity = '1'; });
+      }
+    } else {
+      // Reset grid opacity when leaving the shop
+      const grid = document.getElementById('shop-grid-bg');
+      if (grid) { grid.style.transition = 'none'; grid.style.opacity = '0'; }
+    }
+
+    screenExpand(inEl, {
+      delayMs:   0,    // no waveform delay mid-session
+      expandMs:  320,  // snappier than the boot expand (was 550)
+      flickerMs: 260,  // snappier flicker too
+      onDone: () => { _transitioning = false; },
+    });
+  }
+
+  if (outEl) {
+    _transitioning = true;
+    screenCollapse(outEl, {
+      collapseMs: 220,
+      onDone: switchAndExpand,
+    });
+  } else {
+    // No outgoing element (e.g. first navigation) — just switch
+    switchAndExpand();
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -312,66 +381,131 @@ const AudioManager = (() => {
 })();
 
 // ═══════════════════════════════════════════════════════════════
-// MENU FLICKER-IN
+// SCREEN EXPAND — reusable expand+flicker boot animation
+//
+// screenExpand(el, opts) animates any element with the three-phase
+// CRT power-on: delay → scaleY expand → sin-gate flicker to full.
+//
+// opts (all optional):
+//   delayMs   {number}   silence before expand starts  (default 380)
+//   expandMs  {number}   scaleY expand duration         (default 550)
+//   flickerMs {number}   flicker phase duration         (default 380)
+//   onDone    {function} called when animation completes
 // ═══════════════════════════════════════════════════════════════
-(function menuFlickerIn() {
-  const el = document.getElementById('screen-menu')?.querySelector('.menu-content');
+function screenExpand(el, opts = {}) {
   if (!el) return;
 
-  const WAVE_DELAY_MS = 380;  // head start for waveforms
-  const EXPAND_MS     = 550;  // vertical expand duration
-  const FLICKER_MS    = 380;  // flicker phase after expand
-  const TOTAL_MS      = WAVE_DELAY_MS + EXPAND_MS + FLICKER_MS;
+  const delayMs   = opts.delayMs   ?? 380;
+  const expandMs  = opts.expandMs  ?? 550;
+  const flickerMs = opts.flickerMs ?? 380;
+  const onDone    = opts.onDone    ?? null;
 
   let startTs = null;
   let flickerTimer = 0;
+
+  // Start collapsed and invisible
+  el.style.opacity   = '0';
+  el.style.transform = 'scaleY(0.06)';
 
   function tick(ts) {
     if (!startTs) startTs = ts;
     const elapsed = ts - startTs;
 
-    if (elapsed < WAVE_DELAY_MS) {
-      // keep invisible
-      el.style.opacity = '0';
-      el.style.transform = 'scaleY(0.06)';
+    // ── Phase 1: silence — waveform gets a head start ──
+    if (elapsed < delayMs) {
       requestAnimationFrame(tick);
       return;
     }
 
-    const afterDelay = elapsed - WAVE_DELAY_MS;
+    const afterDelay = elapsed - delayMs;
 
-    if (afterDelay < EXPAND_MS) {
-      // vertical expand, ease-out cubic
-      let t = afterDelay / EXPAND_MS;
+    // ── Phase 2: vertical expand, ease-out cubic ──
+    if (afterDelay < expandMs) {
+      let t = afterDelay / expandMs;
       t = 1 - Math.pow(1 - t, 3);
-      const scale = 0.06 + 0.94 * t;
-      el.style.transform = `scaleY(${scale.toFixed(4)})`;
-      el.style.opacity = (t * 0.9).toFixed(4);
+      el.style.transform = `scaleY(${(0.06 + 0.94 * t).toFixed(4)})`;
+      el.style.opacity   = (t * 0.9).toFixed(4);
       requestAnimationFrame(tick);
       return;
     }
 
-    const afterExpand = afterDelay - EXPAND_MS;
+    const afterExpand = afterDelay - expandMs;
 
-    if (afterExpand < FLICKER_MS) {
-      // sin-gate flicker
+    // ── Phase 3: sin-gate flicker to full opacity ──
+    if (afterExpand < flickerMs) {
       flickerTimer += 0.38;
-      const gate = Math.sin(flickerTimer) > 0.25;
-      const progress = afterExpand / FLICKER_MS; // 0→1
-      const baseAlpha = 0.9 + 0.1 * progress;   // ramps to 1
-      el.style.opacity = (gate ? baseAlpha : baseAlpha * 0.65).toFixed(4);
+      const gate      = Math.sin(flickerTimer) > 0.25;
+      const baseAlpha = 0.9 + 0.1 * (afterExpand / flickerMs);
+      el.style.opacity   = (gate ? baseAlpha : baseAlpha * 0.65).toFixed(4);
       el.style.transform = 'scaleY(1)';
       requestAnimationFrame(tick);
       return;
     }
 
-    // remove inline styles so CSS takes over
-    el.style.opacity = '1';
+    // ── Done: hand off to CSS ──
+    el.style.opacity   = '1';
     el.style.transform = 'scaleY(1)';
+    if (onDone) onDone();
   }
 
   requestAnimationFrame(tick);
-})();
+}
+
+// Boot the menu on page load — same timings as before
+screenExpand(
+  document.getElementById('screen-menu')?.querySelector('.menu-content'),
+  { delayMs: 380, expandMs: 550, flickerMs: 380 }
+);
+
+// ═══════════════════════════════════════════════════════════════
+// SCREEN COLLAPSE — reverse of screenExpand
+//
+// screenCollapse(el, opts) squishes an element back to a thin line
+// using the same ease-in cubic that screenExpand uses in reverse,
+// then calls onDone so the caller can switch screens and expand in.
+//
+// opts (all optional):
+//   collapseMs {number}   squish duration     (default 220)
+//   onDone     {function} called when done
+// ═══════════════════════════════════════════════════════════════
+function screenCollapse(el, opts = {}) {
+  if (!el) { if (opts.onDone) opts.onDone(); return; }
+
+  const collapseMs = opts.collapseMs ?? 220;
+  const onDone     = opts.onDone     ?? null;
+
+  // Snapshot the current opacity so we fade from wherever we are
+  const startOpacity = parseFloat(el.style.opacity) || 1;
+
+  let startTs = null;
+
+  function tick(ts) {
+    if (!startTs) startTs = ts;
+    const elapsed = ts - startTs;
+    const raw = Math.min(elapsed / collapseMs, 1);
+
+    // ease-in cubic — slow start, fast finish (mirror of expand's ease-out)
+    const t = raw * raw * raw;
+
+    const scale   = 1 - 0.94 * t;          // 1 → 0.06
+    const opacity = startOpacity * (1 - t); // fade out in step
+
+    el.style.transform = `scaleY(${scale.toFixed(4)})`;
+    el.style.opacity   = opacity.toFixed(4);
+
+    if (raw < 1) {
+      requestAnimationFrame(tick);
+      return;
+    }
+
+    // Fully collapsed
+    el.style.transform = 'scaleY(0.06)';
+    el.style.opacity   = '0';
+    if (onDone) onDone();
+  }
+
+  requestAnimationFrame(tick);
+}
 
 // ═══════════════════════════════════════════════════════════════
 // RUN STATE
@@ -840,10 +974,6 @@ const Game = (() => {
     if (ship.invincible > 0) ship.invincible -= dt;
     if (invincibleTimer > 0) invincibleTimer = Math.max(0, invincibleTimer - dt);
 
-    // Scroll waveform
-    waveOffset += dt * 60 * (1 + run.level * 0.08);
-    waveT += dt;
-
     // Shooting
     shootTimer -= dt;
     if (shootTimer <= 0 && run.ammo > 0) {
@@ -889,6 +1019,10 @@ const Game = (() => {
     if (timeDilationTimer > 0) timeDilationTimer = Math.max(0, timeDilationTimer - dt);
     if (noAmmoCostTimer  > 0) noAmmoCostTimer  = Math.max(0, noAmmoCostTimer  - dt);
     const eDt = timeDilationTimer > 0 ? dt * 0.4 : dt;
+
+    // Scroll waveform — driven by eDt so Deltalite time dilation slows it with enemies
+    waveOffset += eDt * 60 * (1 + run.level * 0.08);
+    waveT += eDt;
 
     // Enemies
     enemies = enemies.filter(e => {
@@ -1639,17 +1773,17 @@ function spawnPod() {
     const c2 = hexToRgb(pal.sun);
 
     for (let r = 0; r < rows; r++) {
-      const baseY = r * rowSpan + rowSpan * 0.5;
-      const pct   = r / rows;
-      const amp   = (4 + r * 1.4 + lvl * 0.8) * (0.4 + pct * 0.6);
+      const baseY = (r * rowSpan + rowSpan * 0.5 + waveOffset) % H;
+      const screenPct = baseY / H;  // 0=top of screen, 1=bottom — drives color, not row index
+      const amp   = (4 + r * 1.4 + lvl * 0.8) * (0.4 + (r / rows) * 0.6);
       const freq  = 0.022 + r * 0.001;
       const ph    = waveT * 0.5 + r * 0.3;
       const ph2   = waveT * 0.3 + r * 0.18;
 
-      const rr = Math.round(c1.r + (c2.r - c1.r) * pct);
-      const gg = Math.round(c1.g + (c2.g - c1.g) * pct);
-      const bb = Math.round(c1.b + (c2.b - c1.b) * pct);
-      const alpha = 0.14 + pct * 0.38;
+      const rr = Math.round(c1.r + (c2.r - c1.r) * screenPct);
+      const gg = Math.round(c1.g + (c2.g - c1.g) * screenPct);
+      const bb = Math.round(c1.b + (c2.b - c1.b) * screenPct);
+      const alpha = 0.14 + screenPct * 0.38;
 
       ctx.strokeStyle = `rgba(${rr},${gg},${bb},${alpha})`;
       ctx.lineWidth = 0.85;
@@ -2086,6 +2220,7 @@ function spawnPod() {
 // ═══════════════════════════════════════════════════════════════
 let shopMode = 'buy';
 let selectedCardKey = null;
+const craftProgress = {}; // puKey → ingredient keys already slotted; reset on tab switch
 
 // ── Action box labels per tab ────────────────────────────────────
 const ACTION_BOX_LABELS = {
@@ -2098,6 +2233,13 @@ const ACTION_BOX_LABELS = {
 function shopTab(tab) {
   shopMode = tab;
   selectedCardKey = null;
+  // Return any partially-slotted ingredients to inventory and reset lights
+  Object.entries(craftProgress).forEach(([puKey, slots]) => {
+    slots.forEach(ingredientKey => {
+      run.inventory[ingredientKey] = (run.inventory[ingredientKey] || 0) + 1;
+    });
+    delete craftProgress[puKey];
+  });
   ['buy','sell','craft','stash'].forEach(t => {
     const el = document.getElementById('tab-' + t);
     if (el) el.classList.toggle('active', t === tab);
@@ -2230,11 +2372,11 @@ function renderShopBody() {
     const grid = document.createElement('div'); grid.className = 'shop-grid';
     Object.entries(STRINGS.items).forEach(([key, item]) => {
       const price = 80;
-      const card = document.createElement('div'); card.className = 'shop-card slim';
+      const card = document.createElement('div'); card.className = 'shop-card obj';
       card.dataset.cardKey = key; card.dataset.cardTier = 'element'; card.dataset.draggable = '1';
       card.innerHTML = `<div class="shop-card-sym">${item.sym}</div><div class="shop-card-name">${item.name}</div><div class="shop-card-corner"><div class="shop-card-count">${(run?.inventory[key]||0)}/99</div><div class="shop-card-price">${price}¢</div></div>`;
       card.onclick = () => {
-        document.querySelectorAll('.shop-card.slim.selected').forEach(c => c.classList.remove('selected'));
+        document.querySelectorAll('.shop-card.obj.selected').forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
         showItemInfo(key, 'element');
       };
@@ -2250,11 +2392,11 @@ function renderShopBody() {
     const BUY_EXCLUDED_POWERUPS = new Set(['OMEGITE','AXORITE','PHIOMEGA','DELTALITE']);
     Object.entries(STRINGS.powerups).filter(([key]) => !BUY_EXCLUDED_POWERUPS.has(key)).forEach(([key, pu]) => {
       const price = 150;
-      const card = document.createElement('div'); card.className = 'shop-card slim';
+      const card = document.createElement('div'); card.className = 'shop-card obj';
       card.dataset.cardKey = key; card.dataset.cardTier = 'compound'; card.dataset.draggable = '1';
       card.innerHTML = `<div class="shop-card-sym">${pu.sym}</div><div class="shop-card-name">${pu.name}</div><div class="shop-card-corner"><div class="shop-card-count">${(run?.inventory[key]||0)}/99</div><div class="shop-card-price">${price}¢</div></div>`;
       card.onclick = () => {
-        document.querySelectorAll('.shop-card.slim.selected').forEach(c => c.classList.remove('selected'));
+        document.querySelectorAll('.shop-card.obj.selected').forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
         showItemInfo(key, 'compound');
       };
@@ -2264,16 +2406,16 @@ function renderShopBody() {
 
   } else if (shopMode === 'sell') {
 
-    const COMPOUND_KEYS = { LITHEBRYL:75, NITROKALIUM:75, CARBOSILICUM:75, MAGNIUM:75, TITANE:75, ALKALIUM:75 };
-    const ALLOY_KEYS    = { OMEGITE:120, FULL_RESTORE:100, PHIOMEGA:100, DELTALITE:100 };
+    const COMPOUND_KEYS = { LITHEBRYL:75, NITROKALIUM:75, CARBOSILICUM:75, MAGNIUM:75, TITANE:75, ALKALIUM:75, AZOLITHION:75, GAMMITE:75 };
+    const ALLOY_KEYS    = { OMEGITE:120, AXORITE:100, PHIOMEGA:100, DELTALITE:100 };
 
     function makeSellCard(sym, name, effect, qty, price, key, tier) {
-      const card = document.createElement('div'); card.className = 'shop-card slim';
+      const card = document.createElement('div'); card.className = 'shop-card obj';
       card.dataset.cardKey = key; card.dataset.cardTier = tier || 'element'; card.dataset.cardPrice = price; card.dataset.draggable = '1';
       card.innerHTML = `<div class="shop-card-sym">${sym}</div><div class="shop-card-name">${name}</div><div class="shop-card-corner"><div class="shop-card-count">${qty}</div><div class="shop-card-price">SELL ${price}¢</div></div>`;
       card.onclick = () => {
         const alreadySelected = card.classList.contains('selected');
-        document.querySelectorAll('.shop-card.slim.selected').forEach(c => c.classList.remove('selected'));
+        document.querySelectorAll('.shop-card.obj.selected').forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
         showItemInfo(key, tier || 'element');
       };
@@ -2340,8 +2482,31 @@ function renderShopBody() {
     }
 
   } else if (shopMode === 'craft') {
+    const labelEl = document.createElement('div');
+    labelEl.className = 'shop-section-label'; labelEl.textContent = 'ELEMENTS';
+    body.appendChild(labelEl);
+    const gridEl = document.createElement('div'); gridEl.className = 'shop-grid';
+    Object.entries(STRINGS.items).forEach(([key, item]) => {
+      const qty = run?.inventory[key] || 0;
+      const has = qty > 0;
+      const card = document.createElement('div');
+      card.className = 'shop-card obj ' + (has ? 'stash-has' : 'stash-empty');
+      card.dataset.cardKey = key; card.dataset.cardTier = 'element'; card.dataset.draggable = has ? '1' : '0';
+      card.innerHTML =
+        `<div class="shop-card-sym">${item.sym}</div>` +
+        `<div class="shop-card-name">${item.name}</div>` +
+        `<span class="stash-count">${qty}</span>`;
+      card.onclick = () => {
+        document.querySelectorAll('.shop-card.obj.selected').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        showItemInfo(key, 'element');
+      };
+      gridEl.appendChild(card);
+    });
+    body.appendChild(gridEl);
+
     const label = document.createElement('div');
-    label.className = 'shop-section-label'; label.textContent = 'COMPOUNDS';
+    label.className = 'shop-section-label'; label.style.marginTop = '14px'; label.textContent = 'COMPOUNDS';
     body.appendChild(label);
     const compounds = [
       { sym:'Β',  name:'Lithebryl',     recipe:['Be','Ti'], effect:'Shield Max +20, Ammo +8 — Shield Restore',             puKey:'LITHEBRYL',    desc:  'An alloy of Lithium and Beryllium that absorbs and dissipates energy blasts.' },
@@ -2356,15 +2521,19 @@ function renderShopBody() {
     const grid = document.createElement('div'); grid.className = 'shop-grid';
     compounds.forEach(c => {
       const pu = STRINGS.powerups[c.puKey];
-      const canCraft = run && c.recipe.every(r => (run.inventory[r]||0) > 0);
-      const card = document.createElement('div'); card.className = 'shop-card slim';
-      card.dataset.cardKey = c.puKey; card.dataset.cardTier = 'compound'; card.dataset.draggable = canCraft ? '1' : '0';
-      card.style.opacity = canCraft ? '1' : '0.4';
+      const invQty = run?.inventory[c.puKey] || 0;
+      const card = document.createElement('div'); card.className = 'shop-card obj';
+      card.dataset.cardKey = c.puKey; card.dataset.cardTier = 'compound'; card.dataset.draggable = '0';
+      const lightsHTML = c.recipe.map(() => `<span class="craft-light off"></span>`).join('');
       card.innerHTML =
         `<div class="shop-card-sym" style="color:var(--purple)">${c.sym}</div>` +
-        `<div class="shop-card-name">${c.name}</div>`;
+        `<div class="shop-card-name">${c.name}</div>` +
+        `<div class="shop-card-progress">` +
+          `<span class="craft-inv-count${invQty > 0 ? ' has' : ''}">${invQty}</span>` +
+          `<div class="craft-lights">${lightsHTML}</div>` +
+        `</div>`;
       card.onclick = () => {
-        document.querySelectorAll('.shop-card.slim.selected').forEach(el => el.classList.remove('selected'));
+        document.querySelectorAll('.shop-card.obj.selected').forEach(el => el.classList.remove('selected'));
         card.classList.add('selected');
         showItemInfo(c.puKey, 'compound');
       };
@@ -2422,15 +2591,19 @@ function renderShopBody() {
     const gridAlloy = document.createElement('div'); gridAlloy.className = 'shop-grid';
     alloys.forEach(a => {
       const pu = STRINGS.powerups[a.puKey];
-      const canCraft = run && a.recipe.every(r => (run.inventory[r.key] || 0) > 0);
-      const card = document.createElement('div'); card.className = 'shop-card slim';
-      card.dataset.cardKey = a.puKey; card.dataset.cardTier = 'alloy'; card.dataset.draggable = canCraft ? '1' : '0';
-      card.style.cssText += canCraft ? '' : 'opacity:0.4';
+      const invQty = run?.inventory[a.puKey] || 0;
+      const card = document.createElement('div'); card.className = 'shop-card obj';
+      card.dataset.cardKey = a.puKey; card.dataset.cardTier = 'alloy'; card.dataset.draggable = '0';
+      const lightsHTML = a.recipe.map(() => `<span class="craft-light off"></span>`).join('');
       card.innerHTML =
         `<div class="shop-card-sym" style="color:var(--pink);font-size:14px">${a.sym}</div>` +
-        `<div class="shop-card-name">${a.name}</div>`;
+        `<div class="shop-card-name">${a.name}</div>` +
+        `<div class="shop-card-progress">` +
+          `<span class="craft-inv-count${invQty > 0 ? ' has' : ''}">${invQty}</span>` +
+          `<div class="craft-lights">${lightsHTML}</div>` +
+        `</div>`;
       card.onclick = () => {
-        document.querySelectorAll('.shop-card.slim.selected').forEach(el => el.classList.remove('selected'));
+        document.querySelectorAll('.shop-card.obj.selected').forEach(el => el.classList.remove('selected'));
         card.classList.add('selected');
         showItemInfo(a.puKey, 'alloy');
       };
@@ -2450,7 +2623,7 @@ function renderShopBody() {
       const qty = run?.inventory[key] || 0;
       const has = qty > 0;
       const card = document.createElement('div');
-      card.className = 'shop-card slim ' + (has ? 'stash-has' : 'stash-empty');
+      card.className = 'shop-card obj ' + (has ? 'stash-has' : 'stash-empty');
       card.dataset.cardKey  = key;
       card.dataset.cardTier = 'element';
       card.dataset.draggable = has ? '1' : '0';
@@ -2459,7 +2632,7 @@ function renderShopBody() {
         `<div class="shop-card-name">${item.name}</div>` +
         `<span class="stash-count">${qty > 0 ? Math.min(qty, 99) : '0'}</span>`;
       card.onclick = () => {
-        document.querySelectorAll('.shop-card.slim.selected').forEach(c => c.classList.remove('selected'));
+        document.querySelectorAll('.shop-card.obj.selected').forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
         showItemInfo(key, 'element');
       };
@@ -2481,7 +2654,7 @@ function renderShopBody() {
       const totalQty = invQty + resCount;
       const has = invQty > 0;                              // only inv qty enables drag
       const card = document.createElement('div');
-      card.className = 'shop-card slim pu-card ' + (totalQty > 0 ? 'stash-has' : 'stash-empty');
+      card.className = 'shop-card obj pu-card ' + (totalQty > 0 ? 'stash-has' : 'stash-empty');
       card.dataset.puKey = key;
       card.dataset.draggable = has ? '1' : '0';
 
@@ -2501,7 +2674,7 @@ function renderShopBody() {
         `<div class="shop-card-name">${pu.name}</div>` +
         countHTML;
       card.onclick = () => {
-        document.querySelectorAll('.shop-card.slim.selected').forEach(c => c.classList.remove('selected'));
+        document.querySelectorAll('.shop-card.obj.selected').forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
         const tier = ['OMEGITE','AXORITE','PHIOMEGA','DELTALITE'].includes(key) ? 'alloy' : 'compound';
         showItemInfo(key, tier);
@@ -2625,6 +2798,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('btn-pause').onclick = () => Game.togglePause();
   document.getElementById('btn-resume').onclick = () => Game.togglePause();
+  document.getElementById('btn-return').onclick = () => {
+    document.getElementById('overlay-pause').classList.remove('active');
+    document.getElementById('btn-pause').textContent = '⏸️';
+    showScreen('menu');
+    updateMenuUI();
+  };
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' || e.key === 'p' || e.key === 'P') Game.togglePause();
   });
@@ -2821,6 +3000,9 @@ function setupShopDrag() {
     document.querySelectorAll('.shop-reserve-slot').forEach(s => {
       s.classList.remove('drag-over', 'drag-over-full');
     });
+    document.querySelectorAll('#shop-body .shop-card.drag-over').forEach(c => {
+      c.classList.remove('drag-over');
+    });
     const box = document.getElementById('shop-action-box');
     if (box) box.classList.remove('drag-over');
     const stats = document.getElementById('shop-stats-block');
@@ -2832,6 +3014,24 @@ function setupShopDrag() {
     if (slot) {
       slot.classList.add(slot.dataset.key ? 'drag-over-full' : 'drag-over');
       return;
+    }
+    if (shopMode === 'craft' && dragSource === 'card') {
+      const targetCard = craftCardAt(x, y);
+      if (targetCard) {
+        const puKey = targetCard.dataset.cardKey;
+        const tier  = targetCard.dataset.cardTier;
+        const recipe = tier === 'alloy'
+          ? (findAlloy(puKey)?.recipe || []).map(r => r.key)
+          : (findCompound(puKey)?.recipe || []);
+        const progress = craftProgress[puKey] || [];
+        const alreadyFilled = progress.filter(k => k === dragKey).length;
+        const neededCount   = recipe.filter(k => k === dragKey).length;
+        const isValid = dragTier === 'element'
+          ? recipe.includes(dragKey) && alreadyFilled < neededCount
+          : tier === 'alloy' && dragTier === 'compound' && recipe.includes(dragKey) && alreadyFilled < neededCount;
+        if (isValid) targetCard.classList.add('drag-over');
+        return;
+      }
     }
     if (actionBoxAt(x, y)) {
       const box = document.getElementById('shop-action-box');
@@ -2884,6 +3084,17 @@ function setupShopDrag() {
     }
   }
 
+  // ── Shop toast ───────────────────────────────────────────────
+  let _toastTimer = null;
+  function showShopToast(msg) {
+    const el = document.getElementById('shop-toast');
+    if (!el) return;
+    clearTimeout(_toastTimer);
+    el.textContent = msg;
+    el.classList.add('visible');
+    _toastTimer = setTimeout(() => el.classList.remove('visible'), 1500);
+  }
+
   function doBuy(key, tier) {
     if (!run) return;
     if (tier === 'element') {
@@ -2897,6 +3108,10 @@ function setupShopDrag() {
       run.credits -= price;
       run.inventory[key] = Math.min(99, (run.inventory[key] || 0) + 1);
     }
+    const itemName = tier === 'element'
+      ? (STRINGS.items[key]?.name || key)
+      : (STRINGS.powerups[key]?.name || key);
+    showShopToast('Bought: ' + itemName + '!');
     refresh();
   }
 
@@ -2908,41 +3123,78 @@ function setupShopDrag() {
     if (qty <= 0) return;
     run.inventory[key]--;
     run.credits += price;
+    const soldName = tier === 'element'
+      ? (STRINGS.items[key]?.name || key)
+      : (STRINGS.powerups[key]?.name || key);
+    showShopToast('Sold: ' + soldName + '!');
     refresh();
   }
 
   function doCraft(key, tier) {
     if (!run) return;
-    if (tier === 'compound') {
-      const c = findCompound(key);
-      if (!c) return;
-      const canCraft = c.recipe.every(r => (run.inventory[r] || 0) > 0);
-      if (!canCraft) return;
-      c.recipe.forEach(r => run.inventory[r]--);
-      const activePuCount = run.powerups.filter(k => k != null).length;
-      if (activePuCount < run.reserveMax) {
-        const emptyIdx = run.powerups.indexOf(null);
-        if (emptyIdx >= 0) run.powerups[emptyIdx] = key;
-        else run.powerups.push(key);
-      } else {
-        run.inventory[key] = Math.min(99, (run.inventory[key] || 0) + 1);
-      }
-    } else if (tier === 'alloy') {
-      const a = findAlloy(key);
-      if (!a) return;
-      const canCraft = a.recipe.every(r => (run.inventory[r.key] || 0) > 0);
-      if (!canCraft) return;
-      a.recipe.forEach(r => { run.inventory[r.key] = Math.max(0, (run.inventory[r.key] || 0) - 1); });
-      const activePuCount = run.powerups.filter(k => k != null).length;
-      if (activePuCount < run.reserveMax) {
-        const emptyIdx = run.powerups.indexOf(null);
-        if (emptyIdx >= 0) run.powerups[emptyIdx] = key;
-        else run.powerups.push(key);
-      } else {
-        run.inventory[key] = Math.min(99, (run.inventory[key] || 0) + 1);
-      }
+    // Ingredients were consumed one-by-one as lights filled — only handle output here
+    if (tier !== 'compound' && tier !== 'alloy') return;
+    delete craftProgress[key];
+    const activePuCount = run.powerups.filter(k => k != null).length;
+    if (activePuCount < run.reserveMax) {
+      const emptyIdx = run.powerups.indexOf(null);
+      if (emptyIdx >= 0) run.powerups[emptyIdx] = key;
+      else run.powerups.push(key);
+    } else {
+      run.inventory[key] = Math.min(99, (run.inventory[key] || 0) + 1);
     }
+    showShopToast('Crafted: ' + (STRINGS.powerups[key]?.name || key) + '!');
     refresh();
+  }
+
+  // ── Hit-test: craft tab compound/alloy cards ─────────────────
+  function craftCardAt(x, y) {
+    const cards = document.querySelectorAll('#shop-body .shop-card[data-card-tier="compound"], #shop-body .shop-card[data-card-tier="alloy"]');
+    for (const c of cards) {
+      const r = c.getBoundingClientRect();
+      if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return c;
+    }
+    return null;
+  }
+
+  // ── Refresh a single craft card's lights + draggable state ───
+  function refreshCraftCard(puKey, tier, recipe) {
+    const card = document.querySelector(`#shop-body .shop-card[data-card-key="${puKey}"]`);
+    if (!card) return;
+    const progress = craftProgress[puKey] || [];
+    const total = recipe.length;
+    const filled = progress.length;
+    const complete = filled === total;
+
+    // Update lights
+    const lights = card.querySelectorAll('.craft-light');
+    lights.forEach((light, i) => {
+      light.className = 'craft-light ' + (i < filled ? (complete ? 'complete' : 'on') : 'off');
+    });
+
+    // Update inventory count
+    const countEl = card.querySelector('.craft-inv-count');
+    if (countEl) {
+      const invQty = run?.inventory[puKey] || 0;
+      countEl.textContent = invQty;
+      countEl.className = 'craft-inv-count' + (invQty > 0 ? ' has' : '');
+    }
+
+    // Update draggable + craft-ready
+    card.dataset.draggable = complete ? '1' : '0';
+    card.classList.toggle('craft-ready', complete);
+  }
+
+  function refreshSourceCard(ingredientKey) {
+    const src = document.querySelector(`#shop-body .shop-card[data-card-key="${ingredientKey}"][data-card-tier="element"]`);
+    if (!src) return;
+    const qty = run?.inventory[ingredientKey] || 0;
+    const has = qty > 0;
+    src.classList.toggle('stash-has',   has);
+    src.classList.toggle('stash-empty', !has);
+    src.dataset.draggable = has ? '1' : '0';
+    const countEl = src.querySelector('.stash-count');
+    if (countEl) countEl.textContent = qty;
   }
 
   // ── Commit drop ──────────────────────────────────────────────
@@ -2960,6 +3212,42 @@ function setupShopDrag() {
         renderShopBody();
       }
       return;
+    }
+
+    // ── Ingredient → craft card ────────────────────────────────
+    if (dragSource === 'card' && shopMode === 'craft') {
+      const targetCard = craftCardAt(x, y);
+      if (targetCard) {
+        const puKey = targetCard.dataset.cardKey;
+        const tier  = targetCard.dataset.cardTier;
+        const recipe = tier === 'alloy'
+          ? (findAlloy(puKey)?.recipe || [])
+          : (findCompound(puKey)?.recipe || []);
+
+        // Normalise recipe to a flat array of ingredient keys
+        const recipeKeys = tier === 'alloy'
+          ? recipe.map(r => r.key)
+          : recipe; // compound recipes are already string arrays
+
+        if (!craftProgress[puKey]) craftProgress[puKey] = [];
+        const progress = craftProgress[puKey];
+
+        // Find an unfilled slot that matches dragKey
+        const alreadyFilled = progress.filter(k => k === dragKey).length;
+        const neededCount   = recipeKeys.filter(k => k === dragKey).length;
+        const isValid = dragTier === 'element'
+          ? recipeKeys.includes(dragKey) && alreadyFilled < neededCount
+          : tier === 'alloy' && dragTier === 'compound' && recipeKeys.includes(dragKey) && alreadyFilled < neededCount;
+
+        if (isValid && (run.inventory[dragKey] || 0) > 0) {
+          run.inventory[dragKey]--;
+          progress.push(dragKey);
+          refreshCraftCard(puKey, tier, recipeKeys);
+          refreshSourceCard(dragKey);
+        }
+        // Invalid ingredient: silent no-op — card stays in inventory
+        return;
+      }
     }
 
     // ── Card → action box ──────────────────────────────────────
@@ -2982,6 +3270,7 @@ function setupShopDrag() {
       }
       run.powerups[slotIdx] = dragKey;
       run.inventory[dragKey] = Math.max(0, (run.inventory[dragKey] || 0) - 1);
+      showShopToast('Equipped: ' + (STRINGS.powerups[dragKey]?.name || dragKey) + '!');
       refresh();
 
     // ── Reserve → reserve (swap) ───────────────────────────────
@@ -3078,7 +3367,7 @@ function setupShopDrag() {
       showItemInfo(dragKey, tier);
       // Keep selection highlight on the source card
       if (dragEl) {
-        document.querySelectorAll('.shop-card.slim.selected').forEach(c => c.classList.remove('selected'));
+        document.querySelectorAll('.shop-card.obj.selected').forEach(c => c.classList.remove('selected'));
         dragEl.classList.add('selected');
       }
     }
