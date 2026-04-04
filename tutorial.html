@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Angel's Eight — Tutorial</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Monoton&family=VT323&family=Mrs+Saint+Delafield&display=swap');
+
+  :root {
+    --bg:      #050510;
+    --bg2:     #0a0a20;
+    --pink:    #ff2d78;
+    --cyan:    #00f5ff;
+    --purple:  #a855f7;
+    --gold:    #ffd700;
+    --dim:     #ffffff22;
+    --mono:    'VT323', monospace;
+    --display: 'Monoton', sans-serif;
+    --cursive: 'Mrs Saint Delafield', cursive;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; }
+
+  html, body {
+    width:100%; height:100%;
+    background: var(--bg);
+    color: #fff;
+    font-family: var(--mono);
+    overflow: hidden;
+    touch-action: none;
+  }
+
+  /* scanlines */
+  body::after {
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:9999;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px);
+  }
+
+  /* ══ SLIDE SYSTEM ══ */
+  #tut-wrap {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+  }
+
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.45s ease;
+  }
+  .slide.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  /* ══ CLICK HINT ══ */
+  #click-hint {
+    position: fixed;
+    bottom: 28px; left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px; letter-spacing: 0.3em;
+    color: rgba(255,255,255,0.3);
+    z-index: 200;
+    animation: blink 1.8s ease-in-out infinite;
+    pointer-events: none;
+  }
+  @keyframes blink { 0%,100%{opacity:0.3} 50%{opacity:0.8} }
+
+  /* ══ PROGRESS DOTS ══ */
+  #progress {
+    position: fixed;
+    bottom: 18px; left: 50%;
+    transform: translateX(-50%);
+    display: flex; gap: 8px;
+    z-index: 200;
+    pointer-events: none;
+  }
+  .dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    transition: background 0.3s;
+  }
+  .dot.active { background: var(--cyan); box-shadow: 0 0 6px var(--cyan); }
+
+  /* ══ CALLOUT BADGE SYSTEM ══ */
+  .cbadge {
+    position: absolute;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 1.5px solid var(--cyan);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono);
+    font-size: 9px; font-weight: 700;
+    color: var(--cyan);
+    line-height: 1;
+    pointer-events: none;
+    z-index: 10;
+    box-shadow: 0 0 6px rgba(0,245,255,0.35);
+  }
+  .cbadge.gold { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 6px rgba(255,215,0,0.35); }
+  .cbadge.purple { border-color: var(--purple); color: var(--purple); box-shadow: 0 0 6px rgba(168,85,247,0.35); }
+  .cbadge.pink { border-color: var(--pink); color: var(--pink); box-shadow: 0 0 6px rgba(255,45,120,0.35); }
+
+  /* ══ LEGEND GRID ══ */
+  .legend-grid {
+    width: 100%;
+    max-width: min(360px, 96vw);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px 10px;
+    padding: 8px 0 0;
+    flex-shrink: 0;
+  }
+  .legend-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+  }
+  .legend-badge {
+    width: 15px; height: 15px;
+    border-radius: 50%;
+    border: 1.5px solid var(--cyan);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 8px; font-weight: 700;
+    color: var(--cyan); flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .legend-badge.gold  { border-color: var(--gold);   color: var(--gold); }
+  .legend-badge.purple{ border-color: var(--purple);  color: var(--purple); }
+  .legend-badge.pink  { border-color: var(--pink);    color: var(--pink); }
+  .legend-text {
+    display: flex; flex-direction: column; gap: 1px;
+  }
+  .legend-name {
+    font-size: 9px; letter-spacing: 0.16em;
+    color: rgba(255,255,255,0.8); text-transform: uppercase; line-height: 1.2;
+  }
+  .legend-desc {
+    font-size: 8px; letter-spacing: 0.05em;
+    color: rgba(255,255,255,0.35); line-height: 1.4;
+  }
+
+  /* ══ SLIDE 0: TITLE ══ */
+  #slide-0 {
+    background: radial-gradient(ellipse at 50% 30%, #1a0a3a 0%, #050510 70%);
+  }
+  .tut-eyebrow {
+    font-size: 9px; letter-spacing: 0.45em;
+    color: var(--cyan); opacity: 0.65; margin-bottom: 14px;
+  }
+  .tut-title-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 28px;
+  }
+  .tut-title {
+    font-family: var(--display);
+    font-size: clamp(30px, 10vw, 64px);
+    font-weight: 900;
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--cyan) 0%, var(--purple) 50%, var(--pink) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    filter: drop-shadow(0 0 30px rgba(168,85,247,0.4));
+    padding: 12px 16px;
+    margin-bottom: 0px; text-align: center;
+  }
+  .tut-cursive {
+    font-family: var(--cursive);
+    font-size: clamp(30px, 7vw, 56px);
+    color: var(--gold);
+    text-shadow: 0 0 20px rgba(255,45,120,0.7), 0 0 50px rgba(168,85,247,0.4);
+    line-height: 1;
+    position: absolute;
+    z-index: 2;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .tut-intro {
+    font-size: 14px; line-height: 1.8;
+    color: rgba(255,255,255,0.55);
+    text-align: center;
+    max-width: 300px;
+    margin-bottom: 32px;
+  }
+  .tut-start-hint {
+    font-size: 11px; letter-spacing: 0.25em;
+    color: var(--cyan); opacity: 0.7;
+    border: 1px solid rgba(0,245,255,0.25);
+    padding: 10px 28px;
+    animation: blink 1.8s ease-in-out infinite;
+  }
+
+  /* ══ SHARED SCENE FRAME ══ */
+  .scene-frame {
+    position: relative;
+    border: 1px solid rgba(0,245,255,0.18);
+    background: rgba(0,0,0,0.55);
+    overflow: visible;
+    flex-shrink: 0;
+  }
+
+  /* ══ SLIDE 1: MOVEMENT ══ */
+  #slide-1 { gap: 0; padding: 20px; }
+  .slide-title {
+    font-family: var(--display);
+    font-size: clamp(13px, 4vw, 20px);
+    color: var(--cyan);
+    letter-spacing: 0.12em;
+    margin-bottom: 6px;
+    text-align: center;
+  }
+  .slide-body {
+    font-size: 13px; line-height: 1.75;
+    color: rgba(255,255,255,0.5);
+    text-align: center;
+    max-width: 280px;
+    margin-bottom: 16px;
+  }
+
+  /* ══ SLIDE 2: HUD ══ */
+  #slide-2 { padding: 10px 16px 8px; justify-content: flex-start; gap: 0; }
+
+  /* Mock HUD bar */
+  .mock-hud {
+    width: 100%;
+    max-width: 380px;
+    padding: 10px 14px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    background: rgba(5,5,16,0.9);
+    border: 1px solid rgba(0,245,255,0.2);
+    position: relative;
+    flex-shrink: 0;
+  }
+  .mock-hud-left, .mock-hud-right { display:flex; flex-direction:column; gap:4px; }
+  .mock-hud-center { display:flex; flex-direction:column; align-items:center; gap:3px; }
+  .m-label { font-size:8px; letter-spacing:0.2em; color:rgba(255,255,255,0.3); text-transform:uppercase; }
+  .m-val   { font-family:var(--display); font-size:18px; font-weight:700; color:var(--cyan); line-height:1; }
+  .m-val.gold { color: var(--gold); }
+  .m-bar-wrap { width: 80px; }
+  .m-bar {
+    height:4px; background:rgba(255,255,255,0.1); border-radius:2px; overflow:hidden; margin-top:2px;
+  }
+  .m-bar-fill { height:100%; border-radius:2px; }
+  .shield-f { width:70%; background:linear-gradient(90deg,var(--cyan),var(--purple)); }
+  .ammo-f   { width:45%; background:linear-gradient(90deg,var(--pink),var(--gold)); }
+  .m-pause {
+    font-family:var(--mono); font-size:13px; letter-spacing:0.2em;
+    color:var(--purple); border:1px solid var(--purple);
+    background:transparent; padding:4px 10px;
+    align-self: flex-start;
+  }
+
+  /* Mock radio — inline in slide 2 */
+  .mock-radio {
+    display: flex; flex-direction:column; align-items:center; gap:4px;
+    background: rgba(5,5,16,0.85);
+    padding: 6px 10px;
+    border: 1px solid rgba(0,245,255,0.2);
+    position: relative;
+  }
+  .m-radio-label { font-size:7px; letter-spacing:0.25em; color:rgba(255,255,255,0.3); }
+  .m-radio-dial {
+    width:38px; height:38px;
+    border:1px solid rgba(0,245,255,0.3); border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    background:rgba(0,245,255,0.04); position:relative;
+  }
+  .m-radio-needle {
+    position:absolute; width:2px; height:12px;
+    background:var(--cyan); top:5px; left:50%;
+    transform-origin:bottom center;
+    transform: translateX(-50%) rotate(-20deg);
+    border-radius:1px;
+  }
+  .m-radio-track { font-size:8px; color:var(--cyan); opacity:0.7; letter-spacing:0.1em; }
+
+  /* Mock powerup bar — inline in slide 2 */
+  .mock-pubar {
+    display: inline-flex;
+    flex-direction: column; align-items: center; gap: 4px;
+    position: relative;
+  }
+  .mock-pu-slots { display:flex; gap:6px; }
+  .mock-pu-slot {
+    width:34px; height:34px;
+    border:1px solid rgba(168,85,247,0.5);
+    display:flex; align-items:center; justify-content:center;
+    flex-direction:column; gap:1px;
+    clip-path:polygon(5px 0%,100% 0%,calc(100%-5px) 100%,0% 100%);
+    background:rgba(168,85,247,0.08);
+    font-size:5px; letter-spacing:0.05em; color:rgba(255,255,255,0.5);
+  }
+  .mock-pu-sym { font-family:var(--display); font-size:11px; font-weight:700; color:var(--purple); }
+  .mock-stash {
+    width:114px; height:18px;
+    border:1px dashed rgba(168,85,247,0.35);
+    display:flex; align-items:center; justify-content:center;
+    font-size:6px; letter-spacing:0.25em; color:rgba(168,85,247,0.45);
+    background:rgba(168,85,247,0.04);
+  }
+
+  /* HUD mockup wrapper (relative for badge overlay) */
+  #mock-hud-wrap {
+    position: relative;
+    width: 100%;
+    max-width: min(360px, 96vw);
+    flex-shrink: 0;
+  }
+
+  /* ══ SLIDE 3: COMBAT ══ */
+  #slide-3 { padding: 20px; }
+  .combat-scene {
+    width: 280px; height: 180px;
+    position: relative;
+    background: radial-gradient(ellipse at 50% 50%, #0a0a25 0%, #050510 100%);
+    border: 1px solid rgba(0,245,255,0.15);
+    overflow: hidden;
+    flex-shrink: 0;
+    margin-bottom: 18px;
+  }
+
+  /* Starfield dots in combat scene */
+  .star { position:absolute; border-radius:50%; background:#fff; }
+
+  /* Enemy icon — scout triangle matching game canvas draw */
+  .enemy-icon {
+    position: absolute;
+    width: 24px; height: 24px;
+    display: flex; align-items:center; justify-content:center;
+    filter: drop-shadow(0 0 6px #ff6b35);
+  }
+
+  /* Mine icon — black circle + red crosshair matching game canvas draw */
+  .mine-icon {
+    position: absolute;
+    width: 22px; height: 22px;
+    display: flex; align-items:center; justify-content:center;
+    filter: drop-shadow(0 0 8px #ff2020);
+  }
+
+  /* Bullet */
+  .bullet {
+    position: absolute;
+    width: 3px; height: 10px;
+    background: var(--cyan);
+    border-radius: 2px;
+    box-shadow: 0 0 6px var(--cyan);
+    opacity: 0;
+  }
+
+  /* Explosion particle */
+  .explode-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 2px solid var(--pink);
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  /* Mine warning */
+  .mine-x {
+    position: absolute;
+    font-family: var(--display);
+    font-size: 13px;
+    color: var(--gold);
+    opacity: 0;
+  }
+
+  /* ══ SLIDE 4: POWERUPS ══ */
+  #slide-4 { padding: 20px; }
+  .pu-demo-scene {
+    width: 280px; height: 160px;
+    position: relative;
+    background: var(--bg2);
+    border: 1px solid rgba(168,85,247,0.2);
+    overflow: visible;
+    flex-shrink: 0;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 16px;
+  }
+  .pu-float {
+    display: flex; flex-direction:column; align-items:center; gap:4px;
+  }
+  .pu-orb {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, rgba(168,85,247,0.9), rgba(168,85,247,0.2));
+    border: 1px solid var(--purple);
+    box-shadow: 0 0 12px rgba(168,85,247,0.6);
+    display: flex; align-items:center; justify-content:center;
+    font-family: var(--display); font-size: 13px; color: #fff;
+    animation: bobPU 2.2s ease-in-out infinite;
+  }
+  .pu-orb:nth-child(1) { animation-delay: 0s; }
+  .pu-orb:nth-child(2) { animation-delay: 0.7s; }
+  .pu-orb:nth-child(3) { animation-delay: 1.4s; }
+  @keyframes bobPU {
+    0%,100% { transform: translateY(0); }
+    50%      { transform: translateY(-6px); }
+  }
+  .pu-name { font-size: 7px; letter-spacing: 0.1em; color: var(--purple); }
+
+  /* Arrow showing drag */
+  .drag-arrow {
+    position: absolute;
+    bottom: -50px; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+  }
+  .drag-label {
+    font-size: 9px; letter-spacing: 0.2em; color: var(--purple);
+  }
+
+  /* Stash target demo */
+  .stash-target {
+    position: absolute;
+    bottom: -90px; left: 50%; transform: translateX(-50%);
+    width: 120px; height: 20px;
+    border: 1px dashed rgba(168,85,247,0.6);
+    display: flex; align-items:center; justify-content:center;
+    font-size: 6px; letter-spacing: 0.25em; color: var(--purple);
+    background: rgba(168,85,247,0.06);
+    animation: pulseStash 2s ease-in-out infinite;
+  }
+  @keyframes pulseStash {
+    0%,100%{ border-color:rgba(168,85,247,0.35); color:rgba(168,85,247,0.4); }
+    50%{ border-color:rgba(168,85,247,0.9); color:var(--purple); box-shadow:0 0 10px rgba(168,85,247,0.3); }
+  }
+
+  /* ══ SLIDE 5: SHOP ══ */
+  #slide-5 { padding: 10px 14px; justify-content: flex-start; }
+
+  .mock-shop-header {
+    width: 100%;
+    max-width: 360px;
+    padding: 10px 12px 8px;
+    display: flex; align-items:center; justify-content:space-between;
+    border-bottom: 1px solid var(--dim);
+    background: rgba(5,5,16,0.95);
+    border: 1px solid rgba(168,85,247,0.2);
+    flex-shrink: 0;
+  }
+  .mock-shop-supergraph {
+    width: 100%; max-width: 360px;
+    display: flex; flex-direction:column; flex-shrink:0;
+    gap:0; line-height:0;
+  }
+  .sg-o { background:#e8600a; height:4px; }
+  .sg-p { background:#d42b6a; height:5px; }
+  .sg-pu { background:#5b1a8a; height:8px; }
+  .sg-b { background:#0e0b12; height:10px; }
+
+  .mock-shop-layout {
+    width: 100%; max-width: 360px;
+    display: grid; grid-template-columns: 1fr 1fr;
+    border: 1px solid rgba(168,85,247,0.15);
+    border-top: none;
+    background: rgba(5,5,16,0.9);
+    flex-shrink: 0;
+    position: relative;
+  }
+
+  .mock-shop-left {
+    border-right: 1px solid var(--dim);
+    overflow: hidden;
+  }
+  .mock-shop-tabs {
+    display:flex; border-bottom:1px solid var(--dim);
+  }
+  .m-tab {
+    flex:1; padding:7px 0;
+    font-family:var(--mono); font-size:7px; letter-spacing:0.15em;
+    color:rgba(255,255,255,0.3); background:transparent; border:none;
+    border-right:1px solid rgba(255,255,255,0.06);
+    text-align:center;
+  }
+  .m-tab.active { color:var(--cyan); border-bottom:1px solid var(--cyan); background:rgba(0,245,255,0.04); }
+  .mock-cards {
+    display:flex; flex-wrap:wrap; gap:5px; padding:8px;
+  }
+  .mock-card {
+    width:68px;
+    border:1px solid rgba(255,255,255,0.12);
+    padding:7px 6px;
+    display:flex; flex-direction:column; gap:2px;
+    position: relative;
+    background:rgba(255,255,255,0.02);
+  }
+  .mc-sym { font-family:var(--display); font-size:14px; font-weight:700; color:var(--cyan); }
+  .mc-name { font-size:7px; color:#fff; letter-spacing:0.04em; }
+  .mc-eff { font-size:6px; color:rgba(255,255,255,0.35); line-height:1.35; }
+  .mc-price { font-family:var(--display); font-size:8px; color:var(--gold); margin-top:2px; }
+
+  .mock-shop-right {
+    padding: 8px; display:flex; flex-direction:column; gap:8px;
+    overflow: hidden;
+  }
+  .mock-stats-block {
+    border:1px solid var(--dim); position:relative; padding:10px 8px 6px;
+  }
+  .mock-stats-block::before {
+    content:'STATS'; position:absolute; top:-7px; left:6px;
+    background:#0a0a20; padding:0 4px;
+    font-size:7px; letter-spacing:0.3em; color:var(--cyan); opacity:0.6;
+  }
+  .m-stat-row { display:flex; justify-content:space-between; align-items:baseline; padding:3px 0; }
+  .m-stat-label { font-size:6px; letter-spacing:0.1em; color:rgba(255,255,255,0.4); }
+  .m-stat-val { font-family:var(--display); font-size:11px; color:var(--cyan); }
+  .mock-reserves {
+    border:1px solid var(--dim); position:relative; padding:10px 6px 6px;
+  }
+  .mock-reserves::before {
+    content:'RESERVES'; position:absolute; top:-7px; left:6px;
+    background:#0a0a20; padding:0 4px;
+    font-size:7px; letter-spacing:0.3em; color:var(--purple); opacity:0.6;
+  }
+  .mock-res-slots { display:flex; flex-wrap:wrap; gap:4px; }
+  .mock-res-slot {
+    width:26px; height:26px;
+    border:1px solid rgba(168,85,247,0.25);
+    display:flex; align-items:center; justify-content:center;
+    clip-path:polygon(4px 0%,100% 0%,calc(100% - 4px) 100%,0% 100%);
+    background:rgba(168,85,247,0.04);
+    font-family:var(--display); font-size:10px; font-weight:700; color:var(--purple);
+  }
+  .mock-res-slot.filled { border-color:rgba(168,85,247,0.7); background:rgba(168,85,247,0.12); }
+  .mock-launch {
+    font-family:var(--display); font-size:10px; letter-spacing:0.15em;
+    color:var(--cyan); border:2px solid var(--cyan);
+    background:transparent; padding:10px 0;
+    width:100%; cursor:default;
+    margin-top:auto;
+  }
+
+  /* Shop mockup wrapper (relative for badge overlay) */
+  #mock-shop-wrap {
+    position: relative;
+    width: 100%;
+    max-width: min(360px, 96vw);
+    flex-shrink: 0;
+  }
+
+  /* ══ COMBAT ANIMATIONS ══ */
+  @keyframes shootBullet {
+    0%   { opacity:1; transform:translateX(-50%) translateY(0); }
+    100% { opacity:0; transform:translateX(-50%) translateY(-80px); }
+  }
+  @keyframes explodeRing {
+    0%   { opacity:0.9; transform:scale(0); }
+    100% { opacity:0;   transform:scale(2.5); }
+  }
+  @keyframes flashMineWarn {
+    0%,100% { opacity:0; }
+    30%,70% { opacity:1; }
+  }
+  @keyframes shipShake {
+    0%,100% { transform: translate(-50%,-50%); }
+    25%      { transform: translate(calc(-50% - 4px),-50%); }
+    75%      { transform: translate(calc(-50% + 4px),-50%); }
+  }
+  @keyframes driftEnemy {
+    0%,100% { transform: translate(0,0); }
+    50%      { transform: translate(-8px,5px); }
+  }
+
+  /* ══ DRAG ANIM for powerup demo ══ */
+  .pu-dragging {
+    position: absolute;
+    width: 34px; height: 34px;
+    border:1px solid rgba(168,85,247,0.5);
+    display:flex; align-items:center; justify-content:center;
+    flex-direction:column; gap:1px;
+    clip-path:polygon(5px 0%,100% 0%,calc(100%-5px) 100%,0% 100%);
+    background:rgba(168,85,247,0.08);
+    font-family:var(--display); font-size:5px; font-weight:500; color:var(--purple);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  /* ══ MOVEMENT DEMO ══ */
+  .move-scene {
+    width: 260px; height: 160px;
+    position: relative;
+    background: radial-gradient(ellipse at 50% 50%, #0a0a25 0%, #050510 100%);
+    border: 1px solid rgba(0,245,255,0.15);
+    overflow: hidden;
+    flex-shrink: 0;
+    margin-bottom: 16px;
+  }
+
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+<div id="click-hint">TAP TO CONTINUE</div>
+
+<div id="tut-wrap">
+
+  <!-- ════ SLIDE 0: TITLE ════ -->
+  <div class="slide active" id="slide-0">
+    <div class="tut-eyebrow">PILOT ORIENTATION</div>
+    <div class="tut-title-wrap">
+      <div class="tut-title"><br>MANUAL</div>
+      <div class="tut-cursive">Operator's</div>
+    </div>
+    <div class="tut-intro">
+      A crash course in survival.<br>
+      Everything you need to know before launch.
+    </div>
+    <div class="tut-start-hint">TAP TO BEGIN</div>
+  </div>
+
+  <!-- ════ SLIDE 1: MOVEMENT ════ -->
+  <div class="slide" id="slide-1">
+    <div class="slide-title">MOVEMENT &amp; AIMING</div>
+    <div class="slide-body">
+      Move left & right to dodge and aim.
+    </div>
+
+    <div class="move-scene" id="move-scene">
+      <canvas id="move-canvas" width="260" height="160" style="position:absolute;top:0;left:0;width:100%;height:100%"></canvas>
+    </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ SLIDE 2: HUD ════ -->
+  <div class="slide" id="slide-2">
+    <div class="slide-title" style="margin-bottom:8px">YOUR INSTRUMENTS</div>
+
+    <!-- Mock HUD with numbered badges overlaid -->
+    <div id="mock-hud-wrap">
+      <div class="mock-hud" id="mock-hud-el">
+        <div class="mock-hud-left">
+          <div class="m-label">SCORE</div>
+          <div class="m-val" id="m-score">4820</div>
+          <div style="font-family:var(--display);font-size:10px;color:var(--gold);letter-spacing:0.1em">× 3</div>
+        </div>
+        <div class="mock-hud-center">
+          <div style="font-size:7px;letter-spacing:0.3em;color:rgba(255,255,255,0.3)">⏻</div>
+          <div class="m-pause">II</div>
+          <div class="m-label" style="margin-top:4px">LEVEL</div>
+          <div class="m-val">2</div>
+        </div>
+        <div class="mock-hud-right">
+          <div class="m-label">BEST</div>
+          <div class="m-val gold">9100</div>
+          <div style="margin-top:5px">
+            <div class="m-label">SHIELD</div>
+            <div class="m-bar-wrap"><div class="m-bar"><div class="m-bar-fill shield-f" id="mock-shield-bar"></div></div></div>
+          </div>
+          <div style="margin-top:3px">
+            <div class="m-label">AMMO</div>
+            <div class="m-bar-wrap"><div class="m-bar"><div class="m-bar-fill ammo-f" id="mock-ammo-bar"></div></div></div>
+          </div>
+        </div>
+        <!-- Numbered callout badges -->
+        <div class="cbadge" style="bottom:-8px;left:2px">1</div>
+        <div class="cbadge purple" style="bottom:-8px;left:50%;transform:translateX(-50%)">2</div>
+        <div class="cbadge gold" style="bottom:-8px;right:44px">3</div>
+        <div class="cbadge" style="bottom:-8px;right:2px">4</div>
+      </div>
+
+      <!-- Powerup bar + Radio below HUD, also badged -->
+      <div style="position:relative;margin-top:18px;display:flex;justify-content:space-between;align-items:flex-start;padding:0 2px">
+        <!-- Powerup bar -->
+        <div style="position:relative;display:inline-flex;flex-direction:column;align-items:center;gap:4px">
+          <div class="mock-pu-slots">
+            <div class="mock-pu-slot"><div class="mock-pu-sym">Β</div><div>LITHEBRYL</div></div>
+            <div class="mock-pu-slot"><div class="mock-pu-sym">Μ</div><div>MAGNIUM</div></div>
+            <div class="mock-pu-slot" style="border-color:rgba(255,255,255,0.12);background:rgba(255,255,255,0.02)"><div style="font-size:6px;color:rgba(255,255,255,0.3)">EMPTY</div></div>
+          </div>
+          <div class="mock-stash">STASH</div>
+          <div class="cbadge pink" style="top:-8px;right:-8px">5</div>
+        </div>
+        <!-- Radio -->
+        <div style="position:relative;display:inline-flex;flex-direction:column;align-items:center;gap:4px;background:rgba(5,5,16,0.85);padding:6px 10px;border:1px solid rgba(0,245,255,0.2)">
+          <div class="m-radio-label">RADIO</div>
+          <div class="m-radio-dial"><div class="m-radio-needle"></div></div>
+          <div class="m-radio-track">SIGNAL DRIFT</div>
+          <div class="cbadge" style="top:-8px;right:-8px">6</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend-grid" style="margin-top:14px">
+      <div class="legend-row">
+        <div class="legend-badge">1</div>
+        <div class="legend-text">
+          <div class="legend-name">Score &amp; Combo</div>
+          <div class="legend-desc">Current run points. ×multiplier stacks with kills.</div>
+        </div>
+      </div>
+      <div class="legend-row">
+        <div class="legend-badge gold">3</div>
+        <div class="legend-text">
+          <div class="legend-name">High Score</div>
+          <div class="legend-desc">Your all-time best, saved across runs.</div>
+        </div>
+      </div>
+      <div class="legend-row">
+        <div class="legend-badge purple">2</div>
+        <div class="legend-text">
+          <div class="legend-name">Pause / Level</div>
+          <div class="legend-desc">Tap ⏸ to freeze. Current level shown below.</div>
+        </div>
+      </div>
+      <div class="legend-row">
+        <div class="legend-badge">4</div>
+        <div class="legend-text">
+          <div class="legend-name">Shield &amp; Ammo</div>
+          <div class="legend-desc">Shield = health. Ammo refills at score milestones.</div>
+        </div>
+      </div>
+      <div class="legend-row">
+        <div class="legend-badge pink">5</div>
+        <div class="legend-text">
+          <div class="legend-name">Powerups / Stash</div>
+          <div class="legend-desc">Tap a slot to activate. Drag down to stash for later.</div>
+        </div>
+      </div>
+      <div class="legend-row">
+        <div class="legend-badge">6</div>
+        <div class="legend-text">
+          <div class="legend-name">Radio</div>
+          <div class="legend-desc">Swipe the dial to switch music tracks mid-game.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ SLIDE 3: COMBAT ════ -->
+  <div class="slide" id="slide-3">
+    <div class="slide-title">ENEMIES &amp; MINES</div>
+    <div class="slide-body" style="margin-bottom:12px">
+      Shoot enemies. Dodge mines — bullets can't destroy them.
+    </div>
+
+    <div class="combat-scene" id="combat-scene">
+      <!-- populated by JS -->
+    </div>
+
+    <div style="display:flex;gap:24px;margin-top:4px">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+        <!-- Scout triangle — matches game ENEMY_TYPES[0].draw -->
+        <svg width="24" height="24" viewBox="-12 -12 24 24" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 6px #ff6b35)">
+          <polygon points="0,12 -10.2,-12 10.2,-12" fill="none" stroke="#ff6b35" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+        <div style="font-size:9px;letter-spacing:0.15em;color:rgba(255,255,255,0.4)">ENEMY<br><span style="color:var(--cyan)">CAN SHOOT</span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+        <!-- Mine — matches game drawMines(): black fill, red crosshair, inner X -->
+        <svg width="24" height="24" viewBox="-12 -12 24 24" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 8px #ff2020)">
+          <circle cx="0" cy="0" r="10" fill="#000"/>
+          <circle cx="0" cy="0" r="10" fill="none" stroke="#ff2020" stroke-width="1.2"/>
+          <line x1="-10" y1="0" x2="10" y2="0" stroke="#ff2020" stroke-width="1.2"/>
+          <line x1="0" y1="-10" x2="0" y2="10" stroke="#ff2020" stroke-width="1.2"/>
+          <line x1="-5.5" y1="-5.5" x2="5.5" y2="5.5" stroke="rgba(255,30,30,0.5)" stroke-width="1.2"/>
+          <line x1="5.5" y1="-5.5" x2="-5.5" y2="5.5" stroke="rgba(255,30,30,0.5)" stroke-width="1.2"/>
+        </svg>
+        <div style="font-size:9px;letter-spacing:0.15em;color:rgba(255,255,255,0.4)">MINE<br><span style="color:var(--gold)">INDESTRUCTIBLE</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ SLIDE 4: POWERUPS ════ -->
+  <div class="slide" id="slide-4">
+    <div class="slide-title">POWERUPS &amp; STASH</div>
+    <div class="slide-body" style="margin-bottom:12px">
+      Powerups float on the field. Pick them up to activate — or drag them into your STASH to save for a harder level.
+    </div>
+
+    <div class="pu-demo-scene" id="pu-scene" style="flex-direction:column;gap:6px">
+      <div class="mock-pu-slots">
+        <div class="mock-pu-slot"><div class="mock-pu-sym">Β</div><div>LITHEBRYL</div></div>
+        <div class="mock-pu-slot"><div class="mock-pu-sym">Μ</div><div>MAGNIUM</div></div>
+        <div class="mock-pu-slot" style="border-color:rgba(255,255,255,0.12);background:rgba(255,255,255,0.02)"><div style="font-size:6px;color:rgba(255,255,255,0.3)">EMPTY</div></div>
+      </div>
+      <div class="mock-stash">STASH</div>
+
+      <!-- animated drag ghost -->
+      <div class="pu-dragging" id="pu-ghost">M</div>
+    </div>
+
+    <!-- Arrow + stash below scene -->
+    <div style="position:relative;width:280px;height:60px;margin-top:4px">
+      <svg style="position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none">
+        <defs>
+          <marker id="arr2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L8,3 z" fill="rgba(168,85,247,0.7)"/>
+          </marker>
+        </defs>
+        <line x1="140" y1="5" x2="140" y2="42" stroke="rgba(168,85,247,0.5)" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr2)"/>
+      </svg>
+      <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);font-size:8px;letter-spacing:0.2em;color:rgba(168,85,247,0.6);white-space:nowrap">DRAG TO STASH</div>
+      <div class="stash-target" style="position:absolute;bottom:0;left:50%;transform:translateX(-50%)">STASH</div>
+    </div>
+  </div>
+
+  <!-- ════ SLIDE 5: SHOP ════ -->
+  <div class="slide" id="slide-5">
+    <div class="slide-title" style="margin-bottom:4px">THE FUSION SHOP</div>
+    <div class="slide-body" style="margin-bottom:6px;font-size:12px">
+      Opens between levels. Spend credits to upgrade your loadout.
+    </div>
+
+    <!-- Mock shop, wrapped for badge overlay -->
+    <div id="mock-shop-wrap">
+
+      <!-- Header -->
+      <div class="mock-shop-header" style="max-width:min(360px,96vw)">
+        <div>
+          <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--purple);letter-spacing:0.1em">FUSION SHOP</div>
+          <div style="font-size:8px;letter-spacing:0.2em;color:rgba(255,255,255,0.3)">AFTER LEVEL 1</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:7px;letter-spacing:0.2em;color:rgba(255,255,255,0.3)">CREDITS</div>
+          <div style="font-family:var(--display);font-size:13px;color:var(--gold)">340¢</div>
+        </div>
+      </div>
+      <div class="mock-shop-supergraph" style="max-width:min(360px,96vw)">
+        <div class="sg-o"></div><div class="sg-p"></div><div class="sg-pu"></div><div class="sg-b"></div>
+      </div>
+
+      <!-- Two-column body, position:relative for badges -->
+      <div class="mock-shop-layout" style="max-width:min(360px,96vw);position:relative">
+        <!-- Left -->
+        <div class="mock-shop-left">
+          <div class="mock-shop-tabs">
+            <div class="m-tab active">BUY</div>
+            <div class="m-tab">SELL</div>
+            <div class="m-tab">CRAFT</div>
+            <div class="m-tab">STASH</div>
+          </div>
+          <div class="mock-cards">
+            <div class="mock-card">
+              <div class="mc-sym" style="color:var(--cyan)">β</div>
+              <div class="mc-name">Beryllium</div>
+              <div class="mc-eff">Shield Max +6</div>
+              <div class="mc-price">80¢</div>
+            </div>
+            <div class="mock-card" style="border-color:rgba(0,245,255,0.35);background:rgba(0,245,255,0.04)">
+              <div class="mc-sym" style="color:var(--purple)">Β</div>
+              <div class="mc-name">Lithebryl</div>
+              <div class="mc-eff">Shield +20</div>
+              <div class="mc-price">150¢</div>
+            </div>
+            <div class="mock-card">
+              <div class="mc-sym" style="color:var(--cyan)">𝜈</div>
+              <div class="mc-name">Nitrogen</div>
+              <div class="mc-eff">Shoot Spd +3</div>
+              <div class="mc-price">80¢</div>
+            </div>
+          </div>
+          <!-- badge A: tabs -->
+          <div class="cbadge purple" style="top:-8px;left:50%;transform:translateX(-50%)">A</div>
+          <!-- badge B: cards -->
+          <div class="cbadge" style="bottom:-8px;left:50%;transform:translateX(-50%)">B</div>
+        </div>
+        <!-- Right -->
+        <div class="mock-shop-right">
+          <div class="mock-stats-block">
+            <div class="m-stat-row"><div class="m-stat-label">SHOOT SPD</div><div class="m-stat-val">3/s</div></div>
+            <div class="m-stat-row"><div class="m-stat-label">AMMO MAX</div><div class="m-stat-val">50</div></div>
+            <div class="m-stat-row"><div class="m-stat-label">SHIELD MAX</div><div class="m-stat-val">10</div></div>
+          </div>
+          <div class="mock-reserves">
+            <div class="mock-res-slots">
+              <div class="mock-res-slot filled">Β</div>
+              <div class="mock-res-slot filled">Μ</div>
+              <div class="mock-res-slot"></div>
+            </div>
+          </div>
+          <div class="mock-launch">LAUNCH ›</div>
+          <!-- badge C: stats -->
+          <div class="cbadge gold" style="top:-8px;right:4px">C</div>
+          <!-- badge D: reserves -->
+          <div class="cbadge pink" style="top:60px;right:4px">D</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend-grid" style="margin-top:12px">
+      <div class="legend-row">
+        <div class="legend-badge purple">A</div>
+        <div class="legend-text">
+          <div class="legend-name">Tabs</div>
+          <div class="legend-desc">Buy, Sell, Craft, or view your Stash.</div>
+        </div>
+      </div>
+      <div class="legend-row">
+        <div class="legend-badge gold">C</div>
+        <div class="legend-text">
+          <div class="legend-name">Stats Panel</div>
+          <div class="legend-desc">Current loadout. Drag elements here to apply buffs.</div>
+        </div>
+      </div>
+      <div class="legend-row">
+        <div class="legend-badge">B</div>
+        <div class="legend-text">
+          <div class="legend-name">Item Cards</div>
+          <div class="legend-desc">Drag a card to the action box to buy, sell, or craft.</div>
+        </div>
+      </div>
+      <div class="legend-row">
+        <div class="legend-badge pink">D</div>
+        <div class="legend-text">
+          <div class="legend-name">Reserves</div>
+          <div class="legend-desc">Powerups you carry into battle. Drag to rearrange.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ SLIDE 6: CRAFTING ════ -->
+  <div class="slide" id="slide-5">
+    <div class="slide-title" style="margin-bottom:4px">THE FUSION SHOP</div>
+    <div class="slide-body" style="margin-bottom:6px;font-size:12px">
+      Opens between levels. Spend credits to upgrade your loadout.
+    </div>
+
+    <!-- Mock shop, wrapped for badge overlay -->
+    <div id="mock-shop-wrap">
+
+      <!-- Header -->
+      <div class="mock-shop-header" style="max-width:min(360px,96vw)">
+        <div>
+          <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--purple);letter-spacing:0.1em">FUSION SHOP</div>
+          <div style="font-size:8px;letter-spacing:0.2em;color:rgba(255,255,255,0.3)">AFTER LEVEL 1</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:7px;letter-spacing:0.2em;color:rgba(255,255,255,0.3)">CREDITS</div>
+          <div style="font-family:var(--display);font-size:13px;color:var(--gold)">340¢</div>
+        </div>
+      </div>
+      <div class="mock-shop-supergraph" style="max-width:min(360px,96vw)">
+        <div class="sg-o"></div><div class="sg-p"></div><div class="sg-pu"></div><div class="sg-b"></div>
+      </div>
+
+      <!-- Two-column body, position:relative for badges -->
+      <div class="mock-shop-layout" style="max-width:min(360px,96vw);position:relative">
+        <!-- Left -->
+        <div class="mock-shop-left">
+          <div class="mock-shop-tabs">
+            <div class="m-tab active">BUY</div>
+            <div class="m-tab">SELL</div>
+            <div class="m-tab">CRAFT</div>
+            <div class="m-tab">STASH</div>
+          </div>
+          <div class="mock-cards">
+            <div class="mock-card">
+              <div class="mc-sym" style="color:var(--cyan)">β</div>
+              <div class="mc-name">Beryllium</div>
+              <div class="mc-eff">Shield Max +6</div>
+              <div class="mc-price">80¢</div>
+            </div>
+            <div class="mock-card" style="border-color:rgba(0,245,255,0.35);background:rgba(0,245,255,0.04)">
+              <div class="mc-sym" style="color:var(--purple)">Β</div>
+              <div class="mc-name">Lithebryl</div>
+              <div class="mc-eff">Shield +20</div>
+              <div class="mc-price">150¢</div>
+            </div>
+            <div class="mock-card">
+              <div class="mc-sym" style="color:var(--cyan)">𝜈</div>
+              <div class="mc-name">Nitrogen</div>
+              <div class="mc-eff">Shoot Spd +3</div>
+              <div class="mc-price">80¢</div>
+            </div>
+          </div>
+          <!-- badge A: tabs -->
+          <div class="cbadge purple" style="top:-8px;left:50%;transform:translateX(-50%)">A</div>
+          <!-- badge B: cards -->
+          <div class="cbadge" style="bottom:-8px;left:50%;transform:translateX(-50%)">B</div>
+        </div>
+        <!-- Right -->
+        <div class="mock-shop-right">
+          <div class="mock-stats-block">
+            <div class="m-stat-row"><div class="m-stat-label">SHOOT SPD</div><div class="m-stat-val">3/s</div></div>
+            <div class="m-stat-row"><div class="m-stat-label">AMMO MAX</div><div class="m-stat-val">50</div></div>
+            <div class="m-stat-row"><div class="m-stat-label">SHIELD MAX</div><div class="m-stat-val">10</div></div>
+          </div>
+          <div class="mock-reserves">
+            <div class="mock-res-slots">
+              <div class="mock-res-slot filled">Β</div>
+              <div class="mock-res-slot filled">Μ</div>
+              <div class="mock-res-slot"></div>
+            </div>
+          </div>
+          <div class="mock-launch">LAUNCH ›</div>
+          <!-- badge C: stats -->
+          <div class="cbadge gold" style="top:-8px;right:4px">C</div>
+          <!-- badge D: reserves -->
+          <div class="cbadge pink" style="top:60px;right:4px">D</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend-grid" style="margin-top:12px">
+      <div class="legend-row">
+        <div class="legend-badge purple">A</div>
+        <div class="legend-text">
+          <div class="legend-name">Tabs</div>
+          <div class="legend-desc">Buy, Sell, Craft, or view your Stash.</div>
+        </div>
+      </div>
+      <div class="legend-row">
+        <div class="legend-badge gold">C</div>
+        <div class="legend-text">
+          <div class="legend-name">Stats Panel</div>
+          <div class="legend-desc">Current loadout. Drag elements here to apply buffs.</div>
+        </div>
+      </div>
+      <div class="legend-row">
+        <div class="legend-badge">B</div>
+        <div class="legend-text">
+          <div class="legend-name">Item Cards</div>
+          <div class="legend-desc">Drag a card to the action box to buy, sell, or craft.</div>
+        </div>
+      </div>
+      <div class="legend-row">
+        <div class="legend-badge pink">D</div>
+        <div class="legend-text">
+          <div class="legend-name">Reserves</div>
+          <div class="legend-desc">Powerups you carry into battle. Drag to rearrange.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /tut-wrap -->
+
+<script>
+(function(){
+  const SLIDES = document.querySelectorAll('.slide');
+  const N = SLIDES.length;
+  let cur = 0;
+
+  // Build progress dots
+  const prog = document.getElementById('progress');
+  for(let i=0;i<N;i++){
+    const d = document.createElement('div');
+    d.className = 'dot' + (i===0?' active':'');
+    prog.appendChild(d);
+  }
+  const dots = prog.querySelectorAll('.dot');
+
+  const hint = document.getElementById('click-hint');
+
+  function goto(idx){
+    SLIDES[cur].classList.remove('active');
+    dots[cur].classList.remove('active');
+    cur = idx;
+    SLIDES[cur].classList.add('active');
+    dots[cur].classList.add('active');
+    hint.textContent = cur === N-1 ? '' : 'TAP TO CONTINUE';
+    // trigger animations for new slide
+    if(cur===1) startMoveDemo();
+    if(cur===2) startHudAnimate();
+    if(cur===3) startCombat();
+    if(cur===4) startPUDemo();
+  }
+
+  document.addEventListener('pointerdown', e=>{
+    if(e.target.closest('button')) return;
+    if(cur < N-1) goto(cur+1);
+  });
+
+  // ──────────────────────────────────
+  // SLIDE 1: Movement demo
+  // ──────────────────────────────────
+  const moveCanvas = document.getElementById('move-canvas');
+  const mctx = moveCanvas.getContext('2d');
+  const MW = 260, MH = 160;
+
+  // Seed stars once
+  const moveStars = Array.from({length:30}, () => ({
+    x: Math.random()*MW, y: Math.random()*MH,
+    r: Math.random()*0.8+0.3, o: Math.random()*0.5+0.1
+  }));
+
+  // Bullets for move demo
+  let moveBullets = [];
+  let moveShootTimer = 0;
+
+  function drawDemoShip(ctx, x, y, aimAngle) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(aimAngle);
+    ctx.shadowColor = '#00f5ff'; ctx.shadowBlur = 16;
+    // Main body
+    ctx.beginPath();
+    ctx.moveTo(0, -18); ctx.lineTo(-12, 8); ctx.lineTo(-5, 4);
+    ctx.lineTo(0, 10); ctx.lineTo(5, 4); ctx.lineTo(12, 8);
+    ctx.closePath();
+    ctx.strokeStyle = '#00f5ff'; ctx.lineWidth = 1.5; ctx.stroke();
+    // Wing accents
+    ctx.beginPath();
+    ctx.moveTo(-12, 8); ctx.lineTo(-18, 2); ctx.lineTo(-10, -2);
+    ctx.strokeStyle = '#a855f7'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(12, 8); ctx.lineTo(18, 2); ctx.lineTo(10, -2);
+    ctx.stroke();
+    // Engine glow
+    ctx.beginPath();
+    ctx.arc(0, 10, 3 + Math.sin(Date.now()*0.01)*1, 0, Math.PI*2);
+    ctx.fillStyle = '#ff2d78'; ctx.fill();
+    ctx.restore();
+  }
+
+  let moveRAF=null, moveT=0;
+  function startMoveDemo(){
+    if(moveRAF) return;
+    const MAX_ANGLE = 55 * Math.PI / 180;
+    function tick(ts){
+      moveT += 0.018;
+      mctx.clearRect(0, 0, MW, MH);
+
+      // Stars
+      moveStars.forEach(s => {
+        mctx.beginPath(); mctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
+        mctx.fillStyle = `rgba(255,255,255,${s.o})`; mctx.fill();
+      });
+
+      // Ship Movement
+      const shipX = MW/2 + Math.sin(moveT*0.4)*70;
+      const shipY = MH*0.6 + Math.sin(moveT*0.8)*28;
+
+      // Aim Cursor
+      const cursorX = MW/2 + Math.sin(moveT*0.55)*100;
+      const t = Math.max(0, Math.min(1, cursorX / MW));
+      const aimAngle = (t - 0.5) * 2 * MAX_ANGLE;
+
+      // Auto-fire bullet from ship nose
+      moveShootTimer -= 1;
+      if (moveShootTimer <= 0) {
+        const adx = Math.sin(aimAngle), ady = -Math.cos(aimAngle);
+        const spd = 4;
+        moveBullets.push({ x: shipX + adx*10, y: shipY + ady*10, vx: adx*spd, vy: ady*spd, life: 1 });
+        moveShootTimer = 18;
+      }
+
+      // Draw & update bullets
+      moveBullets = moveBullets.filter(b => {
+        b.x += b.vx; b.y += b.vy;
+        if (b.x < 0 || b.x > MW || b.y < 0 || b.y > MH) return false;
+        mctx.save();
+        mctx.shadowColor = '#00f5ff'; mctx.shadowBlur = 6;
+        mctx.strokeStyle = '#00f5ff'; mctx.lineWidth = 2;
+        mctx.beginPath();
+        mctx.moveTo(b.x, b.y); mctx.lineTo(b.x - b.vx*3, b.y - b.vy*3);
+        mctx.stroke(); mctx.restore();
+        return true;
+      });
+
+      drawDemoShip(mctx, shipX, shipY, aimAngle);
+
+      moveRAF = requestAnimationFrame(tick);
+    }
+    tick();
+  }
+
+  // ──────────────────────────────────
+  // SLIDE 2: HUD bar 
+  // ──────────────────────────────────
+  let hudT=0, hudRAF=null;
+  function startHudAnimate(){
+    if(hudRAF) return;
+    function tick(){
+      hudT+=0.01;
+      const sw = 40+30*Math.sin(hudT*0.7);
+      const aw = 20+25*Math.sin(hudT*0.5+1);
+      document.getElementById('mock-shield-bar').style.width=sw+'%';
+      document.getElementById('mock-ammo-bar').style.width=aw+'%';
+      hudRAF=requestAnimationFrame(tick);
+    }
+    tick();
+  }
+
+  // ──────────────────────────────────
+  // SLIDE 3: Combat animation
+  // ──────────────────────────────────
+  const combatScene = document.getElementById('combat-scene');
+  let combatRAF=null, combatSeq=0, combatT=0;
+
+  function buildCombatScene(){
+    combatScene.innerHTML='';
+    // Stars
+    for(let i=0;i<20;i++){
+      const s=document.createElement('div');
+      s.className='star';
+      const sz=Math.random()*1.2+0.4;
+      s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;opacity:${0.1+Math.random()*0.4}`;
+      combatScene.appendChild(s);
+    }
+    // Ship — canvas matching game drawShip()
+    const shipCv=document.createElement('canvas');
+    shipCv.id='cs-ship';
+    shipCv.width=48; shipCv.height=48;
+    shipCv.style.cssText='position:absolute;left:50%;top:65%;transform:translate(-50%,-50%)';
+    combatScene.appendChild(shipCv);
+    (function(){
+      const sc=shipCv.getContext('2d');
+      sc.save(); sc.translate(24,24); sc.rotate(0);
+      sc.shadowColor='#00f5ff'; sc.shadowBlur=16;
+      sc.beginPath();
+      sc.moveTo(0,-18); sc.lineTo(-12,8); sc.lineTo(-5,4);
+      sc.lineTo(0,10); sc.lineTo(5,4); sc.lineTo(12,8);
+      sc.closePath();
+      sc.strokeStyle='#00f5ff'; sc.lineWidth=1.5; sc.stroke();
+      sc.beginPath();
+      sc.moveTo(-12,8); sc.lineTo(-18,2); sc.lineTo(-10,-2);
+      sc.strokeStyle='#a855f7'; sc.lineWidth=1; sc.stroke();
+      sc.beginPath();
+      sc.moveTo(12,8); sc.lineTo(18,2); sc.lineTo(10,-2);
+      sc.stroke();
+      sc.beginPath(); sc.arc(0,10,3,0,Math.PI*2);
+      sc.fillStyle='#ff2d78'; sc.fill();
+      sc.restore();
+    })();
+    // Enemy — scout triangle
+    const enemy=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    enemy.id='cs-enemy';
+    enemy.setAttribute('width','24'); enemy.setAttribute('height','24');
+    enemy.setAttribute('viewBox','-12 -12 24 24');
+    enemy.style.cssText='position:absolute;left:55%;top:20%;transform:translate(-50%,-50%);filter:drop-shadow(0 0 6px #ff6b35);overflow:visible';
+    const epoly=document.createElementNS('http://www.w3.org/2000/svg','polygon');
+    epoly.setAttribute('points','0,12 -10.2,-12 10.2,-12');
+    epoly.setAttribute('fill','none'); epoly.setAttribute('stroke','#ff6b35');
+    epoly.setAttribute('stroke-width','1.5'); epoly.setAttribute('stroke-linejoin','round');
+    enemy.appendChild(epoly);
+    combatScene.appendChild(enemy);
+    // Mine
+    const mine=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    mine.id='cs-mine';
+    mine.setAttribute('width','22'); mine.setAttribute('height','22');
+    mine.setAttribute('viewBox','-11 -11 22 22');
+    mine.style.cssText='position:absolute;left:20%;top:55%;transform:translate(-50%,-50%);filter:drop-shadow(0 0 8px #ff2020);overflow:visible';
+    mine.innerHTML=`
+      <circle cx="0" cy="0" r="9" fill="#000"/>
+      <circle cx="0" cy="0" r="9" fill="none" stroke="#ff2020" stroke-width="1.2"/>
+      <line x1="-9" y1="0" x2="9" y2="0" stroke="#ff2020" stroke-width="1.2"/>
+      <line x1="0" y1="-9" x2="0" y2="9" stroke="#ff2020" stroke-width="1.2"/>
+      <line x1="-5" y1="-5" x2="5" y2="5" stroke="rgba(255,30,30,0.5)" stroke-width="1.2"/>
+      <line x1="5" y1="-5" x2="-5" y2="5" stroke="rgba(255,30,30,0.5)" stroke-width="1.2"/>
+    `;
+    combatScene.appendChild(mine);
+    // Bullet
+    const bullet=document.createElement('div');
+    bullet.id='cs-bullet';
+    bullet.className='bullet';
+    bullet.style.cssText='left:50%;top:55%;transform:translateX(-50%);opacity:0';
+    combatScene.appendChild(bullet);
+    // Explode ring
+    const ring=document.createElement('div');
+    ring.id='cs-ring';
+    ring.className='explode-ring';
+    ring.style.cssText='left:55%;top:20%;width:20px;height:20px;transform:translate(-50%,-50%) scale(0)';
+    combatScene.appendChild(ring);
+    // Mine X warning
+    const mineX=document.createElement('div');
+    mineX.id='cs-minex';
+    mineX.className='mine-x';
+    mineX.textContent='✕';
+    mineX.style.cssText='left:18%;top:45%;';
+    combatScene.appendChild(mineX);
+    // Enemy label
+    const el=document.createElement('div');
+    el.style.cssText='position:absolute;left:62%;top:18%;font-size:8px;letter-spacing:0.12em;color:rgba(255,45,120,0.6)';
+    el.textContent='ENEMY';
+    combatScene.appendChild(el);
+    // Mine label
+    const ml=document.createElement('div');
+    ml.style.cssText='position:absolute;left:22%;top:57%;font-size:8px;letter-spacing:0.12em;color:rgba(255,215,0,0.6)';
+    ml.textContent='MINE';
+    combatScene.appendChild(ml);
+  }
+
+  function startCombat(){
+    buildCombatScene();
+    if(combatRAF) cancelAnimationFrame(combatRAF);
+    combatT=0; combatSeq=0;
+    let phase='idle', phaseT=0;
+    function tick(){
+      combatT+=1;
+      phaseT+=1;
+
+      const bullet=document.getElementById('cs-bullet');
+      const ring=document.getElementById('cs-ring');
+      const enemy=document.getElementById('cs-enemy');
+      const minex=document.getElementById('cs-minex');
+      const ship=document.getElementById('cs-ship');
+      if(!bullet){combatRAF=requestAnimationFrame(tick);return;}
+
+      if(phase==='idle' && phaseT>40){
+        phase='shoot'; phaseT=0;
+        bullet.style.opacity='1';
+        bullet.style.transition='none';
+        bullet.style.top='55%';
+      }
+      else if(phase==='shoot'){
+        const pct=phaseT/30;
+        const ty=55-pct*38;
+        bullet.style.top=ty+'%';
+        if(pct>=1){
+          bullet.style.opacity='0';
+          ring.style.transition='none';
+          ring.style.transform='translate(-50%,-50%) scale(0)';
+          ring.style.opacity='0.9';
+          void ring.offsetWidth;
+          ring.style.transition='transform 0.5s ease-out, opacity 0.5s ease-out';
+          ring.style.transform='translate(-50%,-50%) scale(2.5)';
+          ring.style.opacity='0';
+          enemy.style.display='none';
+          phase='wait'; phaseT=0;
+        }
+      }
+      else if(phase==='wait' && phaseT>50){
+        // reset enemy
+        enemy.style.display='block';
+        enemy.style.left='55%'; enemy.style.top='20%';
+        // mine warning
+        minex.style.animation='none'; void minex.offsetWidth;
+        minex.style.opacity='0';
+        phase='minewarn'; phaseT=0;
+      }
+      else if(phase==='minewarn' && phaseT>10){
+        minex.style.animation='flashMineWarn 1.2s ease';
+        phase='minedone'; phaseT=0;
+      }
+      else if(phase==='minedone' && phaseT>80){
+        phase='idle'; phaseT=0;
+      }
+
+      combatRAF=requestAnimationFrame(tick);
+    }
+    tick();
+  }
+
+  // ──────────────────────────────────
+  // SLIDE 4: Powerup drag demo
+  // ──────────────────────────────────
+  let puRAF=null, puT=0;
+  function startPUDemo(){
+    if(puRAF) return;
+    const ghost = document.getElementById('pu-ghost');
+    let phase='wait', phaseT=0;
+    function tick(){
+      puT+=1; phaseT+=1;
+      if(phase==='wait' && phaseT>60){
+        phase='appear'; phaseT=0;
+        ghost.style.opacity='0.85';
+        ghost.style.transition='none';
+        ghost.style.top='30px'; ghost.style.left='50%';
+        ghost.style.transform='translateX(-50%)';
+      }
+      else if(phase==='appear' && phaseT>10){
+        phase='drag'; phaseT=0;
+      }
+      else if(phase==='drag'){
+        const pct=phaseT/50;
+        const ty=30+pct*95;
+        ghost.style.top=ty+'px';
+        if(pct>=1){
+          phase='drop'; phaseT=0;
+        }
+      }
+      else if(phase==='drop' && phaseT>10){
+        ghost.style.opacity='0';
+        ghost.style.transition='opacity 0.3s';
+        phase='wait'; phaseT=0;
+      }
+      puRAF=requestAnimationFrame(tick);
+    }
+    tick();
+  }
+
+})();
+</script>
+</body>
+</html>

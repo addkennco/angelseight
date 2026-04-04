@@ -621,7 +621,7 @@ const Game = (() => {
   // ═══════════════════════════════════════════════════════════════
   const BOSS_MAX_HP = 500;
   const PHASE_NAMES  = ['PHASE I — EMERGENCE', 'PHASE II — RESONANCE', 'PHASE III — COLLAPSE'];
-  const PHASE_COLORS = ['#a855f7', '#ff2d78', '#ffd700'];
+  const PHASE_COLORS = ['#a855f7', '#d42b6a', '#ffd700'];
   const ELEMENT_ATTACK_INTERVAL = [8, 5, 3]; // seconds between element attacks per phase
 
   let bossActive   = false;
@@ -688,7 +688,7 @@ const Game = (() => {
   const SUB_TYPES = [
     // Orbital — circles the boss
     {
-      type: 'orbital', r: 8, hp: 2, color: '#ff6b35',
+      type: 'orbital', r: 8, hp: 2, color: '#e8600a',
       init(e) {
         e.orbitAngle = Math.random() * Math.PI * 2;
         e.orbitR     = 80 + Math.random() * 40;
@@ -1044,7 +1044,7 @@ const Game = (() => {
       // Ship collision
       if (ship.invincible <= 0 && invincibleTimer <= 0 && dist(ship.x, ship.y, e.x, e.y) < e.r + 12) {
         takeDamage(2);
-        spawnParticles(ship.x, ship.y, '#ff2d78', 8);
+        spawnParticles(ship.x, ship.y, '#d42b6a', 8);
         ship.invincible = 1.5;
         return false;
       }
@@ -1059,7 +1059,7 @@ const Game = (() => {
       if (ship.invincible <= 0 && invincibleTimer <= 0 && dist(b.x, b.y, ship.x, ship.y) < 14) {
         takeDamage(1);
         ship.invincible = 0.8;
-        spawnParticles(ship.x, ship.y, '#ff2d78', 5);
+        spawnParticles(ship.x, ship.y, '#d42b6a', 5);
         return false;
       }
       return b.x > -20 && b.x < W + 20 && b.y > -20 && b.y < H + 20;
@@ -1240,7 +1240,7 @@ const Game = (() => {
               dist(e.x, e.y, ship.x, ship.y) < e.r + 12) {
             takeDamage(2);
             ship.invincible = 1.2;
-            spawnParticles(ship.x, ship.y, '#ff2d78', 8);
+            spawnParticles(ship.x, ship.y, '#d42b6a', 8);
             return false;
           }
           return e.y < H + 60;
@@ -1267,7 +1267,7 @@ const Game = (() => {
   const ENEMY_TYPES = [
     // Scout — triangle rammer
     {
-      type:'scout', r:12, hp:2, dmg:0, color:'#ff6b35', speed:110,
+      type:'scout', r:12, hp:2, dmg:0, color:'#e8600a', speed:110,
       draw(ctx, e) {
         ctx.save(); ctx.translate(e.x, e.y); ctx.rotate(e.angle);
         ctx.beginPath();
@@ -1319,7 +1319,7 @@ const Game = (() => {
     },
     // Swarmer — pentagon sine-wave rammer
     {
-      type:'swarmer', r:8, hp:1, color:'#ff2d78', speed:90,
+      type:'swarmer', r:8, hp:1, color:'#d42b6a', speed:90,
       draw(ctx, e) {
         ctx.save(); ctx.translate(e.x, e.y); ctx.rotate(e.angle);
         ctx.beginPath();
@@ -1377,7 +1377,7 @@ const Game = (() => {
     },
     // Armored — L-shape bouncer
     {
-      type:'armored', r:16, hp:6, color:'#ff9f43', speed:55,
+      type:'armored', r:16, hp:6, color:'#55ff22', speed:55,
       draw(ctx, e) {
         ctx.save(); ctx.translate(e.x, e.y); ctx.rotate(e.angle);
         ctx.strokeStyle = e.color; ctx.lineWidth = 2;
@@ -1558,7 +1558,7 @@ function spawnPod() {
       for (let i = 0; i < 12; i++) {
         const a = (i/12)*Math.PI*2;
         const spd = 400;
-        bullets.push({ x:bx, y:by, speed:spd, vx:Math.cos(a)*spd, vy:Math.sin(a)*spd, dmg:1, enemy:false, color:'#ff2d78' });
+        bullets.push({ x:bx, y:by, speed:spd, vx:Math.cos(a)*spd, vy:Math.sin(a)*spd, dmg:1, enemy:false, color:'#d42b6a' });
       }
     } else {
       const spd = 560;
@@ -1650,10 +1650,10 @@ function spawnPod() {
     if (!pu) return;
     if (pu === 'OMEGITE') {
       triggerSweep({ silent: true });
-      spawnParticles(W / 2, H / 2, '#ff2d78', 40);
+      spawnParticles(W / 2, H / 2, '#d42b6a', 40);
       spawnParticles(W / 2, H / 2, '#ffd700', 40);
       spawnParticles(W / 2, H / 2, '#a855f7', 40);
-      spawnFloatingText(W / 2, H / 2 - 50, 'OMEGITE', '#ff2d78');
+      spawnFloatingText(W / 2, H / 2 - 50, 'OMEGITE', '#d42b6a');
       logPickup('OMEGITE DEPLOYED');
     } else if (pu === 'MAGNIUM') {
       triggerSweep({ silent: false });
@@ -1735,11 +1735,11 @@ function spawnPod() {
 
   // Per-level scene config: [skyTop, skyBottom, sunColor, sunGlow, gridColor, mountainColor]
   const LEVEL_PALETTES = [
-    { skyT:'#0d0020', skyB:'#1a0040', sun:'#ff6ec7', sunG:'#ff2d78', grid:'#2255ff', mtn:'#1133cc' }, // 1
+    { skyT:'#0d0020', skyB:'#1a0040', sun:'#ff6ec7', sunG:'#d42b6a', grid:'#2255ff', mtn:'#1133cc' }, // 1
     { skyT:'#0a0025', skyB:'#1e0050', sun:'#ff8c42', sunG:'#ff4500', grid:'#00ccff', mtn:'#0066cc' }, // 2
-    { skyT:'#100015', skyB:'#300030', sun:'#ff2d78', sunG:'#cc0055', grid:'#cc44ff', mtn:'#8800cc' }, // 3
+    { skyT:'#100015', skyB:'#300030', sun:'#d42b6a', sunG:'#cc0055', grid:'#cc44ff', mtn:'#8800cc' }, // 3
     { skyT:'#1a0800', skyB:'#3d1200', sun:'#ffd700', sunG:'#ff8c00', grid:'#ff6b35', mtn:'#cc3300' }, // 4
-    { skyT:'#200010', skyB:'#450020', sun:'#ff4500', sunG:'#ff0000', grid:'#ff2d78', mtn:'#cc0044' }, // 5
+    { skyT:'#200010', skyB:'#450020', sun:'#ff4500', sunG:'#ff0000', grid:'#d42b6a', mtn:'#cc0044' }, // 5
     { skyT:'#05001a', skyB:'#150040', sun:'#a855f7', sunG:'#6600cc', grid:'#8800ff', mtn:'#550099' }, // 6
     { skyT:'#001510', skyB:'#003322', sun:'#00ff9f', sunG:'#00cc66', grid:'#00ffcc', mtn:'#009966' }, // 7
     { skyT:'#1a0000', skyB:'#400000', sun:'#ffffff', sunG:'#ff0040', grid:'#ff0040', mtn:'#990020' }, // 8
@@ -1864,7 +1864,7 @@ function spawnPod() {
     // Engine glow
     ctx.beginPath();
     ctx.arc(0, 10, 3 + Math.sin(Date.now()*0.01)*1, 0, Math.PI*2);
-    ctx.fillStyle = '#ff2d78'; ctx.fill();
+    ctx.fillStyle = '#d42b6a'; ctx.fill();
 
     ctx.restore();
 
@@ -2222,6 +2222,128 @@ let shopMode = 'buy';
 let selectedCardKey = null;
 const craftProgress = {}; // puKey → ingredient keys already slotted; reset on tab switch
 
+// ═══════════════════════════════════════════════════════════════
+// CRAFT RECIPE VARIANTS
+// Each compound/alloy lists all valid ingredient combinations.
+// resolveVariant() picks the best-matching one given current progress.
+// ═══════════════════════════════════════════════════════════════
+const COMPOUND_VARIANTS = {
+  // Mixed recipes listed first so early drops don't lock out the other ingredient.
+  // Doubled recipes (same element twice) come last as the most restrictive path.
+  LITHEBRYL:    [ ['Be','Ti'], ['Li','Ti'], ['Be','Be'] ],
+  NITROKALIUM:  [ ['N','K'],   ['N','N'],   ['K','K']   ],
+  CARBOSILICUM: [ ['Si','C'],  ['Si','Si'], ['C','C']   ],
+  MAGNIUM:      [ ['Li','Mg'], ['Mg','K'],  ['Mg','Mg'] ],
+  TITANE:       [ ['Ti','N'],  ['Ti','Ti']              ],
+  ALKALIUM:     [ ['Si','K']                            ],
+  AZOLITHION:   [ ['Li','N'],  ['Li','Li']              ],
+  GAMMITE:      [ ['Si','Ti']                           ],
+};
+
+const ALLOY_VARIANTS = {
+  DELTALITE: [
+    [{key:'LITHEBRYL'},{key:'TITANE'},{key:'NITROKALIUM'}],
+    [{key:'LITHEBRYL'},{key:'TITANE'},{key:'TITANE'}],
+    [{key:'LITHEBRYL'},{key:'LITHEBRYL'},{key:'NITROKALIUM'}],
+    [{key:'LITHEBRYL'},{key:'LITHEBRYL'},{key:'TITANE'}],
+    [{key:'LITHEBRYL'},{key:'LITHEBRYL'},{key:'LITHEBRYL'}],
+  ],
+  PHIOMEGA: [
+    [{key:'CARBOSILICUM'},{key:'ALKALIUM'}],
+    [{key:'CARBOSILICUM'},{key:'CARBOSILICUM'}],
+    [{key:'ALKALIUM'},{key:'ALKALIUM'}],
+  ],
+  AXORITE: [
+    [{key:'MAGNIUM'},{key:'NITROKALIUM'},{key:'LITHEBRYL'}],
+    [{key:'MAGNIUM'},{key:'NITROKALIUM'},{key:'NITROKALIUM'}],
+    [{key:'MAGNIUM'},{key:'NITROKALIUM'},{key:'ALKALIUM'}],
+    [{key:'MAGNIUM'},{key:'ALKALIUM'},{key:'LITHEBRYL'}],
+    [{key:'MAGNIUM'},{key:'ALKALIUM'},{key:'NITROKALIUM'}],
+    [{key:'MAGNIUM'},{key:'MAGNIUM'},{key:'LITHEBRYL'}],
+    [{key:'MAGNIUM'},{key:'MAGNIUM'},{key:'NITROKALIUM'}],
+    [{key:'MAGNIUM'},{key:'MAGNIUM'},{key:'ALKALIUM'}],
+  ],
+  OMEGITE: [
+    [{key:'MAGNIUM'},{key:'CARBOSILICUM'},{key:'LITHEBRYL'},{key:'ALKALIUM'}],
+    [{key:'MAGNIUM'},{key:'CARBOSILICUM'},{key:'CARBOSILICUM'},{key:'ALKALIUM'}],
+    [{key:'MAGNIUM'},{key:'ALKALIUM'},{key:'ALKALIUM'},{key:'ALKALIUM'}],
+    [{key:'MAGNIUM'},{key:'MAGNIUM'},{key:'CARBOSILICUM'},{key:'ALKALIUM'}],
+    [{key:'MAGNIUM'},{key:'MAGNIUM'},{key:'ALKALIUM'},{key:'ALKALIUM'}],
+    [{key:'TITANE'},{key:'CARBOSILICUM'},{key:'LITHEBRYL'},{key:'ALKALIUM'}],
+    [{key:'TITANE'},{key:'CARBOSILICUM'},{key:'CARBOSILICUM'},{key:'ALKALIUM'}],
+    [{key:'TITANE'},{key:'ALKALIUM'},{key:'ALKALIUM'},{key:'ALKALIUM'}],
+    [{key:'MAGNIUM'},{key:'ALKALIUM'},{key:'TITANE'}],
+  ],
+};
+
+function resolveCompoundVariant(puKey, progress) {
+  const variants = COMPOUND_VARIANTS[puKey];
+  if (!variants) return null;
+  if (!progress || progress.length === 0) return { puKey, recipe: variants[0] };
+  for (const v of variants) {
+    const remaining = [...v];
+    let ok = true;
+    for (const dropped of progress) {
+      const idx = remaining.indexOf(dropped);
+      if (idx === -1) { ok = false; break; }
+      remaining.splice(idx, 1);
+    }
+    if (ok) return { puKey, recipe: v };
+  }
+  return { puKey, recipe: variants[0] };
+}
+
+function resolveAlloyVariant(puKey, progress) {
+  const variants = ALLOY_VARIANTS[puKey];
+  if (!variants) return null;
+  if (!progress || progress.length === 0) return { puKey, recipe: variants[0] };
+  for (const v of variants) {
+    const remaining = v.map(r => r.key);
+    let ok = true;
+    for (const dropped of progress) {
+      const idx = remaining.indexOf(dropped);
+      if (idx === -1) { ok = false; break; }
+      remaining.splice(idx, 1);
+    }
+    if (ok) return { puKey, recipe: v };
+  }
+  return { puKey, recipe: variants[0] };
+}
+
+function isValidIngredientForAnyVariant(puKey, tier, dragKey, dragTier, progress) {
+  if (tier === 'compound' && dragTier === 'element') {
+    const variants = COMPOUND_VARIANTS[puKey];
+    if (!variants) return false;
+    for (const v of variants) {
+      const remaining = [...v];
+      let ok = true;
+      for (const dropped of progress) {
+        const idx = remaining.indexOf(dropped);
+        if (idx === -1) { ok = false; break; }
+        remaining.splice(idx, 1);
+      }
+      if (ok && remaining.includes(dragKey)) return true;
+    }
+    return false;
+  }
+  if (tier === 'alloy' && dragTier === 'compound') {
+    const variants = ALLOY_VARIANTS[puKey];
+    if (!variants) return false;
+    for (const v of variants) {
+      const remaining = v.map(r => r.key);
+      let ok = true;
+      for (const dropped of progress) {
+        const idx = remaining.indexOf(dropped);
+        if (idx === -1) { ok = false; break; }
+        remaining.splice(idx, 1);
+      }
+      if (ok && remaining.includes(dragKey)) return true;
+    }
+    return false;
+  }
+  return false;
+}
+
 // ── Action box labels per tab ────────────────────────────────────
 const ACTION_BOX_LABELS = {
   buy:   { text: 'DRAG TO BUY',   cls: 'buy-box'   },
@@ -2524,7 +2646,9 @@ function renderShopBody() {
       const invQty = run?.inventory[c.puKey] || 0;
       const card = document.createElement('div'); card.className = 'shop-card obj';
       card.dataset.cardKey = c.puKey; card.dataset.cardTier = 'compound'; card.dataset.draggable = '0';
-      const lightsHTML = c.recipe.map(() => `<span class="craft-light off"></span>`).join('');
+      // Use resolved variant (based on current progress) to set light count
+      const resolvedRecipe = resolveCompoundVariant(c.puKey, craftProgress[c.puKey] || [])?.recipe || c.recipe;
+      const lightsHTML = resolvedRecipe.map(() => `<span class="craft-light off"></span>`).join('');
       card.innerHTML =
         `<div class="shop-card-sym" style="color:var(--purple)">${c.sym}</div>` +
         `<div class="shop-card-name">${c.name}</div>` +
@@ -2594,7 +2718,7 @@ function renderShopBody() {
       const invQty = run?.inventory[a.puKey] || 0;
       const card = document.createElement('div'); card.className = 'shop-card obj';
       card.dataset.cardKey = a.puKey; card.dataset.cardTier = 'alloy'; card.dataset.draggable = '0';
-      const lightsHTML = a.recipe.map(() => `<span class="craft-light off"></span>`).join('');
+      const lightsHTML = (resolveAlloyVariant(a.puKey, craftProgress[a.puKey] || [])?.recipe || a.recipe).map(() => `<span class="craft-light off"></span>`).join('');
       card.innerHTML =
         `<div class="shop-card-sym" style="color:var(--pink);font-size:14px">${a.sym}</div>` +
         `<div class="shop-card-name">${a.name}</div>` +
@@ -2934,6 +3058,22 @@ document.addEventListener('DOMContentLoaded', () => {
 // SHOP DRAG & DROP — powerup stash ↔ reserve slots
 // ═══════════════════════════════════════════════════════════════
 function setupShopDrag() {
+  // Inject long-press style once
+  if (!document.getElementById('craft-longpress-style')) {
+    const s = document.createElement('style');
+    s.id = 'craft-longpress-style';
+    s.textContent = `
+      @keyframes longPressCharge {
+        0%   { box-shadow: 0 0 0 0 rgba(255,45,120,0); border-color: rgba(255,45,120,0.3); }
+        100% { box-shadow: 0 0 0 6px rgba(255,45,120,0); border-color: rgba(255,45,120,0.9); }
+      }
+      .long-press-charging {
+        animation: longPressCharge 0.5s ease-out forwards;
+        border-color: rgba(255,45,120,0.9) !important;
+      }
+    `;
+    document.head.appendChild(s);
+  }
   const DRAG_THRESHOLD = 8;
 
   // ── shared state ────────────────────────────────────────────
@@ -2944,6 +3084,11 @@ function setupShopDrag() {
   let dragEl       = null;
   let startX = 0, startY = 0;
   let dragging     = false;
+
+  // ── Long-press to clear craft card ──────────────────────────
+  const LONG_PRESS_MS = 500;
+  let longPressTimer  = null;
+  let longPressCard   = null;
 
   // ── Ghost ────────────────────────────────────────────────────
   const ghost = document.createElement('div');
@@ -3020,15 +3165,8 @@ function setupShopDrag() {
       if (targetCard) {
         const puKey = targetCard.dataset.cardKey;
         const tier  = targetCard.dataset.cardTier;
-        const recipe = tier === 'alloy'
-          ? (findAlloy(puKey)?.recipe || []).map(r => r.key)
-          : (findCompound(puKey)?.recipe || []);
         const progress = craftProgress[puKey] || [];
-        const alreadyFilled = progress.filter(k => k === dragKey).length;
-        const neededCount   = recipe.filter(k => k === dragKey).length;
-        const isValid = dragTier === 'element'
-          ? recipe.includes(dragKey) && alreadyFilled < neededCount
-          : tier === 'alloy' && dragTier === 'compound' && recipe.includes(dragKey) && alreadyFilled < neededCount;
+        const isValid = isValidIngredientForAnyVariant(puKey, tier, dragKey, dragTier, progress);
         if (isValid) targetCard.classList.add('drag-over');
         return;
       }
@@ -3042,31 +3180,6 @@ function setupShopDrag() {
       const stats = document.getElementById('shop-stats-block');
       if (stats) stats.classList.add('drag-over');
     }
-  }
-
-  // ── Transaction logic ────────────────────────────────────────
-  // Shared lookup: given a key, find its craft compound definition
-  function findCompound(key) {
-    const compounds = [
-      { puKey:'LITHEBRYL',    recipe:['Be','Ti'] },
-      { puKey:'NITROKALIUM',  recipe:['Li','N']  },
-      { puKey:'CARBOSILICUM', recipe:['Si','C']  },
-      { puKey:'MAGNIUM',      recipe:['Mg','K']  },
-      { puKey:'TITANE',       recipe:['Ti','N']  },
-      { puKey:'ALKALIUM',     recipe:['K','Si']  },
-      { puKey:'AZOLITHION',   recipe:['Li','K']  },
-      { puKey:'GAMMITE',      recipe:['Ti','Si'] },
-    ];
-    return compounds.find(c => c.puKey === key) || null;
-  }
-  function findAlloy(key) {
-    const alloys = [
-      { puKey:'OMEGITE',   recipe:[{key:'MAGNIUM'},{key:'ALKALIUM'},{key:'TITANE'}]   },
-      { puKey:'AXORITE',   recipe:[{key:'MAGNIUM'},{key:'TITANE'}]                    },
-      { puKey:'PHIOMEGA',  recipe:[{key:'CARBOSILICUM'},{key:'ALKALIUM'}]              },
-      { puKey:'DELTALITE', recipe:[{key:'LITHEBRYL'},{key:'NITROKALIUM'}]              },
-    ];
-    return alloys.find(a => a.puKey === key) || null;
   }
 
   // ── Element stat buffs ───────────────────────────────────────
@@ -3220,28 +3333,21 @@ function setupShopDrag() {
       if (targetCard) {
         const puKey = targetCard.dataset.cardKey;
         const tier  = targetCard.dataset.cardTier;
-        const recipe = tier === 'alloy'
-          ? (findAlloy(puKey)?.recipe || [])
-          : (findCompound(puKey)?.recipe || []);
-
-        // Normalise recipe to a flat array of ingredient keys
-        const recipeKeys = tier === 'alloy'
-          ? recipe.map(r => r.key)
-          : recipe; // compound recipes are already string arrays
 
         if (!craftProgress[puKey]) craftProgress[puKey] = [];
         const progress = craftProgress[puKey];
 
-        // Find an unfilled slot that matches dragKey
-        const alreadyFilled = progress.filter(k => k === dragKey).length;
-        const neededCount   = recipeKeys.filter(k => k === dragKey).length;
-        const isValid = dragTier === 'element'
-          ? recipeKeys.includes(dragKey) && alreadyFilled < neededCount
-          : tier === 'alloy' && dragTier === 'compound' && recipeKeys.includes(dragKey) && alreadyFilled < neededCount;
+        // Use multi-variant check: is this ingredient valid for any remaining variant?
+        const isValid = isValidIngredientForAnyVariant(puKey, tier, dragKey, dragTier, progress);
 
         if (isValid && (run.inventory[dragKey] || 0) > 0) {
           run.inventory[dragKey]--;
           progress.push(dragKey);
+          // Re-resolve which variant is now active and refresh lights accordingly
+          const resolved = tier === 'alloy'
+            ? resolveAlloyVariant(puKey, progress)
+            : resolveCompoundVariant(puKey, progress);
+          const recipeKeys = tier === 'alloy' ? resolved.recipe.map(r => r.key) : resolved.recipe;
           refreshCraftCard(puKey, tier, recipeKeys);
           refreshSourceCard(dragKey);
         }
@@ -3307,6 +3413,27 @@ function setupShopDrag() {
     document.querySelectorAll('.shop-card.drag-source').forEach(c => c.classList.remove('drag-source'));
   }
 
+  // ── Clear a craft card's progress (long-press) ───────────────
+  function clearCraftCard(puKey, tier) {
+    if (!craftProgress[puKey] || craftProgress[puKey].length === 0) return;
+    // Refund ingredients back to inventory
+    for (const key of craftProgress[puKey]) {
+      if (tier === 'alloy') {
+        run.inventory[key] = Math.min(99, (run.inventory[key] || 0) + 1);
+      } else {
+        run.inventory[key] = Math.min(99, (run.inventory[key] || 0) + 1);
+      }
+    }
+    delete craftProgress[puKey];
+    showShopToast('Cleared — ingredients returned');
+    renderShopBody();
+  }
+
+  function cancelLongPress() {
+    if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+    if (longPressCard)  { longPressCard.classList.remove('long-press-charging'); longPressCard = null; }
+  }
+
   // ── Pointer start ────────────────────────────────────────────
   function onStart(x, y, target) {
     // Any shop card with data-card-key (buy/sell/craft tabs)
@@ -3318,6 +3445,22 @@ function setupShopDrag() {
       dragEl     = card;
       startX = x; startY = y; dragging = false;
       return true;
+    }
+
+    // Long-press on a craft card with in-progress ingredients → clear it
+    if (shopMode === 'craft' && card) {
+      const puKey = card.dataset.cardKey;
+      const tier  = card.dataset.cardTier;
+      if (puKey && (tier === 'compound' || tier === 'alloy') && craftProgress[puKey]?.length > 0) {
+        longPressCard = card;
+        card.classList.add('long-press-charging');
+        longPressTimer = setTimeout(() => {
+          cancelLongPress();
+          clearCraftCard(puKey, tier);
+        }, LONG_PRESS_MS);
+        startX = x; startY = y;
+        return true; // consume the event so it doesn't fall through
+      }
     }
     // Stash tab powerup card
     const puCard = target.closest('[data-pu-key]');
@@ -3344,6 +3487,11 @@ function setupShopDrag() {
   }
 
   function onMove(x, y) {
+    // Any movement cancels a pending long-press
+    if (longPressTimer) {
+      const d = Math.sqrt((x - startX) ** 2 + (y - startY) ** 2);
+      if (d > DRAG_THRESHOLD) cancelLongPress();
+    }
     if (!dragKey) return;
     if (!dragging) {
       const d = Math.sqrt((x-startX)**2 + (y-startY)**2);
@@ -3357,6 +3505,7 @@ function setupShopDrag() {
   }
 
   function onEnd(x, y) {
+    cancelLongPress(); // always clean up any pending hold
     if (!dragKey) return;
     if (dragging) {
       commitDrop(x, y);
