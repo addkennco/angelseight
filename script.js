@@ -44,48 +44,31 @@ const STRINGS = {
     C:  { name:'Carbon',    sym:'ζ', effect:'Ammo Max +8',    desc: 'Used in its crystalline form to create ultra-hardened kinetic penetrators for standard ammo.' },
   },
   powerups: {
-      LITHEBRYL:   { sym:'Β',  name:'Lithebryl',     recipe:['Be','Ti'], effect:'Shield Max +20, Ammo +8',             power:'Shield Restore',           puKey:'LITHEBRYL',    desc:  'An alloy of Lithium and Beryllium that absorbs and dissipates energy blasts.' },
-      NITROKALIUM: { sym:'Π',  name:'Nitrokalium',   recipe:['Li','N'],  effect:'Shoot Speed +12, Shield +6',          power:'Double Fire Rate',         puKey:'NITROKALIUM',  desc:  'A Potassium-Nitrogen gas mixture used to puah the engines to run at dangerous but hyper-efficient levels.'},
-      CARBOSILICUM:{ sym:'Ξ',  name:'Carbosilicium', recipe:['Si','C'],  effect:'Ammo Max +18, Shoot Speed +3',        power:'Double Points',            puKey:'CARBOSILICUM', desc:  'A highly efficient superconductor, allowing fire-control systems to process at lightning speeds.'},
-      MAGNIUM:     { sym:'Μ',  name:'Magnium',       recipe:['Mg','K'],  effect:'Reserve +2, Shoot Speed +6',          power:'Bomb',                     puKey:'MAGNIUM',      desc:  'A Magnesium-based unstable isotope that is highly volatile when impacted.'},
-      TITANE:      { sym:'Θ',  name:'Titane',        recipe:['Ti','N'],  effect:'Shield Max +30, Shoot Speed +5',      power:'Invincibility',            puKey:'TITANE',       desc:  'A low-density, Titanium-based metal that provides near-indestructible hull integrity without adding significant mass.'},
-      ALKALIUM:    { sym:'α',  name:'Alkalium',      recipe:['K','Si'],  effect:'Ammo Max +22, Shoot Speed +8',        power:'Piercing Bullets',         puKey:'ALKALIUM',     desc:  'A Silicon-Potassium compound that uses ionized energy to give shots piercing capabilities.'},
-	  AZOLITHION:  { sym:'Λ',  name:'Azolithion',    recipe:['Li','K'],  effect: 'Ammo +20, Shield +8',                power:'Multishot',                puKey: 'AZOLITHION',  desc:  'A Lithium-Nitrogen composite used for cooling during high-velocity maneuvers.'},
-	  GAMMITE:     { sym:'Γ',  name:'Gammite',       recipe:['Ti','Si'], effect: 'Ammo +8, Shield +8, Shoot Speed +4', power:'No Ammo Cost',             puKey: 'GAMMITE',     desc:  'A complex superconductor used to synchronize ammo and shield frequencies for balanced performance.'},
+      LITHEBRYL:   { sym:'Β',  name:'Lithebryl',     effect:'Shield Max +20, Ammo +8',             power:'Shield Restore',           puKey:'LITHEBRYL',    desc:  'An alloy of Lithium and Beryllium that absorbs and dissipates energy blasts.' },
+      NITROKALIUM: { sym:'Π',  name:'Nitrokalium',   effect:'Shoot Speed +12, Shield +6',          power:'Double Fire Rate',         puKey:'NITROKALIUM',  desc:  'A Potassium-Nitrogen gas mixture used to puah the engines to run at dangerous but hyper-efficient levels.'},
+      CARBOSILICUM:{ sym:'Ξ',  name:'Carbosilicium', effect:'Ammo Max +18, Shoot Speed +3',        power:'Double Points',            puKey:'CARBOSILICUM', desc:  'A highly efficient superconductor, allowing fire-control systems to process at lightning speeds.'},
+      MAGNIUM:     { sym:'Μ',  name:'Magnium',       effect:'Reserve +2, Shoot Speed +6',          power:'Bomb',                     puKey:'MAGNIUM',      desc:  'A Magnesium-based unstable isotope that is highly volatile when impacted.'},
+      TITANE:      { sym:'Θ',  name:'Titane',        effect:'Shield Max +30, Shoot Speed +5',      power:'Invincibility',            puKey:'TITANE',       desc:  'A low-density, Titanium-based metal that provides near-indestructible hull integrity without adding significant mass.'},
+      ALKALIUM:    { sym:'α',  name:'Alkalium',      effect:'Ammo Max +22, Shoot Speed +8',        power:'Piercing Bullets',         puKey:'ALKALIUM',     desc:  'A Silicon-Potassium compound that uses ionized energy to give shots piercing capabilities.'},
+	  AZOLITHION:  { sym:'Λ',  name:'Azolithion',    effect: 'Ammo +20, Shield +8',                power:'Multishot',                puKey: 'AZOLITHION',  desc:  'A Lithium-Nitrogen composite used for cooling during high-velocity maneuvers.'},
+	  GAMMITE:     { sym:'Γ',  name:'Gammite',       effect: 'Ammo +8, Shield +8, Shoot Speed +4', power:'No Ammo Cost',             puKey: 'GAMMITE',     desc:  'A complex superconductor used to synchronize ammo and shield frequencies for balanced performance.'},
 	  OMEGITE: {
         sym: 'Ω', name: 'Omegite', puKey: 'OMEGITE',
-        recipe: [
-          { key: 'MAGNIUM',  label: 'Μ Magnium'   },
-          { key: 'ALKALIUM', label: 'α Alkalium'  },
-          { key: 'TITANE',   label: 'Θ Titane'  },
-        ],
         effect: 'Reserve +3, Shield Max +10, Shoot Speed +10, Ammo Max +10', power:'Super Bomb',
 		desc: 'A terrifyingly unstable material that exists in a state of constant decay.',
       },
       AXORITE: {
         sym: 'Χ', name: 'Axorite', puKey: 'AXORITE',
-        recipe: [
-          { key: 'MAGNIUM', label: 'Μ Magnium'  },
-          { key: 'TITANE',  label: 'Θ Titane' },
-        ],
         effect: 'Shield Max +25, Reserve +2', power:'Full Restore',
 		desc: 'A highly versatile multi-application metal alloy that is used in both defense and munitions.',
       },
       PHIOMEGA: {
         sym: 'Φ', name: 'PhiOmega', puKey: 'PHIOMEGA',
-        recipe: [
-          { key: 'CARBOSILICUM', label: 'Ξ Carbosilicium' },
-          { key: 'ALKALIUM',     label: 'α Alkalium'  },
-        ],
         effect: 'Ammo Max +30, Shoot Speed +6', power:'Burstshot',
 		desc: 'A perfectly lossless superconductor that expels magnetic fields, ideal for maximizing ammo velocity and efficiency.',
       },
       DELTALITE: {
         sym: '∇', name: 'Deltalite', puKey: 'DELTALITE',
-        recipe: [
-          { key: 'LITHEBRYL',     label: 'Β Lithebryl' },
-          { key: 'NITROKALIUM',   label: 'Π Nitrokalium'  },
-        ],
         effect: 'Shield Max +20, Shoot Speed +10', power:'Time Dilation',
 		desc: 'A sophisticated Beryllium-based metal that can survive the friction of warp-speed travel.',
       },	  
@@ -2222,6 +2205,250 @@ let shopMode = 'buy';
 let selectedCardKey = null;
 const craftProgress = {}; // puKey → ingredient keys already slotted; reset on tab switch
 
+// ── Staging queue ────────────────────────────────────────────────
+// Each entry: { key, tier, qty }
+const stagingQueue = [];
+
+function stagingCost(key, tier) {
+  if (shopMode === 'buy')  return tier === 'element' ? 80 : 150;
+  if (shopMode === 'sell') {
+    const SELL = { element:40, compound:75, alloy:100 };
+    return (tier === 'alloy' && key === 'OMEGITE') ? 120 : (SELL[tier] || 40);
+  }
+  return 0;
+}
+
+function renderStaging() {
+  const list  = document.getElementById('staging-list');
+  const total = document.getElementById('staging-total');
+  if (!list) return;
+
+  list.innerHTML = '';
+  if (stagingQueue.length === 0) {
+    if (total) total.textContent = '';
+    return;
+  }
+
+  stagingQueue.forEach((entry, idx) => {
+    const pu   = STRINGS.powerups[entry.key];
+    const item = STRINGS.items[entry.key];
+    const sym  = pu ? pu.sym : item ? item.sym : '?';
+    const name = pu ? pu.name : item ? item.name : entry.key;
+    const cost = stagingCost(entry.key, entry.tier);
+
+    // For craft entries, check if another batch of ingredients is available
+    const canAddMore = entry.ingredients
+      ? canAutoConsume(entry.key, entry.tier)
+      : false;
+
+    const row = document.createElement('div');
+    row.className = 'staging-row';
+    row.innerHTML =
+      `<span class="staging-row-sym">${sym}</span>` +
+      `<span class="staging-row-name">${name}</span>` +
+      `<span class="staging-row-qty">` +
+        `<button class="staging-qty-btn" data-idx="${idx}" data-dir="-1">−</button>` +
+        `<span class="staging-qty-val">${entry.qty}</span>` +
+        `<button class="staging-qty-btn" data-idx="${idx}" data-dir="1"` +
+          (entry.ingredients && !canAddMore ? ' disabled style="opacity:0.25"' : '') +
+        `>+</button>` +
+      `</span>` +
+      `<span class="staging-row-remove" data-idx="${idx}">✕</span>`;
+    list.appendChild(row);
+  });
+
+  // Quantity buttons
+  list.querySelectorAll('.staging-qty-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      if (btn.disabled) return;
+      const idx = parseInt(btn.dataset.idx);
+      const dir = parseInt(btn.dataset.dir);
+      const entry = stagingQueue[idx];
+
+      if (dir === -1) {
+        // Decrement — refund one batch of ingredients if craft entry
+        entry.qty--;
+        if (entry.ingredients) refundOneBatch(entry);
+        if (entry.qty < 1) stagingQueue.splice(idx, 1);
+      } else {
+        // Increment
+        if (entry.ingredients) {
+          // Craft: auto-consume another batch of ingredients
+          if (canAutoConsume(entry.key, entry.tier)) {
+            autoConsume(entry.key, entry.tier);
+            entry.qty++;
+          }
+        } else if (shopMode === 'buy') {
+          const price = stagingCost(entry.key, entry.tier);
+          const otherCost = stagingQueue.reduce((s, e, i) =>
+            i !== idx ? s + stagingCost(e.key, e.tier) * e.qty : s, 0);
+          const maxAffordable = Math.floor((run.credits - otherCost) / price);
+          entry.qty = Math.min(entry.qty + 1, Math.max(1, maxAffordable));
+        } else if (shopMode === 'sell') {
+          const maxSell = run.inventory[entry.key] || 0;
+          entry.qty = Math.min(entry.qty + 1, maxSell);
+        } else {
+          entry.qty++;
+        }
+      }
+      renderStaging();
+      if (shopMode === 'craft') renderShopBody(); // refresh ingredient counts
+    });
+  });
+
+  // Remove buttons — refund all batches for craft entries
+  list.querySelectorAll('.staging-row-remove').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const idx = parseInt(btn.dataset.idx);
+      const entry = stagingQueue[idx];
+      if (entry.ingredients) {
+        for (let i = 0; i < entry.qty; i++) refundOneBatch(entry);
+      }
+      stagingQueue.splice(idx, 1);
+      renderStaging();
+      if (shopMode === 'craft') renderShopBody();
+    });
+  });
+
+  // Running total
+  if (total) {
+    if (shopMode === 'buy') {
+      let sum = 0;
+      stagingQueue.forEach(e => { sum += stagingCost(e.key, e.tier) * e.qty; });
+      total.textContent = `TOTAL: ${sum}¢`;
+    } else if (shopMode === 'sell') {
+      let sum = 0;
+      stagingQueue.forEach(e => { sum += stagingCost(e.key, e.tier) * e.qty; });
+      total.textContent = `EARN: +${sum}¢`;
+    } else {
+      const count = stagingQueue.reduce((s, e) => s + e.qty, 0);
+      total.textContent = `${count} ITEM${count !== 1 ? 'S' : ''} TO CRAFT`;
+    }
+  }
+}
+
+function clearStaging() {
+  // Refund ingredients for any staged craft jobs before clearing
+  stagingQueue.forEach(entry => {
+    if (entry.ingredients) {
+      for (let i = 0; i < entry.qty; i++) refundOneBatch(entry);
+    }
+  });
+  stagingQueue.length = 0;
+  renderStaging();
+}
+
+// ── Craft staging helpers ────────────────────────────────────────
+
+// Returns the best available ingredient list for one craft of puKey,
+// or null if ingredients are insufficient.
+function resolveIngredientBatch(key, tier) {
+  if (!run) return null;
+  const variants = tier === 'alloy' ? ALLOY_VARIANTS[key] : COMPOUND_VARIANTS[key];
+  if (!variants) return null;
+  for (const v of variants) {
+    const needed = tier === 'alloy' ? v.map(r => r.key) : [...v];
+    // Check inventory has all needed ingredients
+    const counts = {};
+    let ok = true;
+    for (const k of needed) {
+      counts[k] = (counts[k] || 0) + 1;
+    }
+    for (const [k, n] of Object.entries(counts)) {
+      if ((run.inventory[k] || 0) < n) { ok = false; break; }
+    }
+    if (ok) return needed; // first satisfiable variant wins
+  }
+  return null;
+}
+
+function canAutoConsume(key, tier) {
+  return resolveIngredientBatch(key, tier) !== null;
+}
+
+function autoConsume(key, tier) {
+  const batch = resolveIngredientBatch(key, tier);
+  if (!batch) return null;
+  for (const k of batch) run.inventory[k] = Math.max(0, (run.inventory[k] || 0) - 1);
+  return batch;
+}
+
+function refundOneBatch(entry) {
+  // entry.ingredients is the ingredient list for ONE batch
+  for (const k of entry.ingredients) {
+    run.inventory[k] = Math.min(99, (run.inventory[k] || 0) + 1);
+  }
+}
+
+// Called when a craft-ready card is dropped on the action box.
+// Ingredients already consumed by light-fill — snapshot and stage.
+function stageCraftJob(key, tier) {
+  if (!run) return;
+  const progress = craftProgress[key];
+  if (!progress || progress.length === 0) return;
+  const ingredients = [...progress];
+  delete craftProgress[key];
+  const existing = stagingQueue.find(e => e.key === key && e.ingredients);
+  if (existing) {
+    existing.qty++;
+    // ingredients already consumed by the light-fill; record them per-batch
+    // We store one batch list and multiply by qty at refund/commit time
+  } else {
+    stagingQueue.push({ key, tier, qty: 1, ingredients });
+  }
+  renderStaging();
+}
+
+function stageItem(key, tier) {
+  if (!run) return;
+  if (shopMode === 'buy') {
+    const price = tier === 'element' ? 80 : 150;
+    const alreadyCommitted = stagingQueue.reduce((s, e) => s + stagingCost(e.key, e.tier) * e.qty, 0);
+    if (run.credits - alreadyCommitted < price) { showShopToast('Not enough credits!'); return; }
+  }
+  if (shopMode === 'sell') {
+    const alreadyStaged = stagingQueue.find(e => e.key === key)?.qty || 0;
+    if (alreadyStaged >= (run.inventory[key] || 0)) { showShopToast('No more to sell!'); return; }
+  }
+  const existing = stagingQueue.find(e => e.key === key);
+  if (existing) existing.qty++;
+  else stagingQueue.push({ key, tier, qty: 1 });
+  renderStaging();
+}
+
+function commitStaging() {
+  if (!run || stagingQueue.length === 0) return;
+  if (shopMode === 'buy') {
+    const total = stagingQueue.reduce((s, e) => s + stagingCost(e.key, e.tier) * e.qty, 0);
+    if (run.credits < total) { showShopToast('Not enough credits!'); return; }
+    stagingQueue.forEach(({ key, tier, qty }) => {
+      run.credits -= stagingCost(key, tier) * qty;
+      run.inventory[key] = Math.min(99, (run.inventory[key] || 0) + qty);
+    });
+    showShopToast(`Bought ${stagingQueue.reduce((s, e) => s + e.qty, 0)} item(s)!`);
+  } else if (shopMode === 'sell') {
+    stagingQueue.forEach(({ key, tier, qty }) => {
+      const available = run.inventory[key] || 0;
+      const actual = Math.min(qty, available);
+      run.inventory[key] = available - actual;
+      run.credits += stagingCost(key, tier) * actual;
+    });
+    showShopToast(`Sold ${stagingQueue.reduce((s, e) => s + e.qty, 0)} item(s)!`);
+  } else if (shopMode === 'craft') {
+    // Ingredients already consumed at stage time — just output the items
+    const count = stagingQueue.reduce((s, e) => s + e.qty, 0);
+    stagingQueue.forEach(({ key, qty }) => {
+      run.inventory[key] = Math.min(99, (run.inventory[key] || 0) + qty);
+    });
+    showShopToast(`Crafted ${count} item${count !== 1 ? 's' : ''}!`);
+  }
+  clearStaging();
+  refresh();
+  renderShopBody();
+}
+
 // ═══════════════════════════════════════════════════════════════
 // CRAFT RECIPE VARIANTS
 // Each compound/alloy lists all valid ingredient combinations.
@@ -2346,10 +2573,10 @@ function isValidIngredientForAnyVariant(puKey, tier, dragKey, dragTier, progress
 
 // ── Action box labels per tab ────────────────────────────────────
 const ACTION_BOX_LABELS = {
-  buy:   { text: 'DRAG TO BUY',   cls: 'buy-box'   },
-  sell:  { text: 'DRAG TO SELL',  cls: 'sell-box'  },
-  craft: { text: 'DRAG TO CRAFT', cls: 'craft-box' },
-  stash: { text: 'DRAG TO STASH', cls: ''          },
+  buy:   { text: 'DRAG TO STAGE',  cls: 'buy-box'   },
+  sell:  { text: 'DRAG TO STAGE',  cls: 'sell-box'  },
+  craft: { text: 'DRAG TO CRAFT',  cls: 'craft-box' },
+  stash: { text: 'DRAG TO EQUIP',  cls: ''          },
 };
 
 function shopTab(tab) {
@@ -2366,15 +2593,24 @@ function shopTab(tab) {
     const el = document.getElementById('tab-' + t);
     if (el) el.classList.toggle('active', t === tab);
   });
-  // Update action box
+  // Update action box label and confirm button label
   const box = document.getElementById('shop-action-box');
   if (box) {
     const cfg = ACTION_BOX_LABELS[tab] || ACTION_BOX_LABELS.buy;
     box.textContent = cfg.text;
     box.className = 'shop-action-box ' + cfg.cls;
   }
+  const staging = document.getElementById('shop-staging');
+  if (staging) staging.style.display = tab === 'stash' ? 'none' : 'flex';
+  const confirmBtn = document.getElementById('btn-shop-action');
+  if (confirmBtn) {
+    const labels = { buy: 'BUY ALL', sell: 'SELL ALL', craft: 'CRAFT ALL' };
+    confirmBtn.textContent = labels[tab] ?? '';
+  }
   // Reset info panel
   clearItemInfo();
+  clearIngredientHighlights();
+  clearStaging();
   renderShopBody();
   updateShopStats();
   updateShopReserves();
@@ -2386,12 +2622,44 @@ function clearItemInfo() {
   if (panel) panel.innerHTML = '<div class="shop-info-empty">TAP ANY CARD FOR INFO</div>';
 }
 
+function clearIngredientHighlights() {
+  document.querySelectorAll('.recipe-ingredient, .recipe-ingredient--owned').forEach(el => {
+    el.classList.remove('recipe-ingredient', 'recipe-ingredient--owned');
+  });
+}
+
+function highlightIngredientCards(puKey, tier) {
+  clearIngredientHighlights();
+  // Collect all unique ingredient keys across all variants
+  const allKeys = new Set();
+  if (tier === 'compound') {
+    const variants = COMPOUND_VARIANTS[puKey];
+    if (variants) variants.forEach(v => v.forEach(k => allKeys.add(k)));
+  } else if (tier === 'alloy') {
+    const variants = ALLOY_VARIANTS[puKey];
+    if (variants) variants.forEach(v => v.forEach(r => allKeys.add(r.key)));
+  }
+  // Apply classes to matching ingredient source cards (elements + compounds in INGREDIENTS section)
+  allKeys.forEach(key => {
+    // Match element or compound ingredient cards — skip craft target cards (they have .craft-lights inside)
+    const candidates = document.querySelectorAll(
+      `#shop-body .shop-card[data-card-key="${key}"][data-card-tier="element"],` +
+      `#shop-body .shop-card[data-card-key="${key}"][data-card-tier="compound"]`
+    );
+    candidates.forEach(card => {
+      if (card.querySelector('.craft-lights')) return; // skip craft target cards
+      const qty = run?.inventory[key] || 0;
+      card.classList.add(qty > 0 ? 'recipe-ingredient--owned' : 'recipe-ingredient');
+    });
+  });
+}
+
 function showItemInfo(key, tier) {
   // tier: 'element' | 'compound' | 'alloy' | 'powerup'
   const panel = document.getElementById('shop-info-panel');
   if (!panel) return;
 
-  let sym, name, effect, power, recipe, desc, price;
+  let sym, name, effect, power, recipeLines, desc, price;
   const symClass = tier === 'compound' ? 'compound' : tier === 'alloy' ? 'alloy' : '';
 
   if (tier === 'element') {
@@ -2403,40 +2671,45 @@ function showItemInfo(key, tier) {
     const pu = STRINGS.powerups[key];
     if (!pu) return;
     sym = pu.sym; name = pu.name; effect = pu.effect; power = pu.power; desc = pu.desc;
-    // Build recipe string
-    if (Array.isArray(pu.recipe)) {
-      // simple array of element keys
-      recipe = pu.recipe.map(k => {
-        const el = STRINGS.items[k]; return el ? `${el.sym} ${el.name}` : k;
-      }).join(' + ');
-    } else if (pu.recipe && typeof pu.recipe === 'object') {
-      // already an object with key/label pairs — but compounds use plain arrays
-      recipe = null;
-    }
-    // Alloys have array-of-objects recipes stored on the craft data, not STRINGS
-    // We'll look them up from the craft arrays
-    if (tier === 'alloy') {
-      const ALLOY_RECIPES = {
-        OMEGITE:   'Μ Magnium + α Alkalium + Θ Titane',
-        AXORITE:   'Μ Magnium + Θ Titane',
-        PHIOMEGA:  'Ξ Carbosilicium + α Alkalium',
-        DELTALITE: 'Β Lithebryl + Π Nitrokalium',
-      };
-      recipe = ALLOY_RECIPES[key] || '';
-      price = key === 'OMEGITE' ? 'SELL 120¢' : 'SELL 100¢';
-    } else if (tier === 'compound') {
+
+    if (tier === 'compound') {
+      // Pull all variants from COMPOUND_VARIANTS and render each as a line
+      const variants = COMPOUND_VARIANTS[key];
+      if (variants) {
+        recipeLines = variants.map(v =>
+          v.map(k => { const el = STRINGS.items[k]; return el ? `${el.sym} ${el.name}` : k; }).join(' + ')
+        );
+      }
       price = 'BUY 150¢ · SELL 75¢';
+    } else if (tier === 'alloy') {
+      // Pull all variants from ALLOY_VARIANTS and render each as a line
+      const variants = ALLOY_VARIANTS[key];
+      if (variants) {
+        recipeLines = variants.map(v =>
+          v.map(r => {
+            const p = STRINGS.powerups[r.key];
+            return p ? `${p.sym} ${p.name}` : r.key;
+          }).join(' + ')
+        );
+      }
+      price = key === 'OMEGITE' ? 'SELL 120¢' : 'SELL 100¢';
     } else {
       price = 'BUY 150¢';
     }
   }
+
+  const recipeHTML = recipeLines && recipeLines.length
+    ? recipeLines.map((line, i) =>
+        `<div class="shop-info-recipe">${i === 0 ? 'RECIPE: ' : '    or: '}${line}</div>`
+      ).join('')
+    : '';
 
   panel.innerHTML =
     `<div class="shop-info-sym ${symClass}">${sym}</div>` +
     `<div class="shop-info-name">${name}</div>` +
     (effect ? `<div class="shop-info-effect">EXPEND: ${effect}</div>` : '') +
 	(power  ? `<div class="shop-info-power">TRIGGER: ${power}</div>` : '') +
-    (recipe ? `<div class="shop-info-recipe">RECIPE: ${recipe}</div>` : '') +
+    recipeHTML +
     (desc   ? `<div class="shop-info-desc">${desc}</div>` : '') +
     (price  ? `<div class="shop-info-price">${price}</div>` : '');
 }
@@ -2604,10 +2877,14 @@ function renderShopBody() {
     }
 
   } else if (shopMode === 'craft') {
-    const labelEl = document.createElement('div');
-    labelEl.className = 'shop-section-label'; labelEl.textContent = 'ELEMENTS';
-    body.appendChild(labelEl);
-    const gridEl = document.createElement('div'); gridEl.className = 'shop-grid';
+
+    // ── INGREDIENTS — elements + compounds as always-visible draggable sources ──
+    const labelIngr = document.createElement('div');
+    labelIngr.className = 'shop-section-label'; labelIngr.textContent = 'INGREDIENTS';
+    body.appendChild(labelIngr);
+    const gridIngr = document.createElement('div'); gridIngr.className = 'shop-grid';
+
+    // Elements
     Object.entries(STRINGS.items).forEach(([key, item]) => {
       const qty = run?.inventory[key] || 0;
       const has = qty > 0;
@@ -2622,36 +2899,52 @@ function renderShopBody() {
         document.querySelectorAll('.shop-card.obj.selected').forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
         showItemInfo(key, 'element');
+        clearIngredientHighlights();
       };
-      gridEl.appendChild(card);
+      gridIngr.appendChild(card);
     });
-    body.appendChild(gridEl);
 
-    const label = document.createElement('div');
-    label.className = 'shop-section-label'; label.style.marginTop = '14px'; label.textContent = 'COMPOUNDS';
-    body.appendChild(label);
-    const compounds = [
-      { sym:'Β',  name:'Lithebryl',     recipe:['Be','Ti'], effect:'Shield Max +20, Ammo +8 — Shield Restore',             puKey:'LITHEBRYL',    desc:  'An alloy of Lithium and Beryllium that absorbs and dissipates energy blasts.' },
-      { sym:'Π',  name:'Nitrokalium',   recipe:['Li','N'],  effect:'Shoot Spd +12, Shield +6 — Double Fire Rate 8s',       puKey:'NITROKALIUM',  desc:  'A Potassium-Nitrogen gas mixture used to puah the engines to run at dangerous but hyper-efficient levels.'},
-      { sym:'Ξ',  name:'Carbosilicium', recipe:['Si','C'],  effect:'Ammo Max +18, Shoot Spd +3 — Double Points 15s',       puKey:'CARBOSILICUM', desc:  'A highly efficient superconductor, allowing fire-control systems to process at lightning speeds.'},
-      { sym:'Μ',  name:'Magnium',       recipe:['Mg','K'],  effect:'Reserve +2, Shoot Spd +6 — Bomb',                      puKey:'MAGNIUM',      desc:  'A Magnesium-based unstable isotope that is highly volatile when impacted.'},
-      { sym:'Θ',  name:'Titane',        recipe:['Ti','N'],  effect:'Shield Max +30, Shoot Spd +5 — Invincibility 10s',     puKey:'TITANE',       desc:  'A low-density, Titanium-based metal that provides near-indestructible hull integrity without adding significant mass.'},
-      { sym:'α',  name:'Alkalium',      recipe:['K','Si'],  effect:'Ammo Max +22, Shoot Spd +8 — Piercing Bullets',        puKey:'ALKALIUM',     desc:  'A Silicon-Potassium compound that uses ionized energy to give shots piercing capabilities.'},
-	  { sym:'Λ',  name:'Azolithion',    recipe:['Li','K'],  effect: 'Ammo +20, Shield +8 — Bullet Shift 15s',              puKey: 'AZOLITHION',  desc:  'A Lithium-Nitrogen composite used for cooling during high-velocity maneuvers.'},
-	  { sym:'Γ',  name:'Gammite',       recipe:['Ti','Si'], effect: 'Ammo +8, Shield +8, Shoot Spd +4 — No Ammo Cost 10s', puKey: 'GAMMITE',     desc:  'A complex superconductor used to synchronize ammo and shield frequencies for balanced performance.'},
-    ];
-    const grid = document.createElement('div'); grid.className = 'shop-grid';
-    compounds.forEach(c => {
-      const pu = STRINGS.powerups[c.puKey];
-      const invQty = run?.inventory[c.puKey] || 0;
+    // Compounds — always shown, draggable only when owned
+    Object.keys(COMPOUND_VARIANTS).forEach(key => {
+      const pu = STRINGS.powerups[key];
+      if (!pu) return;
+      const qty = run?.inventory[key] || 0;
+      const has = qty > 0;
+      const card = document.createElement('div');
+      card.className = 'shop-card obj ' + (has ? 'stash-has' : 'stash-empty');
+      card.dataset.cardKey = key; card.dataset.cardTier = 'compound'; card.dataset.draggable = has ? '1' : '0';
+      card.innerHTML =
+        `<div class="shop-card-sym" style="color:${has ? 'var(--purple)' : 'rgba(168,85,247,0.25)'}">${pu.sym}</div>` +
+        `<div class="shop-card-name">${pu.name}</div>` +
+        `<span class="stash-count" style="color:var(--purple)">${qty}</span>`;
+      card.onclick = () => {
+        document.querySelectorAll('.shop-card.obj.selected').forEach(el => el.classList.remove('selected'));
+        card.classList.add('selected');
+        showItemInfo(key, 'compound');
+        highlightIngredientCards(key, 'compound');
+      };
+      gridIngr.appendChild(card);
+    });
+
+    body.appendChild(gridIngr);
+
+    // ── CRAFT — compound target cards (progress lights) ───────────
+    const labelCraft = document.createElement('div');
+    labelCraft.className = 'shop-section-label'; labelCraft.style.marginTop = '14px'; labelCraft.textContent = 'CRAFT';
+    body.appendChild(labelCraft);
+    const gridCraft = document.createElement('div'); gridCraft.className = 'shop-grid';
+
+    Object.keys(COMPOUND_VARIANTS).forEach(key => {
+      const pu = STRINGS.powerups[key];
+      if (!pu) return;
+      const invQty = run?.inventory[key] || 0;
       const card = document.createElement('div'); card.className = 'shop-card obj';
-      card.dataset.cardKey = c.puKey; card.dataset.cardTier = 'compound'; card.dataset.draggable = '0';
-      // Use resolved variant (based on current progress) to set light count
-      const resolvedRecipe = resolveCompoundVariant(c.puKey, craftProgress[c.puKey] || [])?.recipe || c.recipe;
+      card.dataset.cardKey = key; card.dataset.cardTier = 'compound'; card.dataset.draggable = '0';
+      const resolvedRecipe = resolveCompoundVariant(key, craftProgress[key] || [])?.recipe || Object.values(COMPOUND_VARIANTS[key])[0];
       const lightsHTML = resolvedRecipe.map(() => `<span class="craft-light off"></span>`).join('');
       card.innerHTML =
-        `<div class="shop-card-sym" style="color:var(--purple)">${c.sym}</div>` +
-        `<div class="shop-card-name">${c.name}</div>` +
+        `<div class="shop-card-sym" style="color:var(--purple)">${pu.sym}</div>` +
+        `<div class="shop-card-name">${pu.name}</div>` +
         `<div class="shop-card-progress">` +
           `<span class="craft-inv-count${invQty > 0 ? ' has' : ''}">${invQty}</span>` +
           `<div class="craft-lights">${lightsHTML}</div>` +
@@ -2659,13 +2952,14 @@ function renderShopBody() {
       card.onclick = () => {
         document.querySelectorAll('.shop-card.obj.selected').forEach(el => el.classList.remove('selected'));
         card.classList.add('selected');
-        showItemInfo(c.puKey, 'compound');
+        showItemInfo(key, 'compound');
+        highlightIngredientCards(key, 'compound');
       };
-      grid.appendChild(card);
+      gridCraft.appendChild(card);
     });
-    body.appendChild(grid);
+    body.appendChild(gridCraft);
 
-    // ── ALLOYS — crafted from compounds + elements ────────────────
+    // ── ALLOYS — crafted from compounds (progress lights) ─────────
     const labelAlloy = document.createElement('div');
     labelAlloy.className = 'shop-section-label';
     labelAlloy.style.marginTop = '14px';
@@ -2730,6 +3024,7 @@ function renderShopBody() {
         document.querySelectorAll('.shop-card.obj.selected').forEach(el => el.classList.remove('selected'));
         card.classList.add('selected');
         showItemInfo(a.puKey, 'alloy');
+        highlightIngredientCards(a.puKey, 'alloy');
       };
       gridAlloy.appendChild(card);
     });
@@ -2886,6 +3181,8 @@ document.addEventListener('DOMContentLoaded', () => {
     showScreen('game');
     Game.startLevel();
   };
+
+  document.getElementById('btn-shop-action').onclick = () => commitStaging();
 
   document.getElementById('btn-shop-menu').onclick = () => {
     if (!run) run = newRun();
@@ -3053,6 +3350,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   setupShopDrag();
 });
+
+// ── Shop refresh — updates all right-panel displays ─────────────
+function refresh() {
+  updateShopReserves();
+  updateShopStats();
+  renderStaging();
+  if (shopMode === 'stash') renderShopBody();
+  document.getElementById('shop-credits').textContent = run ? run.credits + '¢' : '0¢';
+}
 
 // ═══════════════════════════════════════════════════════════════
 // SHOP DRAG & DROP — powerup stash ↔ reserve slots
@@ -3248,13 +3554,18 @@ function setupShopDrag() {
     // Ingredients were consumed one-by-one as lights filled — only handle output here
     if (tier !== 'compound' && tier !== 'alloy') return;
     delete craftProgress[key];
-    const activePuCount = run.powerups.filter(k => k != null).length;
-    if (activePuCount < run.reserveMax) {
-      const emptyIdx = run.powerups.indexOf(null);
-      if (emptyIdx >= 0) run.powerups[emptyIdx] = key;
-      else run.powerups.push(key);
-    } else {
+    // In craft tab, always stash to inventory so the item stays available as an alloy ingredient
+    if (shopMode === 'craft') {
       run.inventory[key] = Math.min(99, (run.inventory[key] || 0) + 1);
+    } else {
+      const activePuCount = run.powerups.filter(k => k != null).length;
+      if (activePuCount < run.reserveMax) {
+        const emptyIdx = run.powerups.indexOf(null);
+        if (emptyIdx >= 0) run.powerups[emptyIdx] = key;
+        else run.powerups.push(key);
+      } else {
+        run.inventory[key] = Math.min(99, (run.inventory[key] || 0) + 1);
+      }
     }
     showShopToast('Crafted: ' + (STRINGS.powerups[key]?.name || key) + '!');
     refresh();
@@ -3262,8 +3573,11 @@ function setupShopDrag() {
 
   // ── Hit-test: craft tab compound/alloy cards ─────────────────
   function craftCardAt(x, y) {
+    // Only match craft target cards — distinguished by containing .craft-lights
+    // This excludes compound ingredient source cards in the INGREDIENTS section
     const cards = document.querySelectorAll('#shop-body .shop-card[data-card-tier="compound"], #shop-body .shop-card[data-card-tier="alloy"]');
     for (const c of cards) {
+      if (!c.querySelector('.craft-lights')) continue; // skip ingredient source cards
       const r = c.getBoundingClientRect();
       if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return c;
     }
@@ -3272,7 +3586,10 @@ function setupShopDrag() {
 
   // ── Refresh a single craft card's lights + draggable state ───
   function refreshCraftCard(puKey, tier, recipe) {
-    const card = document.querySelector(`#shop-body .shop-card[data-card-key="${puKey}"]`);
+    // Must match the craft target card specifically — it contains .craft-lights
+    // querySelector returns the first match which may be the ingredient source card
+    const allCards = document.querySelectorAll(`#shop-body .shop-card[data-card-key="${puKey}"]`);
+    const card = Array.from(allCards).find(c => c.querySelector('.craft-lights'));
     if (!card) return;
     const progress = craftProgress[puKey] || [];
     const total = recipe.length;
@@ -3299,15 +3616,31 @@ function setupShopDrag() {
   }
 
   function refreshSourceCard(ingredientKey) {
-    const src = document.querySelector(`#shop-body .shop-card[data-card-key="${ingredientKey}"][data-card-tier="element"]`);
-    if (!src) return;
-    const qty = run?.inventory[ingredientKey] || 0;
-    const has = qty > 0;
-    src.classList.toggle('stash-has',   has);
-    src.classList.toggle('stash-empty', !has);
-    src.dataset.draggable = has ? '1' : '0';
-    const countEl = src.querySelector('.stash-count');
-    if (countEl) countEl.textContent = qty;
+    // Covers both element and compound ingredient source cards in the INGREDIENTS section
+    const src = document.querySelector(
+      `#shop-body .shop-card[data-card-key="${ingredientKey}"]:not([data-card-tier="alloy"]):not(.shop-card-progress)`
+    );
+    // Prefer the one that is NOT a craft target (no .craft-lights inside)
+    const allMatches = document.querySelectorAll(
+      `#shop-body .shop-card[data-card-key="${ingredientKey}"][data-card-tier="element"],` +
+      `#shop-body .shop-card[data-card-key="${ingredientKey}"][data-card-tier="compound"].stash-has,` +
+      `#shop-body .shop-card[data-card-key="${ingredientKey}"][data-card-tier="compound"].stash-empty`
+    );
+    allMatches.forEach(card => {
+      if (card.querySelector('.craft-lights')) return; // skip craft target cards
+      const qty = run?.inventory[ingredientKey] || 0;
+      const has = qty > 0;
+      card.classList.toggle('stash-has',   has);
+      card.classList.toggle('stash-empty', !has);
+      card.dataset.draggable = has ? '1' : '0';
+      const countEl = card.querySelector('.stash-count');
+      if (countEl) countEl.textContent = qty;
+      // Update sym color for compound ingredient cards
+      if (card.dataset.cardTier === 'compound') {
+        const symEl = card.querySelector('.shop-card-sym');
+        if (symEl) symEl.style.color = has ? 'var(--purple)' : 'rgba(168,85,247,0.25)';
+      }
+    });
   }
 
   // ── Commit drop ──────────────────────────────────────────────
@@ -3358,9 +3691,9 @@ function setupShopDrag() {
 
     // ── Card → action box ──────────────────────────────────────
     if (dragSource === 'card' && onActionBox) {
-      if      (shopMode === 'buy')   doBuy(dragKey, dragTier);
-      else if (shopMode === 'sell')  doSell(dragKey, dragTier);
-      else if (shopMode === 'craft') doCraft(dragKey, dragTier);
+      if      (shopMode === 'buy')   stageItem(dragKey, dragTier);
+      else if (shopMode === 'sell')  stageItem(dragKey, dragTier);
+      else if (shopMode === 'craft') stageCraftJob(dragKey, dragTier);
       renderShopBody();
       return;
     }
@@ -3397,13 +3730,6 @@ function setupShopDrag() {
       refresh();
     }
     // card → non-box: cancel (no-op)
-  }
-
-  function refresh() {
-    updateShopReserves();
-    updateShopStats();
-    if (shopMode === 'stash') renderShopBody();
-    document.getElementById('shop-credits').textContent = run ? run.credits + '¢' : '0¢';
   }
 
   function reset() {

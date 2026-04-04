@@ -57,19 +57,6 @@
     pointer-events: all;
   }
 
-  /* ══ CLICK HINT ══ */
-  #click-hint {
-    position: fixed;
-    bottom: 28px; left: 50%;
-    transform: translateX(-50%);
-    font-size: 11px; letter-spacing: 0.3em;
-    color: rgba(255,255,255,0.3);
-    z-index: 200;
-    animation: blink 1.8s ease-in-out infinite;
-    pointer-events: none;
-  }
-  @keyframes blink { 0%,100%{opacity:0.3} 50%{opacity:0.8} }
-
   /* ══ PROGRESS DOTS ══ */
   #progress {
     position: fixed;
@@ -185,18 +172,11 @@
     white-space: nowrap;
   }
   .tut-intro {
-    font-size: 14px; line-height: 1.8;
+    font-size: 12px; line-height: 1.8;
     color: rgba(255,255,255,0.55);
-    text-align: center;
+    text-align: left;
     max-width: 300px;
     margin-bottom: 32px;
-  }
-  .tut-start-hint {
-    font-size: 11px; letter-spacing: 0.25em;
-    color: var(--cyan); opacity: 0.7;
-    border: 1px solid rgba(0,245,255,0.25);
-    padding: 10px 28px;
-    animation: blink 1.8s ease-in-out infinite;
   }
 
   /* ══ SHARED SCENE FRAME ══ */
@@ -219,11 +199,11 @@
     text-align: center;
   }
   .slide-body {
-    font-size: 13px; line-height: 1.75;
-    color: rgba(255,255,255,0.5);
-    text-align: center;
-    max-width: 280px;
-    margin-bottom: 16px;
+    font-size: 13px; line-height: 1.0;
+    color: var(--gold);
+	font-style: italic;
+    text-align: left;
+    max-width: 300px;
   }
 
   /* ══ SLIDE 2: HUD ══ */
@@ -537,10 +517,11 @@
     font-family:var(--display); font-size:10px; font-weight:700; color:var(--purple);
   }
   .mock-res-slot.filled { border-color:rgba(168,85,247,0.7); background:rgba(168,85,247,0.12); }
-  .mock-launch {
-    font-family:var(--display); font-size:10px; letter-spacing:0.15em;
+  .mock-button {
+    text-align:center;
+	font-family:var(--display); font-size:10px; letter-spacing:0.15em;
     color:var(--cyan); border:2px solid var(--cyan);
-    background:transparent; padding:10px 0;
+    background:transparent; padding:8px 0;
     width:100%; cursor:default;
     margin-top:auto;
   }
@@ -607,41 +588,40 @@
 <body>
 
 <div id="progress"></div>
-<div id="click-hint">TAP TO CONTINUE</div>
 
 <div id="tut-wrap">
 
   <!-- ════ SLIDE 0: TITLE ════ -->
   <div class="slide active" id="slide-0">
-    <div class="tut-eyebrow">PILOT ORIENTATION</div>
+    <div class="tut-eyebrow">ALPHA LYRAE AEROSPACE DIVISION</div>
     <div class="tut-title-wrap">
       <div class="tut-title"><br>MANUAL</div>
       <div class="tut-cursive">Operator's</div>
     </div>
     <div class="tut-intro">
-      A crash course in survival.<br>
-      Everything you need to know before launch.
+      Ver 25.04-A0V<br>
+	  Calibration: Zero-Magnitude Standard<br>
+	  Vehicle Class: Eagle026<br>
+      Disclaimer: Distribution to unauthorized parties outside of the Castor Moving Group is strictly prohibited. 
     </div>
-    <div class="tut-start-hint">TAP TO BEGIN</div>
   </div>
 
   <!-- ════ SLIDE 1: MOVEMENT ════ -->
   <div class="slide" id="slide-1">
     <div class="slide-title">MOVEMENT &amp; AIMING</div>
-    <div class="slide-body">
-      Move left & right to dodge and aim.
-    </div>
-
     <div class="move-scene" id="move-scene">
       <canvas id="move-canvas" width="260" height="160" style="position:absolute;top:0;left:0;width:100%;height:100%"></canvas>
     </div>
+	    <div class="slide-body">
+      Move left & right to dodge and aim.
+    </div>
       </div>
     </div>
-  </div>
+</div>
 
   <!-- ════ SLIDE 2: HUD ════ -->
   <div class="slide" id="slide-2">
-    <div class="slide-title" style="margin-bottom:8px">YOUR INSTRUMENTS</div>
+    <div class="slide-title" style="margin-bottom:8px">HUD READOUT</div>
 
     <!-- Mock HUD with numbered badges overlaid -->
     <div id="mock-hud-wrap">
@@ -652,9 +632,7 @@
           <div style="font-family:var(--display);font-size:10px;color:var(--gold);letter-spacing:0.1em">× 3</div>
         </div>
         <div class="mock-hud-center">
-          <div style="font-size:7px;letter-spacing:0.3em;color:rgba(255,255,255,0.3)">⏻</div>
-          <div class="m-pause">II</div>
-          <div class="m-label" style="margin-top:4px">LEVEL</div>
+          <div class="m-label">LEVEL</div>
           <div class="m-val">2</div>
         </div>
         <div class="mock-hud-right">
@@ -717,8 +695,8 @@
       <div class="legend-row">
         <div class="legend-badge purple">2</div>
         <div class="legend-text">
-          <div class="legend-name">Pause / Level</div>
-          <div class="legend-desc">Tap ⏸ to freeze. Current level shown below.</div>
+          <div class="legend-name">Level</div>
+          <div class="legend-desc">Current sector level.</div>
         </div>
       </div>
       <div class="legend-row">
@@ -748,44 +726,17 @@
   <!-- ════ SLIDE 3: COMBAT ════ -->
   <div class="slide" id="slide-3">
     <div class="slide-title">ENEMIES &amp; MINES</div>
-    <div class="slide-body" style="margin-bottom:12px">
-      Shoot enemies. Dodge mines — bullets can't destroy them.
-    </div>
-
     <div class="combat-scene" id="combat-scene">
       <!-- populated by JS -->
     </div>
-
-    <div style="display:flex;gap:24px;margin-top:4px">
-      <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
-        <!-- Scout triangle — matches game ENEMY_TYPES[0].draw -->
-        <svg width="24" height="24" viewBox="-12 -12 24 24" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 6px #ff6b35)">
-          <polygon points="0,12 -10.2,-12 10.2,-12" fill="none" stroke="#ff6b35" stroke-width="1.5" stroke-linejoin="round"/>
-        </svg>
-        <div style="font-size:9px;letter-spacing:0.15em;color:rgba(255,255,255,0.4)">ENEMY<br><span style="color:var(--cyan)">CAN SHOOT</span></div>
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
-        <!-- Mine — matches game drawMines(): black fill, red crosshair, inner X -->
-        <svg width="24" height="24" viewBox="-12 -12 24 24" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 0 8px #ff2020)">
-          <circle cx="0" cy="0" r="10" fill="#000"/>
-          <circle cx="0" cy="0" r="10" fill="none" stroke="#ff2020" stroke-width="1.2"/>
-          <line x1="-10" y1="0" x2="10" y2="0" stroke="#ff2020" stroke-width="1.2"/>
-          <line x1="0" y1="-10" x2="0" y2="10" stroke="#ff2020" stroke-width="1.2"/>
-          <line x1="-5.5" y1="-5.5" x2="5.5" y2="5.5" stroke="rgba(255,30,30,0.5)" stroke-width="1.2"/>
-          <line x1="5.5" y1="-5.5" x2="-5.5" y2="5.5" stroke="rgba(255,30,30,0.5)" stroke-width="1.2"/>
-        </svg>
-        <div style="font-size:9px;letter-spacing:0.15em;color:rgba(255,255,255,0.4)">MINE<br><span style="color:var(--gold)">INDESTRUCTIBLE</span></div>
-      </div>
+	    <div class="slide-body">
+      Shoot enemies. Dodge mines.
     </div>
   </div>
 
-  <!-- ════ SLIDE 4: POWERUPS ════ -->
+  <!-- ════ SLIDE 4: RESERVES ════ -->
   <div class="slide" id="slide-4">
-    <div class="slide-title">POWERUPS &amp; STASH</div>
-    <div class="slide-body" style="margin-bottom:12px">
-      Powerups float on the field. Pick them up to activate — or drag them into your STASH to save for a harder level.
-    </div>
-
+    <div class="slide-title">RESERVES</div>
     <div class="pu-demo-scene" id="pu-scene" style="flex-direction:column;gap:6px">
       <div class="mock-pu-slots">
         <div class="mock-pu-slot"><div class="mock-pu-sym">Β</div><div>LITHEBRYL</div></div>
@@ -797,29 +748,16 @@
       <!-- animated drag ghost -->
       <div class="pu-dragging" id="pu-ghost">M</div>
     </div>
-
-    <!-- Arrow + stash below scene -->
-    <div style="position:relative;width:280px;height:60px;margin-top:4px">
-      <svg style="position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none">
-        <defs>
-          <marker id="arr2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-            <path d="M0,0 L0,6 L8,3 z" fill="rgba(168,85,247,0.7)"/>
-          </marker>
-        </defs>
-        <line x1="140" y1="5" x2="140" y2="42" stroke="rgba(168,85,247,0.5)" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#arr2)"/>
-      </svg>
-      <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);font-size:8px;letter-spacing:0.2em;color:rgba(168,85,247,0.6);white-space:nowrap">DRAG TO STASH</div>
-      <div class="stash-target" style="position:absolute;bottom:0;left:50%;transform:translateX(-50%)">STASH</div>
+	  <div class="slide-body">
+      Click to activate Compounds/Alloys in your RESERVES.<br>
+	  Drag them into your STASH for crafting, buffing your stats, or a later sector.<br>
+	  When RESERVES are full, Compounds and Alloys are automatically sent to your STASH.<br>
     </div>
   </div>
 
   <!-- ════ SLIDE 5: SHOP ════ -->
   <div class="slide" id="slide-5">
     <div class="slide-title" style="margin-bottom:4px">THE FUSION SHOP</div>
-    <div class="slide-body" style="margin-bottom:6px;font-size:12px">
-      Opens between levels. Spend credits to upgrade your loadout.
-    </div>
-
     <!-- Mock shop, wrapped for badge overlay -->
     <div id="mock-shop-wrap">
 
@@ -827,7 +765,7 @@
       <div class="mock-shop-header" style="max-width:min(360px,96vw)">
         <div>
           <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--purple);letter-spacing:0.1em">FUSION SHOP</div>
-          <div style="font-size:8px;letter-spacing:0.2em;color:rgba(255,255,255,0.3)">AFTER LEVEL 1</div>
+          <div style="font-size:8px;letter-spacing:0.2em;color:rgba(255,255,255,0.3)">MODE: IN TRANSIT | LOCATION: SECTOR 2</div>
         </div>
         <div style="text-align:right">
           <div style="font-size:7px;letter-spacing:0.2em;color:rgba(255,255,255,0.3)">CREDITS</div>
@@ -887,7 +825,7 @@
               <div class="mock-res-slot"></div>
             </div>
           </div>
-          <div class="mock-launch">LAUNCH ›</div>
+          <div class="mock-button">LAUNCH ›</div>
           <!-- badge C: stats -->
           <div class="cbadge gold" style="top:-8px;right:4px">C</div>
           <!-- badge D: reserves -->
@@ -909,33 +847,32 @@
         <div class="legend-badge gold">C</div>
         <div class="legend-text">
           <div class="legend-name">Stats Panel</div>
-          <div class="legend-desc">Current loadout. Drag elements here to apply buffs.</div>
+          <div class="legend-desc">Current stats. Drag Elements, Compounds, and Alloys here to apply buffs.</div>
         </div>
       </div>
       <div class="legend-row">
         <div class="legend-badge">B</div>
         <div class="legend-text">
           <div class="legend-name">Item Cards</div>
-          <div class="legend-desc">Drag a card to the action box to buy, sell, or craft.</div>
+          <div class="legend-desc">Drag a card to the action box to buy, sell, or craft. Hit Go to Finalize.</div>
         </div>
       </div>
       <div class="legend-row">
         <div class="legend-badge pink">D</div>
         <div class="legend-text">
           <div class="legend-name">Reserves</div>
-          <div class="legend-desc">Powerups you carry into battle. Drag to rearrange.</div>
+          <div class="legend-desc">Compounds and Alloys you carry into Sectors. Drag to rearrange.</div>
         </div>
       </div>
+    </div>
+	  <div class="slide-body">
+      Buy, Sell, Craft, and view your STASH to upgrade stats and equip Compounds and Alloys.
     </div>
   </div>
 
   <!-- ════ SLIDE 6: CRAFTING ════ -->
   <div class="slide" id="slide-6">
     <div class="slide-title" style="margin-bottom:4px">CRAFTING</div>
-    <div class="slide-body" style="margin-bottom:6px;font-size:12px">
-      Combine elements to create compounds. Tap a card to see recipe variants.
-    </div>
-
     <!-- Mock shop, wrapped for badge overlay -->
     <div style="max-width:min(360px,96vw);position:relative">
 
@@ -943,7 +880,7 @@
       <div class="mock-shop-header" style="max-width:min(360px,96vw)">
         <div>
           <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--purple);letter-spacing:0.1em">FUSION SHOP</div>
-          <div style="font-size:8px;letter-spacing:0.2em;color:rgba(255,255,255,0.3)">CRAFT TAB</div>
+          <div style="font-size:8px;letter-spacing:0.2em;color:rgba(255,255,255,0.3)">MODE: IN TRANSIT | LOCATION: SECTOR 6</div>
         </div>
         <div style="text-align:right">
           <div style="font-size:7px;letter-spacing:0.2em;color:rgba(255,255,255,0.3)">CREDITS</div>
@@ -1003,11 +940,11 @@
             <div style="font-size:7px;letter-spacing:0.2em;color:rgba(255,255,255,0.3);margin-bottom:6px;text-align:center">ACTION BOX</div>
             <div style="min-height:40px;display:flex;align-items:center;justify-content:center;margin-bottom:8px">
               <div style="font-size:7px;color:rgba(255,255,255,0.3);text-align:center;line-height:1.4">
-                Drag items here<br>to stage craft
+                Drag items here
               </div>
             </div>
             <!-- GO button -->
-            <div style="font-family:var(--display);font-size:10px;letter-spacing:0.15em;color:var(--cyan);border:2px solid var(--cyan);background:transparent;padding:8px 0;text-align:center">
+            <div class="mock-button">
               GO ›
             </div>
             <div class="cbadge gold" style="top:-6px;right:-6px">C</div>
@@ -1019,7 +956,7 @@
               <div class="mock-res-slot"></div>
             </div>
           </div>
-          <div class="mock-launch">LAUNCH ›</div>
+          <div class="mock-button">LAUNCH ›</div>
         </div>
       </div>
     </div>
@@ -1055,6 +992,12 @@
         </div>
       </div>
     </div>
+	  <div class="slide-body">
+      Drag Elements onto Compound cards, or Compounds onto Alloy Cards.<br>
+	  Drag completed Craft cards to the right and click GO to craft.<br>
+	  Double click a Craft card to clear it of all loaded Elements or Compounds.<br>
+	  Tap a card to see recipe variants.
+    </div>
   </div>
 
 </div><!-- /tut-wrap -->
@@ -1074,8 +1017,6 @@
   }
   const dots = prog.querySelectorAll('.dot');
 
-  const hint = document.getElementById('click-hint');
-
   function goto(idx){
     if(idx < 0 || idx >= N) return; // bounds check
     SLIDES[cur].classList.remove('active');
@@ -1083,7 +1024,6 @@
     cur = idx;
     SLIDES[cur].classList.add('active');
     dots[cur].classList.add('active');
-    hint.textContent = cur === N-1 ? '' : 'TAP TO CONTINUE';
     // trigger animations for new slide
     if(cur===1) startMoveDemo();
     if(cur===2) startHudAnimate();
@@ -1266,7 +1206,7 @@
       s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;opacity:${0.1+Math.random()*0.4}`;
       combatScene.appendChild(s);
     }
-    // Ship — canvas matching game drawShip()
+    // Ship
     const shipCv=document.createElement('canvas');
     shipCv.id='cs-ship';
     shipCv.width=48; shipCv.height=48;
@@ -1335,7 +1275,7 @@
     mineX.id='cs-minex';
     mineX.className='mine-x';
     mineX.textContent='✕';
-    mineX.style.cssText='left:18%;top:45%;';
+    mineX.style.cssText='left:18%;top:49%;';
     combatScene.appendChild(mineX);
     // Enemy label
     const el=document.createElement('div');
@@ -1432,7 +1372,7 @@
       }
       else if(phase==='drag'){
         const pct=phaseT/50;
-        const ty=30+pct*95;
+        const ty=30+pct*70;
         ghost.style.top=ty+'px';
         if(pct>=1){
           phase='drop'; phaseT=0;
