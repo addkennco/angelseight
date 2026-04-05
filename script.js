@@ -164,22 +164,22 @@ function showScreen(id) {
     switchAndExpand();
   }
 }
-
- (function() { // Check to see this isn't a typo
-    function openTutorial() {
-      document.getElementById('tutorial-overlay').classList.add('active');
-	   const iframe = document.getElementById('tutorial-frame');
-      if (iframe && iframe.contentWindow && iframe.contentWindow.resetTutorial) {
-        iframe.contentWindow.resetTutorial();
-      }
-    }
-    function closeTutorial() {
-      document.getElementById('tutorial-overlay').classList.remove('active');
-    }
-    document.getElementById('btn-tutorial-menu').onclick  = openTutorial;
-    document.getElementById('btn-tutorial-pause').onclick = openTutorial;
-    document.getElementById('btn-tutorial-close').onclick = closeTutorial;
-  })();
+ // this function was moved from the html and is buggy now, likely syntax error
+ //(function() {
+   // function openTutorial() {
+   //   document.getElementById('tutorial-overlay').classList.add('active');
+   //   const iframe = document.getElementById('tutorial-frame');
+   //   if (iframe && iframe.contentWindow && iframe.contentWindow.resetTutorial) {
+   //     iframe.contentWindow.resetTutorial();
+   //   }
+   // }
+   // function closeTutorial() {
+   //   document.getElementById('tutorial-overlay').classList.remove('active');
+   // }
+   // document.getElementById('btn-tutorial-menu').onclick  = openTutorial;
+   // document.getElementById('btn-tutorial-pause').onclick = openTutorial;
+   // document.getElementById('btn-tutorial-close').onclick = closeTutorial;
+ // })();
 
 // ═══════════════════════════════════════════════════════════════
 // AUDIO MANAGER
@@ -2073,7 +2073,7 @@ function spawnPod() {
         ctx.closePath(); ctx.stroke();
         // Symbol inside
         const pu = STRINGS.powerups[d.key];
-        ctx.font = 'bold 11px VT323, monospace';
+        ctx.font = 'bold 11px Reddit Mono, monospace';
         ctx.fillStyle = `rgba(168,85,247,${pulse})`;
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         ctx.fillText(pu ? pu.sym : '?', 0, 0);
@@ -2082,7 +2082,7 @@ function spawnPod() {
         ctx.shadowColor = '#00f5ff'; ctx.shadowBlur = 10;
         ctx.beginPath(); ctx.arc(0, 0, d.r, 0, Math.PI * 2);
         ctx.strokeStyle = '#00f5ff'; ctx.lineWidth = 1; ctx.stroke();
-        ctx.font = 'bold 9px VT323, monospace';
+        ctx.font = 'bold 9px Reddit Mono, monospace';
         ctx.fillStyle = '#00f5ff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         ctx.fillText(d.key, 0, 0);
       }
@@ -2118,7 +2118,7 @@ function spawnPod() {
       ctx.closePath(); ctx.stroke();
       // Powerup symbol
       const pu = STRINGS.powerups[pod.puKey];
-      ctx.font = 'bold 13px VT323, monospace';
+      ctx.font = 'bold 13px Reddit Mono, monospace';
       ctx.fillStyle = `rgba(0,245,255,${0.8 + 0.2 * pulse})`;
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.shadowColor = '#00f5ff'; ctx.shadowBlur = 8;
@@ -2143,7 +2143,7 @@ function spawnPod() {
       f.y += f.vy * 0.016; f.life -= 0.016;
       ctx.save();
       ctx.globalAlpha = Math.min(1, f.life * 2);
-      ctx.font = 'bold 11px VT323, monospace';
+      ctx.font = 'bold 11px Reddit Mono, monospace';
       ctx.fillStyle = f.color; ctx.textAlign = 'center';
       ctx.shadowColor = f.color; ctx.shadowBlur = 6;
       ctx.fillText(f.text, f.x, f.y);
