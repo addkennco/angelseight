@@ -160,10 +160,26 @@ function showScreen(id) {
       onDone: switchAndExpand,
     });
   } else {
-    // No outgoing element (e.g. first navigation) — just switch
+    // No outgoing element
     switchAndExpand();
   }
 }
+
+ (function() { // Check to see this isn't a typo
+    function openTutorial() {
+      document.getElementById('tutorial-overlay').classList.add('active');
+	   const iframe = document.getElementById('tutorial-frame');
+      if (iframe && iframe.contentWindow && iframe.contentWindow.resetTutorial) {
+        iframe.contentWindow.resetTutorial();
+      }
+    }
+    function closeTutorial() {
+      document.getElementById('tutorial-overlay').classList.remove('active');
+    }
+    document.getElementById('btn-tutorial-menu').onclick  = openTutorial;
+    document.getElementById('btn-tutorial-pause').onclick = openTutorial;
+    document.getElementById('btn-tutorial-close').onclick = closeTutorial;
+  })();
 
 // ═══════════════════════════════════════════════════════════════
 // AUDIO MANAGER
@@ -959,7 +975,7 @@ const Game = (() => {
 
     // Shooting
     shootTimer -= dt;
-    if (shootTimer <= 0 && run.ammo > 0) {
+    if (shootTimer <= 0 && run.ammo > 0 && !endSweepFired) {
       fireBullet();
       shootTimer = 1 / run.shootSpeed;
       if (noAmmoCostTimer <= 0) { run.ammo = Math.max(0, run.ammo - 1); updateAmmoBar(); }
@@ -967,7 +983,7 @@ const Game = (() => {
 
     // Spawn powerup pods
     podSpawnTimer -= dt;
-    if (podSpawnTimer <= 0) {
+    if (podSpawnTimer <= 0 && !endSweepFired) {
       spawnPod();
       podSpawnTimer = 18 + Math.random() * 12; // pod every 18-30s
     }
@@ -1616,11 +1632,13 @@ function spawnPod() {
     // Spawn burst particles at every enemy and mine position
     enemies.forEach(e => spawnParticles(e.x, e.y, e.color, 8));
     mines.forEach(m   => spawnParticles(m.x, m.y, '#ff2020', 6));
+	drops.forEach(d => { if (d.isPowerup) collectDrop(d); });
     // Wipe the field
     enemies = [];
     mines   = [];
-    bullets = bullets.filter(b => !b.enemy);   // keep player bullets
-    drops   = [];                               // drops too — clean slate
+    bullets = [];
+	pods = [];
+    drops   = [];
     if (!silent) {
       spawnParticles(W / 2, H / 2, '#ffd700', 60);
       spawnFloatingText(W / 2, H / 2 - 40, 'SECTOR SWEPT', '#ffd700');
@@ -2392,9 +2410,10 @@ function stageCraftJob(key, tier) {
   delete craftProgress[key];
   const existing = stagingQueue.find(e => e.key === key && e.ingredients);
   if (existing) {
-    existing.qty++;
-    // ingredients already consumed by the light-fill; record them per-batch
-    // We store one batch list and multiply by qty at refund/commit time
+     // Validate ingredients for this additional batch were actually consumed
+     if (!progress || progress.length === 0) return; // ← no new ingredients dragged
+     existing.qty++;
+     existing.ingredients = [...existing.ingredients, ...progress]; // IMPORTANT LOOK HERE FOR BATCH FIXING
   } else {
     stagingQueue.push({ key, tier, qty: 1, ingredients });
   }
@@ -2418,6 +2437,17 @@ function stageItem(key, tier) {
   renderStaging();
 }
 
+// ── Shop toast ───────────────────────────────────────────────
+let _toastTimer = null;
+function showShopToast(msg) {
+  const el = document.getElementById('shop-toast');
+  if (!el) return;
+  clearTimeout(_toastTimer);
+  el.textContent = msg;
+  el.classList.add('visible');
+  _toastTimer = setTimeout(() => el.classList.remove('visible'), 1500);
+}
+
 function commitStaging() {
   if (!run || stagingQueue.length === 0) return;
   if (shopMode === 'buy') {
@@ -2437,14 +2467,15 @@ function commitStaging() {
     });
     showShopToast(`Sold ${stagingQueue.reduce((s, e) => s + e.qty, 0)} item(s)!`);
   } else if (shopMode === 'craft') {
-    // Ingredients already consumed at stage time — just output the items
-    const count = stagingQueue.reduce((s, e) => s + e.qty, 0);
-    stagingQueue.forEach(({ key, qty }) => {
-      run.inventory[key] = Math.min(99, (run.inventory[key] || 0) + qty);
-    });
-    showShopToast(`Crafted ${count} item${count !== 1 ? 's' : ''}!`);
-  }
+     const count = stagingQueue.reduce((s, e) => s + e.qty, 0);
+     stagingQueue.forEach(({ key, qty }) => {
+       run.inventory[key] = Math.min(99, (run.inventory[key] || 0) + qty);
+     });
+     stagingQueue.forEach(entry => { delete entry.ingredients; }); // ← strip before clearStaging
+     showShopToast(`Crafted ${count} item${count !== 1 ? 's' : ''}!`);
+   }
   clearStaging();
+  console.log('after clearStaging, queue length:', stagingQueue.length, 'list innerHTML:', document.getElementById('staging-list')?.innerHTML);
   refresh();
   renderShopBody();
 }
@@ -2573,10 +2604,10 @@ function isValidIngredientForAnyVariant(puKey, tier, dragKey, dragTier, progress
 
 // ── Action box labels per tab ────────────────────────────────────
 const ACTION_BOX_LABELS = {
-  buy:   { text: 'DRAG TO STAGE',  cls: 'buy-box'   },
-  sell:  { text: 'DRAG TO STAGE',  cls: 'sell-box'  },
-  craft: { text: 'DRAG TO CRAFT',  cls: 'craft-box' },
-  stash: { text: 'DRAG TO EQUIP',  cls: ''          },
+  buy:   { cls: 'buy-box'   },
+  sell:  { cls: 'sell-box'  },
+  craft: { cls: 'craft-box' },
+  stash: { cls: ''          },
 };
 
 function shopTab(tab) {
@@ -2597,7 +2628,6 @@ function shopTab(tab) {
   const box = document.getElementById('shop-action-box');
   if (box) {
     const cfg = ACTION_BOX_LABELS[tab] || ACTION_BOX_LABELS.buy;
-    box.textContent = cfg.text;
     box.className = 'shop-action-box ' + cfg.cls;
   }
   const staging = document.getElementById('shop-staging');
@@ -2713,6 +2743,13 @@ function showItemInfo(key, tier) {
     (desc   ? `<div class="shop-info-desc">${desc}</div>` : '') +
     (price  ? `<div class="shop-info-price">${price}</div>` : '');
 }
+
+   const STAT_CAPS = {
+     shootSpeed: 12,   
+     ammoMax:   200,   
+     shieldMax:  50,   
+     reserveMax:  8,   
+   };
 
 function updateShopStats() {
   if (!run) return;
@@ -3356,7 +3393,7 @@ function refresh() {
   updateShopReserves();
   updateShopStats();
   renderStaging();
-  if (shopMode === 'stash') renderShopBody();
+  renderShopBody();
   document.getElementById('shop-credits').textContent = run ? run.credits + '¢' : '0¢';
 }
 
@@ -3489,87 +3526,32 @@ function setupShopDrag() {
   }
 
   // ── Element stat buffs ───────────────────────────────────────
-  function applyElementBuff(key) {
-    if (!run) return;
-    switch (key) {
-      case 'Be': run.shieldMax  += 6;  run.shield = Math.min(run.shield + 6, run.shieldMax);  break;
-      case 'Li': run.shieldMax  += 4;  run.shield = Math.min(run.shield + 4, run.shieldMax);  break;
-      case 'Ti': run.shieldMax  += 8;  run.shield = Math.min(run.shield + 8, run.shieldMax);  break;
-      case 'N':  run.shootSpeed += 3;                                                           break;
-      case 'Si': run.ammoMax    += 10; run.ammo   = Math.min(run.ammo + 10,  run.ammoMax);    break;
-      case 'Mg': run.reserveMax  = Math.min(8, run.reserveMax + 1);                            break;
-      case 'K':  run.shootSpeed += 5;                                                           break;
-      case 'C':  run.ammoMax    += 8;  run.ammo   = Math.min(run.ammo + 8,   run.ammoMax);    break;
-    }
-  }
-
-  // ── Shop toast ───────────────────────────────────────────────
-  let _toastTimer = null;
-  function showShopToast(msg) {
-    const el = document.getElementById('shop-toast');
-    if (!el) return;
-    clearTimeout(_toastTimer);
-    el.textContent = msg;
-    el.classList.add('visible');
-    _toastTimer = setTimeout(() => el.classList.remove('visible'), 1500);
-  }
-
-  function doBuy(key, tier) {
-    if (!run) return;
-    if (tier === 'element') {
-      const price = 80;
-      if (run.credits < price) return;
-      run.credits -= price;
-      run.inventory[key] = Math.min(99, (run.inventory[key] || 0) + 1);
-    } else if (tier === 'compound') {
-      const price = 150;
-      if (run.credits < price) return;
-      run.credits -= price;
-      run.inventory[key] = Math.min(99, (run.inventory[key] || 0) + 1);
-    }
-    const itemName = tier === 'element'
-      ? (STRINGS.items[key]?.name || key)
-      : (STRINGS.powerups[key]?.name || key);
-    showShopToast('Bought: ' + itemName + '!');
-    refresh();
-  }
-
-  function doSell(key, tier) {
-    if (!run) return;
-    const SELL_PRICES = { element:40, compound:75, alloy:100 };
-    const price = tier === 'alloy' && key === 'OMEGITE' ? 120 : SELL_PRICES[tier] || 40;
-    const qty = run.inventory[key] || 0;
-    if (qty <= 0) return;
-    run.inventory[key]--;
-    run.credits += price;
-    const soldName = tier === 'element'
-      ? (STRINGS.items[key]?.name || key)
-      : (STRINGS.powerups[key]?.name || key);
-    showShopToast('Sold: ' + soldName + '!');
-    refresh();
-  }
-
-  function doCraft(key, tier) {
-    if (!run) return;
-    // Ingredients were consumed one-by-one as lights filled — only handle output here
-    if (tier !== 'compound' && tier !== 'alloy') return;
-    delete craftProgress[key];
-    // In craft tab, always stash to inventory so the item stays available as an alloy ingredient
-    if (shopMode === 'craft') {
-      run.inventory[key] = Math.min(99, (run.inventory[key] || 0) + 1);
-    } else {
-      const activePuCount = run.powerups.filter(k => k != null).length;
-      if (activePuCount < run.reserveMax) {
-        const emptyIdx = run.powerups.indexOf(null);
-        if (emptyIdx >= 0) run.powerups[emptyIdx] = key;
-        else run.powerups.push(key);
-      } else {
-        run.inventory[key] = Math.min(99, (run.inventory[key] || 0) + 1);
-      }
-    }
-    showShopToast('Crafted: ' + (STRINGS.powerups[key]?.name || key) + '!');
-    refresh();
-  }
+function applyElementBuff(key) {
+     if (!run) return;
+     switch (key) {
+       case 'Be': if (run.shieldMax >= STAT_CAPS.shieldMax) { showShopToast('SHIELD MAXED'); return; }
+           run.shieldMax = Math.min(run.shieldMax + 6, STAT_CAPS.shieldMax);
+           run.shield = Math.min(run.shield + 6, run.shieldMax); break;
+       case 'Li': if (run.shieldMax >= STAT_CAPS.shieldMax) { showShopToast('SHIELD MAXED'); return; }
+           run.shieldMax = Math.min(run.shieldMax + 4, STAT_CAPS.shieldMax);
+           run.shield = Math.min(run.shield + 4, run.shieldMax); break;
+       case 'Ti': if (run.shieldMax >= STAT_CAPS.shieldMax) { showShopToast('SHIELD MAXED'); return; }
+           run.shieldMax = Math.min(run.shieldMax + 8, STAT_CAPS.shieldMax);
+           run.shield = Math.min(run.shield + 8, run.shieldMax); break;
+       case 'N': if (run.shootSpeed >= STAT_CAPS.shootSpeed) { showShopToast('SPEED MAXED'); return; }
+           run.shootSpeed = Math.min(run.shootSpeed + 3, STAT_CAPS.shootSpeed); break;
+	   case 'K': if (run.shootSpeed >= STAT_CAPS.shootSpeed) { showShopToast('SPEED MAXED'); return; }
+           run.shootSpeed = Math.min(run.shootSpeed + 5, STAT_CAPS.shootSpeed); break;
+       case 'Si': if (run.ammoMax >= STAT_CAPS.ammoMax) { showShopToast('AMMO MAXED'); return; }
+           run.ammoMax = Math.min(run.ammoMax + 10, STAT_CAPS.ammoMax);
+           run.ammo = Math.min(run.ammo + 10, run.ammoMax); break;
+	   case 'C':  if (run.ammoMax >= STAT_CAPS.ammoMax) { showShopToast('AMMO MAXED'); return; }
+           run.ammoMax = Math.min(run.ammoMax + 8, STAT_CAPS.ammoMax);
+           run.ammo = Math.min(run.ammo + 8, run.ammoMax); break;
+       case 'Mg': if (run.reserveMax >= STAT_CAPS.reserveMax) { showShopToast('RESERVES MAXED'); return; }
+           run.reserveMax = Math.min(8, run.reserveMax + 1); break;
+     }
+   }
 
   // ── Hit-test: craft tab compound/alloy cards ─────────────────
   function craftCardAt(x, y) {

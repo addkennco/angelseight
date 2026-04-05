@@ -688,19 +688,18 @@
   }
 
   /* ── Action box ── */
+  /* ── Action box ── */
   .shop-action-box {
+    width: 75%;
+    height: 38px;
+    flex-shrink: 0;
     border: 1px dashed rgba(255,255,255,0.12);
     display: flex; align-items: center; justify-content: center;
-	width: 75%;
-    height: 56px;
-    font-size: 7px; letter-spacing: 0.3em;
-    color: rgba(255,255,255,0.18);
-    flex-shrink: 0;
   }
-  .shop-action-box.buy-box    { border-color: rgba(0,245,255,0.2);   color: rgba(0,245,255,0.3); } 
-  .shop-action-box.sell-box   { border-color: rgba(255,45,120,0.2);  color: rgba(255,45,120,0.3); }
-  .shop-action-box.craft-box  { border-color: rgba(168,85,247,0.2);  color: rgba(168,85,247,0.3); }
-  .shop-action-box.drag-over  { background: rgba(255,255,255,0.06); border-style: solid; color: #fff; }
+  .shop-action-box.buy-box   { border-color: rgba(0,245,255,0.3); }
+  .shop-action-box.sell-box  { border-color: rgba(255,45,120,0.3); }
+  .shop-action-box.craft-box { border-color: rgba(168,85,247,0.3); }
+  .shop-action-box.drag-over { background: rgba(255,255,255,0.06); border-style: solid; }
 
   /* Shop Cards */
   .shop-card.obj {
@@ -957,6 +956,36 @@
     opacity: 0; background: rgba(255,45,120,0.12);
     transition: opacity 0.08s;
   }
+  
+  #tutorial-overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(5,5,16,0.88);
+    align-items: center; justify-content: center;
+  }
+  #tutorial-overlay.active { display: flex; }
+  #tutorial-frame {
+    width: 90vw; height: 90vh;
+    max-width: 430px;
+    border: 1px solid var(--purple);
+    box-shadow: 0 0 40px rgba(168,85,247,0.3);
+    background: var(--bg);
+  }
+  #tutorial-wrapper {
+    position: relative;
+    display: flex;   
+}
+  #btn-tutorial-close {
+    position: absolute;
+    top: -28px;     
+    right: 0;  
+    font-family: 'Noto Emoji'; font-size: 20px;
+    background: transparent; border: 0;
+    color: var(--purple); cursor: pointer;
+    z-index: 1001; line-height: 1;
+    transition: color 0.15s;
+  }
+  #btn-tutorial-close:active { color: var(--cyan); }
 
 </style>
 </head>
@@ -980,7 +1009,7 @@
     <div class="menu-coords" id="menu-coords"> ∅ ⊷ ☈ ⏦ ☰ ⚸ ⏛ ☊ </div>
     <button class="btn-sweep" id="btn-start">LAUNCH</button>
     <button class="btn-secondary" id="btn-shop-menu">FUSION SHOP</button>
-    <button class="btn-secondary" id="btn-tutorial-menu">HOW TO PLAY</button>
+    <button class="btn-secondary" id="btn-tutorial-menu">OPERATOR'S MANUAL</button>
   </div>
 </div>
 
@@ -1090,7 +1119,7 @@
 	VOL:<input type="range" id="volume" class="volume" min="0" max="100" value="50">
 	SFX:<input type="range" id="sfxvolume" class="volume" min="0" max="100" value="40">
 	</div>
-    <button class="btn-sweep" id="btn-resume" style="margin-top:4px">🡺 RESUME</button>
+    <button class="btn-sweep" id="btn-resume" style="margin-top:4px">RESUME</button>
   </div>
 </div><!-- /#screen-game -->
 
@@ -1103,7 +1132,7 @@
     <div class="story-text" id="story-text"></div>
     <div class="story-coords" id="story-coords"></div>
     <button class="btn-sweep" id="btn-to-shop" style="margin-top:8px">ENTER SHOP</button>
-    <button class="btn-sweep" id="btn-story-launch" style="margin-top:8px">LAUNCH 🡺</button>
+    <button class="btn-sweep" id="btn-story-launch" style="margin-top:8px">LAUNCH</button>
   </div>
 </div>
 
@@ -1209,7 +1238,7 @@
       <!-- Staging area (replaces bare action box) -->
       <div class="shop-staging" id="shop-staging">
         <div class="staging-droprow">
-          <div class="shop-action-box buy-box" id="shop-action-box">DRAG TO STAGE</div>
+          <div class="shop-action-box buy-box" id="shop-action-box"></div>
           <button class="btn-secondary staging-confirm" id="btn-shop-action">BUY ALL</button>
         </div>
         <div class="staging-list" id="staging-list"></div>
@@ -1222,7 +1251,7 @@
       </div>
 
       <!-- Launch -->
-      <button class="btn-sweep" id="btn-shop-launch" onclick="shopContinue()">LAUNCH 🡺</button>
+      <button class="btn-sweep" id="btn-shop-launch" onclick="shopContinue()">LAUNCH</button>
 
     </div>
   </div>
@@ -1249,50 +1278,11 @@
      TUTORIAL OVERLAY
 ══════════════════════════════════════ -->
 <div id="tutorial-overlay">
-  <button id="btn-tutorial-close">❎</button>
-  <iframe id="tutorial-frame" src="tutorial.html" scrolling="no"></iframe>
+  <div id="tutorial-wrapper">  
+    <button id="btn-tutorial-close">❎</button>
+    <iframe id="tutorial-frame" src="tutorial.html" scrolling="no"></iframe>
+  </div>
 </div>
-
-<style>
-  #tutorial-overlay {
-    display: none;
-    position: fixed; inset: 0; z-index: 1000;
-    background: rgba(5,5,16,0.88);
-    align-items: center; justify-content: center;
-  }
-  #tutorial-overlay.active { display: flex; }
-  #tutorial-frame {
-    width: 90vw; height: 90vh;
-    max-width: 430px;
-    border: 1px solid var(--purple);
-    box-shadow: 0 0 40px rgba(168,85,247,0.3);
-    background: var(--bg);
-  }
-  #btn-tutorial-close {
-    position: absolute;
-    top: calc(5vh + 6px); right: calc(5vw + 6px);
-    font-family: 'Noto Emoji'; font-size: 20px;
-    background: transparent; border: 0;
-    color: var(--purple); cursor: pointer;
-    z-index: 1001; line-height: 1;
-    transition: color 0.15s;
-  }
-  #btn-tutorial-close:active { color: var(--cyan); }
-</style>
-
-<script>
-  (function() {
-    function openTutorial() {
-      document.getElementById('tutorial-overlay').classList.add('active');
-    }
-    function closeTutorial() {
-      document.getElementById('tutorial-overlay').classList.remove('active');
-    }
-    document.getElementById('btn-tutorial-menu').onclick  = openTutorial;
-    document.getElementById('btn-tutorial-pause').onclick = openTutorial;
-    document.getElementById('btn-tutorial-close').onclick = closeTutorial;
-  })();
-</script>
 
 </body>
 </html>
