@@ -1027,7 +1027,7 @@ const Game = (() => {
 
     // Scroll waveform — driven by eDt so Deltalite time dilation slows it with enemies
     waveOffset += eDt * 60 * (1 + run.level * 0.08) * waveDir;
-	if (waveOffset >= H || waveOffset <= 0) waveDir *= 1;
+	if (waveOffset >= H || waveOffset <= 0) waveDir *= -1;
     waveT += eDt;
 
     // Enemies
