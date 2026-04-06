@@ -1992,9 +1992,10 @@ function screenShake(magnitude, duration) {
        ctx.beginPath();
        ctx.roundRect(-W/2, -H/2, W, H, R);
        ctx.fill();
-       ctx.restore();
-     }
-   }
+           }
+    ctx.restore();
+  });
+}
 
   function drawEnemies() {
     enemies.forEach(e => {
