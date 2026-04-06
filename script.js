@@ -164,22 +164,26 @@ function showScreen(id) {
     switchAndExpand();
   }
 }
- // this function was moved from the html and is buggy now, likely syntax error
- //(function() {
-   // function openTutorial() {
-   //   document.getElementById('tutorial-overlay').classList.add('active');
-   //   const iframe = document.getElementById('tutorial-frame');
-   //   if (iframe && iframe.contentWindow && iframe.contentWindow.resetTutorial) {
-   //     iframe.contentWindow.resetTutorial();
-   //   }
-   // }
-   // function closeTutorial() {
-   //   document.getElementById('tutorial-overlay').classList.remove('active');
-   // }
-   // document.getElementById('btn-tutorial-menu').onclick  = openTutorial;
-   // document.getElementById('btn-tutorial-pause').onclick = openTutorial;
-   // document.getElementById('btn-tutorial-close').onclick = closeTutorial;
- // })();
+function openTutorial() {
+  const iframe = document.getElementById('tutorial-frame');
+  if (!iframe) return;
+  if (iframe.contentWindow && iframe.contentWindow.resetTutorial) {
+    iframe.contentWindow.resetTutorial();
+    document.getElementById('tutorial-overlay').classList.add('active');
+  } else {
+    // First load — wait for iframe, then show
+    iframe.addEventListener('load', function onLoad() {
+      iframe.removeEventListener('load', onLoad);
+      if (iframe.contentWindow && iframe.contentWindow.resetTutorial) {
+        iframe.contentWindow.resetTutorial();
+      }
+      document.getElementById('tutorial-overlay').classList.add('active');
+    });
+  }
+}
+function closeTutorial() {
+  document.getElementById('tutorial-overlay').classList.remove('active');
+}
 
 // ═══════════════════════════════════════════════════════════════
 // AUDIO MANAGER
@@ -552,6 +556,7 @@ const Game = (() => {
   let drops    = [];
   let shootTimer = 0;
   let waveOffset = 0;
+  let waveDir = 1;
   let waveT = 0;
   let levelTimer = 0;
   let spawnTimer = 0;
@@ -867,6 +872,7 @@ const Game = (() => {
     ship.invincible = 0;
     shootTimer = 0;
     waveOffset = 0;
+	waveDir = 1;
     waveT = 0;
     levelTimer = 0;
     spawnTimer = 0;
@@ -1020,7 +1026,8 @@ const Game = (() => {
     const eDt = timeDilationTimer > 0 ? dt * 0.4 : dt;
 
     // Scroll waveform — driven by eDt so Deltalite time dilation slows it with enemies
-    waveOffset += eDt * 60 * (1 + run.level * 0.08);
+    waveOffset += eDt * 60 * (1 + run.level * 0.08) * waveDir;
+	if (waveOffset >= H || waveOffset <= 0) waveDir *= 1;
     waveT += eDt;
 
     // Enemies
@@ -3253,6 +3260,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('overlay-clear').classList.remove('active');
     showStory(run.level);
   };
+
+  document.getElementById('btn-tutorial-menu').onclick  = openTutorial;
+  document.getElementById('btn-tutorial-pause').onclick = openTutorial;
+  document.getElementById('btn-tutorial-close').onclick = closeTutorial;
 
   document.getElementById('btn-pause').onclick = () => Game.togglePause();
   document.getElementById('btn-resume').onclick = () => Game.togglePause();

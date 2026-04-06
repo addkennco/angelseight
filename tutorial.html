@@ -1076,6 +1076,11 @@
   // Reset to slide 0 when tutorial is opened
   // This function should be called from the parent context when opening the tutorial
   window.resetTutorial = function() {
+    // Cancel all running animation loops so they restart cleanly on next visit
+    if(moveRAF)   { cancelAnimationFrame(moveRAF);   moveRAF   = null; }
+    if(hudRAF)    { cancelAnimationFrame(hudRAF);    hudRAF    = null; }
+    if(combatRAF) { cancelAnimationFrame(combatRAF); combatRAF = null; }
+    if(puRAF)     { cancelAnimationFrame(puRAF);     puRAF     = null; }
     goto(0);
   };
 
