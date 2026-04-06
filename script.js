@@ -1994,8 +1994,7 @@ function screenShake(magnitude, duration) {
        ctx.fill();
        ctx.restore();
      }
-   });
-  }
+   }
 
   function drawEnemies() {
     enemies.forEach(e => {
