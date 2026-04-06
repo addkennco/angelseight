@@ -2808,8 +2808,8 @@ function showItemInfo(key, tier) {
 
    const STAT_CAPS = {
      shootSpeed: 12,   
-     ammoMax:   200,   
-     shieldMax:  50,   
+     ammoMax:   300,   
+     shieldMax: 100,   
      reserveMax:  8,   
    };
 
@@ -2819,14 +2819,14 @@ function updateShopStats() {
   const spd = run.shootSpeed;
   document.getElementById('stat-val-speed').textContent  = spd.toFixed(1);
   document.getElementById('stat-bar-speed').style.width  = Math.min(100, (spd / 12) * 100) + '%';
-  // Ammo max: default 50 (base 65 in newRun... using ammoMax), display cap 200
+  // Ammo max: default 50 (base 65 in newRun... using ammoMax), display cap 300
   const ammo = run.ammoMax;
   document.getElementById('stat-val-ammo').textContent   = ammo;
-  document.getElementById('stat-bar-ammo').style.width   = Math.min(100, (ammo / 200) * 100) + '%';
-  // Shield max: default 10, max 50
+  document.getElementById('stat-bar-ammo').style.width   = Math.min(100, (ammo / 300) * 100) + '%';
+  // Shield max: default 10, max 100
   const shld = run.shieldMax;
   document.getElementById('stat-val-shield').textContent = shld;
-  document.getElementById('stat-bar-shield').style.width = Math.min(100, (shld / 50) * 100) + '%';
+  document.getElementById('stat-bar-shield').style.width = Math.min(100, (shld / 100) * 100) + '%';
   // Reserve: default 3, max 8
   const res = run.reserveMax;
   document.getElementById('stat-val-reserve').textContent = res;
