@@ -2536,7 +2536,6 @@ function commitStaging() {
      showShopToast(`Crafted ${count} item${count !== 1 ? 's' : ''}!`);
    }
   clearStaging();
-  console.log('after clearStaging, queue length:', stagingQueue.length, 'list innerHTML:', document.getElementById('staging-list')?.innerHTML);
   refresh();
   renderShopBody();
 }
