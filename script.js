@@ -569,6 +569,8 @@ const Game = (() => {
   let podSpawnTimer = 0;
   let ammoMilestones = [];              // ammo refills
   let endSweepFired = false;            // end level sweep
+  let shakeIntensity = 0;               // current shake magnitude in px
+  let shakeDuration  = 0;               // seconds remaining
 
   // ═══════════════════════════════════════════════════════════════
   // TESSERACT — 4D → 2D PROJECTION
@@ -882,6 +884,8 @@ const Game = (() => {
     piercingBullets = false;
     timeDilationTimer = 0;
     noAmmoCostTimer = 0;
+	shakeIntensity = 0;
+    shakeDuration  = 0;
     run.bulletType = 'standard';
     maxEnemies = 14 + run.level * 5;          // enemy increase per level
     levelDuration = 30 + run.level * 4;       // time increase per level
@@ -916,6 +920,7 @@ const Game = (() => {
     ship.x = ship.targetX = W / 2;
     ship.y = H - 130;
     ship.invincible = 0;
+	endSweepFired = false;
     shootTimer = 0;
 
     // Reset per-level power timers (run stats carry over untouched)
@@ -923,13 +928,14 @@ const Game = (() => {
     piercingBullets   = false;
     timeDilationTimer = 0;
     noAmmoCostTimer   = 0;
+	shakeIntensity = 0;
+    shakeDuration  = 0;
 
     // Boss HUD — show and reset
     document.getElementById('boss-hud').classList.add('active');
     document.getElementById('boss-bar').style.width = '100%';
     document.getElementById('boss-phase').textContent = PHASE_NAMES[0];
     document.getElementById('boss-phase').style.color = PHASE_COLORS[0];
-    document.getElementById('hud-level').textContent  = '⬡';
 
     // Clear any lingering overlays
     document.getElementById('overlay-death').classList.remove('active');
@@ -948,7 +954,7 @@ const Game = (() => {
     if (state === 'playing') {
       update(dt);
     }
-    render();
+    render(dt);
     animId = requestAnimationFrame(loop);
   }
 
@@ -1632,40 +1638,72 @@ function spawnPod() {
     updateScoreHUD();
   }
 
-  // ── SWEEP —───────────────────────────────────────────────────────
+  // ── SWEEP ───────────────────────────────────────────────────────
   // opts.silent = true suppresses the log message
   function triggerSweep(opts = {}) {
-    const silent = opts.silent || false;
-    // Spawn burst particles at every enemy and mine position
-    enemies.forEach(e => spawnParticles(e.x, e.y, e.color, 8));
-    mines.forEach(m   => spawnParticles(m.x, m.y, '#ff2020', 6));
-	drops.forEach(d => { if (d.isPowerup) collectDrop(d); });
-    // Wipe the field
-    enemies = [];
-    mines   = [];
-    bullets = [];
-	pods = [];
-    drops   = [];
-    if (!silent) {
-      spawnParticles(W / 2, H / 2, '#ffd700', 60);
-      spawnFloatingText(W / 2, H / 2 - 40, 'SECTOR SWEPT', '#ffd700');
-      logPickup('SECTOR SWEPT');
-    }
-  }
+  const silent = opts.silent || false;
 
+  enemies.forEach(e => spawnParticles(e.x, e.y, e.color, 8));
+  mines.forEach(m => spawnParticles(m.x, m.y, '#ff2020', 6));
+
+  // Crack pods into collectable drops rather than destroying them
+  pods.forEach(pod => {
+    drops.push({ x: pod.x, y: pod.y, key: pod.puKey, isPowerup: true, r: 13, t: 0 });
+    spawnParticles(pod.x, pod.y, '#a855f7', 10);
+  });
+  pods = [];
+
+  // Collect any already-cracked in-flight drops
+  drops.forEach(d => { if (d.isPowerup) collectDrop(d); });
+
+  enemies = [];
+  mines   = [];
+  bullets = [];
+  drops   = [];
+
+  if (!silent) {
+    spawnParticles(W / 2, H / 2, '#ffd700', 60);
+    spawnFloatingText(W / 2, H / 2 - 40, 'SECTOR SWEPT', '#ffd700');
+    logPickup('SECTOR SWEPT');
+  }
+}
+ // ── BOMB SHAKE ───────────────────────────────────────────────────
+function screenShake(magnitude, duration) {
+  shakeIntensity = magnitude;
+  shakeDuration  = duration;
+}
+ // ── POWERUP TRIGGERS ─────────────────────────────────────────────	
   function triggerPowerup(idx) {
     const pu = run.powerups[idx];
     if (!pu) return;
     if (pu === 'OMEGITE') {
-      triggerSweep({ silent: true });
-      spawnParticles(W / 2, H / 2, '#d42b6a', 40);
-      spawnParticles(W / 2, H / 2, '#ffd700', 40);
-      spawnParticles(W / 2, H / 2, '#a855f7', 40);
-      spawnFloatingText(W / 2, H / 2 - 50, 'OMEGITE', '#d42b6a');
-      logPickup('OMEGITE DEPLOYED');
+  	  triggerSweep({ silent: true });
+	  spawnParticles(W / 2, H / 2, '#d42b6a', 40);
+ 	  spawnParticles(W / 2, H / 2, '#ffd700', 40);
+	  spawnParticles(W / 2, H / 2, '#a855f7', 40);
+	  spawnFloatingText(W / 2, H / 2 - 50, 'OMEGITE', '#d42b6a');
+	  screenShake(10, 0.6);
+	  logPickup('OMEGITE DEPLOYED');
+	}
     } else if (pu === 'MAGNIUM') {
-      triggerSweep({ silent: false });
-      logPickup('MAGNIUM DEPLOYED');
+ 	 // Screen-wide AOE — 5 damage to all enemies, no effect on mines or pods
+  	const MAG_DMG = 5;
+  	enemies.forEach(e => {
+    e.hp -= MAG_DMG;
+    spawnParticles(e.x, e.y, e.color, 8);
+    if (e.hp <= 0) {
+      run.score += 100;
+      spawnParticles(e.x, e.y, e.color, 14);
+      spawnFloatingText(e.x, e.y - 10, '+100', e.color);
+      updateScoreHUD();
+  	  }
+ 	 });
+	  enemies = enemies.filter(e => e.hp > 0);
+	  spawnParticles(W / 2, H / 2, '#a855f7', 50);
+	  spawnFloatingText(W / 2, H / 2 - 30, 'MAGNIUM', '#a855f7');
+	  screenShake(4, 0.4); 
+	  logPickup('MAGNIUM DEPLOYED');
+	}
     } else if (pu === 'LITHEBRYL') {
       run.shield = run.shieldMax; updateShieldBar(); logPickup('SHIELD RESTORED');
     } else if (pu === 'NITROKALIUM') {
@@ -1723,23 +1761,35 @@ function spawnPod() {
   floaters = [];
 
   // ── RENDER ────────────────────────────────────────────────────
-  function render() {
-    ctx.clearRect(0,0,W,H);
-    ctx.fillStyle = '#050510';
-    ctx.fillRect(0,0,W,H);
+ function render(dt) {
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#050510';
+  ctx.fillRect(0, 0, W, H);  // ← background stays fixed, outside shake
 
-    drawWaveform();
-    drawPods();
-    drawDrops();
-    drawMines();
-    drawBullets();
-    drawEnemies();
-    if (bossActive || bossDefeated) drawBoss();
-    if (bossActive) drawSubEnemies();
-    drawShip();
-    drawParticles();
-    drawFloaters();
+  ctx.save();
+  if (shakeDuration > 0) {
+    shakeDuration = Math.max(0, shakeDuration - dt);
+    const s = shakeIntensity * (shakeDuration / 0.6);
+    ctx.translate(
+      (Math.random() * 2 - 1) * s,
+      (Math.random() * 2 - 1) * s
+    );
   }
+
+  drawWaveform();
+  drawPods();
+  drawDrops();
+  drawMines();
+  drawBullets();
+  drawEnemies();
+  if (bossActive || bossDefeated) drawBoss();
+  if (bossActive) drawSubEnemies();
+  drawShip();
+  drawParticles();
+  drawFloaters();
+
+  ctx.restore();
+}
 
   // Per-level scene config: [skyTop, skyBottom, sunColor, sunGlow, gridColor, mountainColor]
   const LEVEL_PALETTES = [
@@ -3178,7 +3228,7 @@ function showStory(level) {
   const isBossApproach = level === 9;
 
   document.getElementById('story-level-label').textContent = isBossApproach
-    ? 'ANGEL\'S EIGHT INCOMING'
+    ? 'APPROACHING THE SOURCE'
     : STRINGS.ui.levelComplete(level);
   document.getElementById('story-text').textContent = s.text;
   document.getElementById('story-coords').textContent = s.coords || '';
