@@ -1968,34 +1968,34 @@ function screenShake(magnitude, duration) {
         ctx.shadowColor = b.color || '#a855f7'; ctx.shadowBlur = 6;
         ctx.beginPath(); ctx.arc(b.x, b.y, 3, 0, Math.PI*2);
         ctx.fillStyle = b.color || '#a855f7'; ctx.fill();
-       } else {
-     const isPiercing = piercingBullets;
-     const bColor = isPiercing ? '#ffffff' : b.color;
-     ctx.shadowColor = isPiercing ? '#00f5ff' : b.color;
-     ctx.shadowBlur  = isPiercing ? 16 : 8;
-     ctx.fillStyle = bColor;
+      } else {
+        const isPiercing = piercingBullets;
+        const bColor = isPiercing ? '#ffffff' : b.color;
+        ctx.shadowColor = isPiercing ? '#00f5ff' : b.color;
+        ctx.shadowBlur  = isPiercing ? 16 : 8;
+        ctx.fillStyle = bColor;
 
-     if (run.bulletType === 'laser') {
-       ctx.fillRect(b.x - 2, b.y - 12, 4, 24);
-     } else if (run.bulletType === '12spread' || isPiercing) {
-       // Keep circle for radial/piercing — pill shape doesn't read well in all directions
-       ctx.beginPath();
-       ctx.arc(b.x, b.y, isPiercing ? 4 : 3, 0, Math.PI * 2);
-       ctx.fill();
-     } else {
-       // Standard & 3-spread: pill/capsule oriented along travel direction
-       const angle = Math.atan2(b.vy, b.vx) + Math.PI / 2;
-       const W = 3, H = 10, R = 1.5;
-       ctx.save();
-       ctx.translate(b.x, b.y);
-       ctx.rotate(angle);
-       ctx.beginPath();
-       ctx.roundRect(-W/2, -H/2, W, H, R);
-       ctx.fill();
-           }
-    ctx.restore();
-  });
-}
+        if (run.bulletType === 'laser') {
+          ctx.fillRect(b.x - 2, b.y - 12, 4, 24);
+        } else if (run.bulletType === '12spread' || isPiercing) {
+          ctx.beginPath();
+          ctx.arc(b.x, b.y, isPiercing ? 4 : 3, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          const angle = Math.atan2(b.vy, b.vx) + Math.PI / 2;
+          const bW = 3, bH = 10, bR = 1.5;
+          ctx.save();
+          ctx.translate(b.x, b.y);
+          ctx.rotate(angle);
+          ctx.beginPath();
+          ctx.roundRect(-bW/2, -bH/2, bW, bH, bR);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+      ctx.restore();
+    });
+  }
 
   function drawEnemies() {
     enemies.forEach(e => {
