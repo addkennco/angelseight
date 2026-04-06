@@ -559,6 +559,7 @@
 
   /* ── header ── */
   .shop-header {
+	position: relative;
     width:100%; padding: 12px 14px 10px;
     display:flex; align-items:center; justify-content:space-between;
     border-bottom: 1px solid var(--dim);
@@ -1184,6 +1185,10 @@
   <!-- Header -->
   <div class="shop-header">
     <div>
+	<!-- Powerup decoration — orbiting star animation -->
+	<canvas id="shop-powerup-deco" width="60" height="60"
+  	style="position:absolute; top:12px; left:12px; pointer-events:none;">
+	</canvas>
       <div class="shop-title">FUSION SHOP</div>
       <div class="shop-level-badge" id="shop-level-badge">AFTER LEVEL 1</div>
     </div>
