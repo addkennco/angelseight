@@ -2873,6 +2873,102 @@ function updateShopReserves() {
   }
 }
 
+// ── Shop decoration: orbiting star ───────────────────────────
+(function() {
+  const DECO_SIZE   = 60;   // canvas dimensions (px)
+  const CX          = 30;   // centre x
+  const CY          = 30;   // centre y
+  const BODY_R      = 6;    // main star radius (px)
+  const ORBIT_R_X   = 10;   // orbit x-radius
+  const ORBIT_R_Y   = 6;    // orbit y-radius (0.6 × x = ellipse depth illusion)
+  const SMALL_R     = 2;    // orbiting star radius
+  const ORBIT_SPEED = 0.04; // radians per frame
+
+  let angle    = 0;
+  let decoRAF  = null;
+  let decoCtx  = null;
+
+  function initShopDeco() {
+    const cv = document.getElementById('shop-powerup-deco');
+    if (!cv) return;
+    decoCtx = cv.getContext('2d');
+    if (!decoRAF) decoRAF = requestAnimationFrame(renderShopDeco);
+  }
+
+  function stopShopDeco() {
+    if (decoRAF) { cancelAnimationFrame(decoRAF); decoRAF = null; }
+  }
+
+  function renderShopDeco() {
+    if (!decoCtx) return;
+    decoCtx.clearRect(0, 0, DECO_SIZE, DECO_SIZE);
+
+    angle += ORBIT_SPEED;
+    const inBack = Math.sin(angle + ORBIT_SPEED) < 0;
+
+    // Orbiting star position
+    const ox = CX + Math.cos(angle) * ORBIT_R_X;
+    const oy = CY + Math.sin(angle) * ORBIT_R_Y;
+
+    // Depth alpha: 0.2 (back) → 1.0 (front)
+    const depthAlpha = (Math.sin(angle) + 1) * 0.4 + 0.2;
+
+    function drawSmallStar() {
+      if (Math.sin(angle) <= -0.1 && depthAlpha <= 0.3) return;
+      decoCtx.save();
+      decoCtx.globalAlpha = depthAlpha;
+      decoCtx.shadowColor = 'white';
+      decoCtx.shadowBlur  = 4 * depthAlpha;
+      decoCtx.fillStyle   = 'white';
+      decoCtx.beginPath();
+      decoCtx.arc(ox, oy, SMALL_R, 0, Math.PI * 2);
+      decoCtx.fill();
+      decoCtx.restore();
+    }
+
+    function drawMainStar() {
+      // Glow ring pass — shadow only, no fill, so body stays transparent
+      // (page background #050510 shows through, avoiding the inward-bleed snafu)
+      decoCtx.save();
+      decoCtx.shadowColor = 'white';
+      decoCtx.shadowBlur  = 8;
+      decoCtx.strokeStyle = 'rgba(255,255,255,0.9)';
+      decoCtx.lineWidth   = 1;
+      decoCtx.beginPath();
+      decoCtx.arc(CX, CY, BODY_R, 0, Math.PI * 2);
+      decoCtx.stroke();  // ← stroke only, no fill — glow without inward bleed
+      decoCtx.restore();
+
+      // Ping ripple
+      const pingProgress = (Date.now() % 1200) / 1200;
+      const rippleR      = BODY_R + pingProgress * 18;
+      const rippleAlpha  = (1 - pingProgress) * 0.3;
+      decoCtx.save();
+      decoCtx.strokeStyle = `rgba(255,255,255,${rippleAlpha})`;
+      decoCtx.lineWidth   = 1.5;
+      decoCtx.beginPath();
+      decoCtx.arc(CX, CY, rippleR, 0, Math.PI * 2);
+      decoCtx.stroke();
+      decoCtx.restore();
+    }
+
+    // Draw order: back star → main body → front star (occlusion)
+    if (inBack) {
+      drawSmallStar();
+      drawMainStar();
+    } else {
+      drawMainStar();
+      drawSmallStar();
+    }
+
+    decoRAF = requestAnimationFrame(renderShopDeco);
+  }
+
+  // Expose so shopTab() can start/stop it
+  window.initShopDeco = initShopDeco;
+  window.stopShopDeco = stopShopDeco;
+})();
+
 function renderShopBody() {
   const body = document.getElementById('shop-body');
   body.innerHTML = '';
@@ -3228,6 +3324,7 @@ function shopContinue() {
     // Final shop visit done — route to boss fight
     run.ammo = run.ammoMax; // refill ammo before boss
     showScreen('game');
+	stopShopDeco();
     Game.startBoss();
     return;
   }
@@ -3306,6 +3403,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!run) run = newRun();
     document.getElementById('shop-level-badge').textContent = 'MODE: STATIONARY';
     showScreen('shop');
+	initShopDeco();
     shopTab('buy');
   };
 
@@ -3314,6 +3412,7 @@ document.addEventListener('DOMContentLoaded', () => {
     run = newRun();
     document.getElementById('overlay-death').classList.remove('active');
     showScreen('game');
+	stopShopDeco();
     Game.startLevel();
   };
 
@@ -3356,6 +3455,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('shop-level-badge').textContent = STRINGS.ui.afterLevel(run.level);
     document.getElementById('shop-credits').textContent = run.credits + '¢';
     showScreen('shop');
+	initShopDeco();
     shopTab('buy');
   };
 
