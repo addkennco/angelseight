@@ -1713,7 +1713,6 @@ function screenShake(magnitude, duration) {
 	  spawnFloatingText(W / 2, H / 2 - 30, 'MAGNIUM', '#a855f7');
 	  screenShake(4, 0.4); 
 	  logPickup('MAGNIUM DEPLOYED');
-	}
     } else if (pu === 'LITHEBRYL') {
       run.shield = run.shieldMax; updateShieldBar(); logPickup('SHIELD RESTORED');
     } else if (pu === 'NITROKALIUM') {
