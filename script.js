@@ -1561,7 +1561,7 @@ function spawnPod() {
     const adx = Math.sin(aimAngle);
     const ady = -Math.cos(aimAngle);
     if (run.bulletType === '3spread') {
-      [-0.35, 0, 0.35].forEach(offset => {
+      [-0.15, 0, 0.15].forEach(offset => {
         const a = Math.atan2(ady, adx) + offset;
         const spd = 520;
         bullets.push({ x:bx, y:by, speed:spd, vx:Math.cos(a)*spd, vy:Math.sin(a)*spd, dmg:1, enemy:false, color:'#a855f7' });
@@ -1655,11 +1655,22 @@ function spawnPod() {
 
   // Collect any already-cracked in-flight drops
   drops.forEach(d => { if (d.isPowerup) collectDrop(d); });
-
+	  
+  if (bossActive && boss && boss.alive) {
+    const bombDmg = opts.bossDmg || 30;
+    boss.hp -= bombDmg;
+    boss.hitFlash = 0.3; 
+    spawnParticles(boss.x, boss.y, '#ffd700', 40);
+    document.getElementById('boss-bar').style.width =
+      Math.max(0, (boss.hp / BOSS_MAX_HP) * 100) + '%';
+    if (boss.hp <= 0) onBossDefeated();
+  }
+	  
   enemies = [];
   mines   = [];
   bullets = [];
-  drops   = [];
+  subenemies = [];
+	  
 
   if (!silent) {
     spawnParticles(W / 2, H / 2, '#ffd700', 60);
@@ -1958,22 +1969,33 @@ function screenShake(magnitude, duration) {
         ctx.shadowColor = b.color || '#a855f7'; ctx.shadowBlur = 6;
         ctx.beginPath(); ctx.arc(b.x, b.y, 3, 0, Math.PI*2);
         ctx.fillStyle = b.color || '#a855f7'; ctx.fill();
-      } else {
-        const isPiercing = piercingBullets;
-        const bColor = isPiercing ? '#ffffff' : b.color;
-        ctx.shadowColor = isPiercing ? '#00f5ff' : b.color;
-        ctx.shadowBlur  = isPiercing ? 16 : 8;
-        ctx.beginPath();
-        if (run.bulletType === 'laser') {
-          ctx.fillStyle = bColor;
-          ctx.fillRect(b.x-2, b.y-12, 4, 24);
-        } else {
-          ctx.arc(b.x, b.y, isPiercing ? 4 : 3, 0, Math.PI*2);
-          ctx.fillStyle = bColor; ctx.fill();
-        }
-      }
-      ctx.restore();
-    });
+       } else {
+     const isPiercing = piercingBullets;
+     const bColor = isPiercing ? '#ffffff' : b.color;
+     ctx.shadowColor = isPiercing ? '#00f5ff' : b.color;
+     ctx.shadowBlur  = isPiercing ? 16 : 8;
+     ctx.fillStyle = bColor;
+
+     if (run.bulletType === 'laser') {
+       ctx.fillRect(b.x - 2, b.y - 12, 4, 24);
+     } else if (run.bulletType === '12spread' || isPiercing) {
+       // Keep circle for radial/piercing — pill shape doesn't read well in all directions
+       ctx.beginPath();
+       ctx.arc(b.x, b.y, isPiercing ? 4 : 3, 0, Math.PI * 2);
+       ctx.fill();
+     } else {
+       // Standard & 3-spread: pill/capsule oriented along travel direction
+       const angle = Math.atan2(b.vy, b.vx) + Math.PI / 2;
+       const W = 3, H = 10, R = 1.5;
+       ctx.save();
+       ctx.translate(b.x, b.y);
+       ctx.rotate(angle);
+       ctx.beginPath();
+       ctx.roundRect(-W/2, -H/2, W, H, R);
+       ctx.fill();
+       ctx.restore();
+     }
+   });
   }
 
   function drawEnemies() {
