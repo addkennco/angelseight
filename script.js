@@ -1669,7 +1669,7 @@ function spawnPod() {
   enemies = [];
   mines   = [];
   bullets = [];
-  subenemies = [];
+  subEnemies = [];
 	  
 
   if (!silent) {
