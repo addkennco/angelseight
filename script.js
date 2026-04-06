@@ -1026,8 +1026,8 @@ const Game = (() => {
     const eDt = timeDilationTimer > 0 ? dt * 0.4 : dt;
 
     // Scroll waveform — driven by eDt so Deltalite time dilation slows it with enemies
-    waveOffset += eDt * 60 * (1 + run.level * 0.08) * waveDir;
-	if (waveOffset >= H || waveOffset <= 0) waveDir *= -1;
+    // Wrap over 2H so the second half is the palindromic mirror of the first
+    waveOffset = (waveOffset + eDt * 60 * (1 + run.level * 0.08)) % (H * 2);
     waveT += eDt;
 
     // Enemies
@@ -1782,11 +1782,16 @@ function spawnPod() {
 
     for (let r = 0; r < rows; r++) {
       const baseY = (r * rowSpan + rowSpan * 0.5 + waveOffset) % H;
-      const screenPct = baseY / H;  // 0=top of screen, 1=bottom — drives color, not row index
-      const amp   = (4 + r * 1.4 + lvl * 0.8) * (0.4 + (r / rows) * 0.6);
-      const freq  = 0.022 + r * 0.001;
-      const ph    = waveT * 0.5 + r * 0.3;
-      const ph2   = waveT * 0.3 + r * 0.18;
+      const screenPct = baseY / H;  // 0=top, 1=bottom — drives ALL visual properties
+      // amp/freq/phase use screenPct (actual Y on screen), NOT row index r.
+      // This makes lines near each other on screen always look similar,
+      // so the wrap seam is seamless — no jump from flat to wavy rows.
+      const amp   = (4 + screenPct * rows * 1.4 + lvl * 0.8) * (0.4 + screenPct * 0.6);
+      const freq  = 0.022 + screenPct * rows * 0.001;
+      const cycle  = waveOffset / H;
+      const localT = cycle < 1 ? cycle : 2 - cycle;
+      const ph    = localT * 30 * 0.5 + screenPct * rows * 0.3;
+      const ph2   = localT * 30 * 0.3 + screenPct * rows * 0.18;
 
       const rr = Math.round(c1.r + (c2.r - c1.r) * screenPct);
       const gg = Math.round(c1.g + (c2.g - c1.g) * screenPct);
