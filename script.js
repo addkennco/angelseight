@@ -1684,7 +1684,6 @@ function screenShake(magnitude, duration) {
 	  spawnFloatingText(W / 2, H / 2 - 50, 'OMEGITE', '#d42b6a');
 	  screenShake(10, 0.6);
 	  logPickup('OMEGITE DEPLOYED');
-	}
     } else if (pu === 'MAGNIUM') {
  	 // Screen-wide AOE — 5 damage to all enemies, no effect on mines or pods
   	const MAG_DMG = 5;
