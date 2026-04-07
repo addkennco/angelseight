@@ -3013,8 +3013,8 @@ function renderShopBody() {
 
   } else if (shopMode === 'sell') {
 
-    const COMPOUND_KEYS = { LITHEBRYL:75, NITROKALIUM:75, CARBOSILICUM:75, MAGNIUM:75, TITANE:75, ALKALIUM:75, AZOLITHION:75, GAMMITE:75 };
-    const ALLOY_KEYS    = { OMEGITE:120, AXORITE:100, PHIOMEGA:100, DELTALITE:100 };
+    const COMPOUND_KEYS = { LITHEBRYL:90, NITROKALIUM:90, CARBOSILICUM:90, MAGNIUM:90, TITANE:90, ALKALIUM:90, AZOLITHION:90, GAMMITE:90 };
+    const ALLOY_KEYS    = { OMEGITE:250, AXORITE:200, PHIOMEGA:200, DELTALITE:200 };
 
     function makeSellCard(sym, name, effect, qty, price, key, tier) {
       const card = document.createElement('div'); card.className = 'shop-card obj';
