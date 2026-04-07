@@ -526,8 +526,8 @@ function newRun() {
     shieldMax: 10 + save.permStats.shieldMax,
     ammo: 65 + save.permStats.ammoMax,
     ammoMax: 100 + save.permStats.ammoMax,
-    shootSpeed: 3 + save.permStats.shootSpeed,
-	ammoRefillRate:    1 + save.permStats.ammoRefillRate,
+    shootSpeed: 4 + save.permStats.shootSpeed,
+	ammoRefillRate: 1 + save.permStats.ammoRefillRate,
     reserveMax: 3,
     powerups: [],
     inventory: {},
@@ -569,7 +569,7 @@ const Game = (() => {
   let pods = [];                        // powerup pods
   let podSpawnTimer = 0;
   let ammoRefillTimer = 0;              // time-based ammo refill
-  const AMMO_REFILL_INTERVAL = 18;      // seconds between refill ticks
+  const AMMO_REFILL_INTERVAL = 5;      // seconds between refill ticks
   let endSweepFired = false;            // end level sweep
   let shakeIntensity = 0;               // current shake magnitude in px
   let shakeDuration  = 0;               // seconds remaining
@@ -1007,13 +1007,14 @@ const Game = (() => {
 	if (ammoRefillTimer <= 0) {
   	  ammoRefillTimer = AMMO_REFILL_INTERVAL;
   	  const refill = Math.min(
-      run.ammoRefillRate * 3,        // 3 ammo per refill-unit
+      run.ammoRefillRate * 30,        // 30 ammo per refill-unit
       run.ammoMax - run.ammo         // never exceed ammoMax
   );
   if (refill > 0) {
     run.ammo += refill;
     updateAmmoBar();
-    spawnFloatingText(W * 0.5, H * 0.5, '+ AMMO', '#00f5ff');
+    spawnFloatingText(W * 0.5, H - 160, '+ AMMO', '#00f5ff');
+	logPickup('AMMO REFILL +' + refill);
   }
 }
 
@@ -2840,13 +2841,13 @@ const STAT_CAPS = {
   ammoMax:         300,
   shieldMax:       100,
   reserveMax:        8,
-  ammoRefillRate:   10,   // each unit ≈ +3 ammo per interval
+  ammoRefillRate:   10,   // each unit ≈ +30 ammo per interval
 };
 
 
 function updateShopStats() {
   if (!run) return;
-  //Ammo refill rate, max needed!
+  //Ammo refill rate, max 10
   const refRate = run.ammoRefillRate;
   document.getElementById('stat-val-refill').textContent = refRate;
   document.getElementById('stat-bar-refill').style.width = Math.min(100, (refRate / STAT_CAPS.ammoRefillRate) * 100) + '%';
