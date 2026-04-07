@@ -924,6 +924,7 @@ const Game = (() => {
     ship.invincible = 0;
 	endSweepFired = false;
     shootTimer = 0;
+	ammoRefillTimer = AMMO_REFILL_INTERVAL;
 
     // Reset per-level power timers (run stats carry over untouched)
     invincibleTimer   = 0;
