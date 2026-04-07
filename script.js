@@ -2325,8 +2325,8 @@ const stagingQueue = [];
 function stagingCost(key, tier) {
   if (shopMode === 'buy')  return tier === 'element' ? 80 : 150;
   if (shopMode === 'sell') {
-    const SELL = { element:40, compound:75, alloy:100 };
-    return (tier === 'alloy' && key === 'OMEGITE') ? 120 : (SELL[tier] || 40);
+    const SELL = { element:40, compound:90, alloy:130 };
+	return (tier === 'alloy' && key === 'OMEGITE') ? 250 : (SELL[tier] || 40);
   }
   return 0;
 }
@@ -2364,9 +2364,7 @@ function renderStaging() {
         `<span class="staging-qty-val">${entry.qty}</span>` +
         `<button class="staging-qty-btn" data-idx="${idx}" data-dir="1"` +
           (entry.ingredients && !canAddMore ? ' disabled style="opacity:0.25"' : '') +
-        `>+</button>` +
-      `</span>` +
-      `<span class="staging-row-remove" data-idx="${idx}">✕</span>`;
+        `>+</button>`;
     list.appendChild(row);
   });
 
@@ -2407,21 +2405,6 @@ function renderStaging() {
       }
       renderStaging();
       if (shopMode === 'craft') renderShopBody(); // refresh ingredient counts
-    });
-  });
-
-  // Remove buttons — refund all batches for craft entries
-  list.querySelectorAll('.staging-row-remove').forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.stopPropagation();
-      const idx = parseInt(btn.dataset.idx);
-      const entry = stagingQueue[idx];
-      if (entry.ingredients) {
-        for (let i = 0; i < entry.qty; i++) refundOneBatch(entry);
-      }
-      stagingQueue.splice(idx, 1);
-      renderStaging();
-      if (shopMode === 'craft') renderShopBody();
     });
   });
 
