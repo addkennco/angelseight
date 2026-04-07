@@ -3318,6 +3318,7 @@ function renderShopBody() {
 
 function shopContinue() {
   run.level++;
+  run.shootSpeed++; 
   if (run.level === 9) {
     // Final shop visit done — route to boss fight
     run.ammo = run.ammoMax; // refill ammo before boss
