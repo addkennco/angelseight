@@ -19,7 +19,7 @@ const STRINGS = {
     credits: 'CREDITS',
     fusionShop: 'FUSION SHOP',
     afterLevel: (n) => `MODE: IN TRANSIT | LOCATION: SECTOR ${n}`,
-    buy: 'BUY', sell: 'SELL', craft: 'CRAFT', launch: 'LAUNCH ›',
+    buy: 'BUY', sell: 'SELL', craft: 'CRAFT', launch: 'LAUNCH',
   },
   story: [
     null,
@@ -37,39 +37,39 @@ const STRINGS = {
     Be: { name:'Beryllium', sym:'β', effect:'Shield Max +6',  desc: 'A rare, thermal-resistant material used for shielding components that must withstand extreme reentry heat.' },
     Li: { name:'Lithium',   sym:'λ', effect:'Shield Max +4',  desc: 'A high-capacity energy storage medium used to power the grid for rapid shield cycling.' },
     Ti: { name:'Titanium',  sym:'τ', effect:'Shield Max +8',  desc: 'A high-tensile, non-corrosive plating used for primary hull reinforcement.' },
-    N:  { name:'Nitrogen',  sym:'𝜈', effect:'Shoot Speed +3', desc: 'A cryogenic propellant used for rapid-burst thruster cooling to achieve momentary speed spikes.' },
+    N:  { name:'Nitrogen',  sym:'𝜈', effect:'Ammo Refill +3', desc: 'A cryogenic propellant used for rapid-burst thruster cooling to achieve momentary speed spikes.' },
     Si: { name:'Silicon',   sym:'Σ', effect:'Ammo Max +10',   desc: "A refined semiconductor essential for the ship's tactical computer and targeting sub-routines." },
     Mg: { name:'Magnesium', sym:'μ', effect:'Reserve +1',     desc: 'A lightweight reactive metal that serves as the primary igniter for thermal-based weaponry.' },
-    K:  { name:'Potassium', sym:'κ', effect:'Shoot Speed +5', desc: 'A highly volatile ionic catalyst used to spark high-energy reactions in reactors.' },
+    K:  { name:'Potassium', sym:'κ', effect:'Ammo Refill +5', desc: 'A highly volatile ionic catalyst used to spark high-energy reactions in reactors.' },
     C:  { name:'Carbon',    sym:'ζ', effect:'Ammo Max +8',    desc: 'Used in its crystalline form to create ultra-hardened kinetic penetrators for standard ammo.' },
   },
   powerups: {
       LITHEBRYL:   { sym:'Β',  name:'Lithebryl',     effect:'Shield Max +20, Ammo +8',             power:'Shield Restore',           puKey:'LITHEBRYL',    desc:  'An alloy of Lithium and Beryllium that absorbs and dissipates energy blasts.' },
-      NITROKALIUM: { sym:'Π',  name:'Nitrokalium',   effect:'Shoot Speed +12, Shield +6',          power:'Double Fire Rate',         puKey:'NITROKALIUM',  desc:  'A Potassium-Nitrogen gas mixture used to puah the engines to run at dangerous but hyper-efficient levels.'},
-      CARBOSILICUM:{ sym:'Ξ',  name:'Carbosilicium', effect:'Ammo Max +18, Shoot Speed +3',        power:'Double Points',            puKey:'CARBOSILICUM', desc:  'A highly efficient superconductor, allowing fire-control systems to process at lightning speeds.'},
-      MAGNIUM:     { sym:'Μ',  name:'Magnium',       effect:'Reserve +2, Shoot Speed +6',          power:'Bomb',                     puKey:'MAGNIUM',      desc:  'A Magnesium-based unstable isotope that is highly volatile when impacted.'},
-      TITANE:      { sym:'Θ',  name:'Titane',        effect:'Shield Max +30, Shoot Speed +5',      power:'Invincibility',            puKey:'TITANE',       desc:  'A low-density, Titanium-based metal that provides near-indestructible hull integrity without adding significant mass.'},
-      ALKALIUM:    { sym:'α',  name:'Alkalium',      effect:'Ammo Max +22, Shoot Speed +8',        power:'Piercing Bullets',         puKey:'ALKALIUM',     desc:  'A Silicon-Potassium compound that uses ionized energy to give shots piercing capabilities.'},
+      NITROKALIUM: { sym:'Π',  name:'Nitrokalium',   effect:'Ammo Refill +12, Shield +6',          power:'Double Ammo Refill',       puKey:'NITROKALIUM',  desc:  'A Potassium-Nitrogen gas mixture used to puah the engines to run at dangerous but hyper-efficient levels.'},
+      CARBOSILICUM:{ sym:'Ξ',  name:'Carbosilicium', effect:'Ammo Max +18, Ammo Refill +3',        power:'Double Points',            puKey:'CARBOSILICUM', desc:  'A highly efficient superconductor, allowing fire-control systems to process at lightning speeds.'},
+      MAGNIUM:     { sym:'Μ',  name:'Magnium',       effect:'Reserve +2, Ammo Refill +6',          power:'Bomb',                     puKey:'MAGNIUM',      desc:  'A Magnesium-based unstable isotope that is highly volatile when impacted.'},
+      TITANE:      { sym:'Θ',  name:'Titane',        effect:'Shield Max +30, Ammo Refill +5',      power:'Invincibility',            puKey:'TITANE',       desc:  'A low-density, Titanium-based metal that provides near-indestructible hull integrity without adding significant mass.'},
+      ALKALIUM:    { sym:'α',  name:'Alkalium',      effect:'Ammo Max +22, Ammo Refill +8',        power:'Piercing Bullets',         puKey:'ALKALIUM',     desc:  'A Silicon-Potassium compound that uses ionized energy to give shots piercing capabilities.'},
 	  AZOLITHION:  { sym:'Λ',  name:'Azolithion',    effect: 'Ammo +20, Shield +8',                power:'Multishot',                puKey: 'AZOLITHION',  desc:  'A Lithium-Nitrogen composite used for cooling during high-velocity maneuvers.'},
-	  GAMMITE:     { sym:'Γ',  name:'Gammite',       effect: 'Ammo +8, Shield +8, Shoot Speed +4', power:'No Ammo Cost',             puKey: 'GAMMITE',     desc:  'A complex superconductor used to synchronize ammo and shield frequencies for balanced performance.'},
+	  GAMMITE:     { sym:'Γ',  name:'Gammite',       effect: 'Ammo +8, Shield +8, Ammo Refill +4', power:'No Ammo Cost',             puKey: 'GAMMITE',     desc:  'A complex superconductor used to synchronize ammo and shield frequencies for balanced performance.'},
 	  OMEGITE: {
         sym: 'Ω', name: 'Omegite', puKey: 'OMEGITE',
-        effect: 'Reserve +3, Shield Max +10, Shoot Speed +10, Ammo Max +10', power:'Super Bomb',
+        power:'Super Bomb',
 		desc: 'A terrifyingly unstable material that exists in a state of constant decay.',
       },
       AXORITE: {
         sym: 'Χ', name: 'Axorite', puKey: 'AXORITE',
-        effect: 'Shield Max +25, Reserve +2', power:'Full Restore',
+        power:'Full Restore',
 		desc: 'A highly versatile multi-application metal alloy that is used in both defense and munitions.',
       },
       PHIOMEGA: {
         sym: 'Φ', name: 'PhiOmega', puKey: 'PHIOMEGA',
-        effect: 'Ammo Max +30, Shoot Speed +6', power:'Burstshot',
+        power:'Burstshot',
 		desc: 'A perfectly lossless superconductor that expels magnetic fields, ideal for maximizing ammo velocity and efficiency.',
       },
       DELTALITE: {
         sym: '∇', name: 'Deltalite', puKey: 'DELTALITE',
-        effect: 'Shield Max +20, Shoot Speed +10', power:'Time Dilation',
+        power:'Time Dilation',
 		desc: 'A sophisticated Beryllium-based metal that can survive the friction of warp-speed travel.',
       },	  
   }
@@ -79,7 +79,7 @@ const STRINGS = {
 // SAVE / STATE
 // ═══════════════════════════════════════════════════════════════
 const SAVE_KEY = 'a8_save_v1';
-let save = { highScore: 0, storyFlags: 0, permStats: { shootSpeed:0, ammoMax:0, shieldMax:0 } };
+let save = { highScore: 0, storyFlags: 0, permStats: { shootSpeed:0, ammoMax:0, shieldMax:0, ammoRefillRate:0 } };
 function loadSave() {
   try { const d = localStorage.getItem(SAVE_KEY); if(d) save = JSON.parse(atob(d)); } catch(e){}
 }
@@ -527,6 +527,7 @@ function newRun() {
     ammo: 65 + save.permStats.ammoMax,
     ammoMax: 100 + save.permStats.ammoMax,
     shootSpeed: 3 + save.permStats.shootSpeed,
+	ammoRefillRate:    1 + save.permStats.ammoRefillRate,
     reserveMax: 3,
     powerups: [],
     inventory: {},
@@ -567,7 +568,8 @@ const Game = (() => {
   let waveLeft = [], waveRight = [];    // waveform bkg
   let pods = [];                        // powerup pods
   let podSpawnTimer = 0;
-  let ammoMilestones = [];              // ammo refills
+  let ammoRefillTimer = 0;              // time-based ammo refill
+  const AMMO_REFILL_INTERVAL = 18;      // seconds between refill ticks
   let endSweepFired = false;            // end level sweep
   let shakeIntensity = 0;               // current shake magnitude in px
   let shakeDuration  = 0;               // seconds remaining
@@ -868,7 +870,7 @@ const Game = (() => {
     drops     = [];
     pods      = [];
     podSpawnTimer = 8 + Math.random() * 6; // first pod after 8-14s
-    ammoMilestones = [200, 350, 500, 750, 900, 1200, 1600, 2000, 2500].slice(); // reset each level
+    ammoRefillTimer = AMMO_REFILL_INTERVAL;   // reset timer each level
     ship.x = ship.targetX = W / 2;
     ship.y = H - 130;
     ship.invincible = 0;
@@ -1000,14 +1002,20 @@ const Game = (() => {
       podSpawnTimer = 18 + Math.random() * 12; // pod every 18-30s
     }
 
-    // Ammo milestones
-    if (ammoMilestones.length > 0 && run.score >= ammoMilestones[0]) {
-      ammoMilestones.shift();
-      const refill = Math.round(run.ammoMax * 0.18);
-      run.ammo = Math.min(run.ammoMax, run.ammo + refill);
-      updateAmmoBar();
-      spawnFloatingText(W * 0.5, H * 0.5, '+ AMMO', '#00f5ff');
-    }
+    // Time-based ammo refill — wired to ammoRefillRate, capped at ammoMax
+	ammoRefillTimer -= dt;
+	if (ammoRefillTimer <= 0) {
+  	  ammoRefillTimer = AMMO_REFILL_INTERVAL;
+  	  const refill = Math.min(
+      run.ammoRefillRate * 3,        // 3 ammo per refill-unit
+      run.ammoMax - run.ammo         // never exceed ammoMax
+  );
+  if (refill > 0) {
+    run.ammo += refill;
+    updateAmmoBar();
+    spawnFloatingText(W * 0.5, H * 0.5, '+ AMMO', '#00f5ff');
+  }
+}
 
     // Spawn enemies / mines
     spawnTimer -= dt;
@@ -1716,9 +1724,11 @@ function screenShake(magnitude, duration) {
     } else if (pu === 'LITHEBRYL') {
       run.shield = run.shieldMax; updateShieldBar(); logPickup('SHIELD RESTORED');
     } else if (pu === 'NITROKALIUM') {
-      run.shootSpeed *= 2; setTimeout(() => { run.shootSpeed /= 2; }, 8000);
-      logPickup('SPEED UP 8s');
-    } else if (pu === 'CARBOSILICUM') {
+      run.ammoRefillRate *= 2;
+  	  setTimeout(() => { run.ammoRefillRate = Math.round(run.ammoRefillRate / 2); }, 30000);
+  	  spawnFloatingText(W / 2, H / 2 - 30, 'NITROKALIUM', '#00f5ff');
+  	  logPickup('DOUBLE AMMO REFILL');
+	} else if (pu === 'CARBOSILICUM') {
       run.combo = Math.max(run.combo, 2); logPickup('×2 ACTIVE');
     } else if (pu === 'TITANE') {
       invincibleTimer = 10;
@@ -2825,12 +2835,14 @@ function showItemInfo(key, tier) {
     (price  ? `<div class="shop-info-price">${price}</div>` : '');
 }
 
-   const STAT_CAPS = {
-     shootSpeed: 12,   
-     ammoMax:   300,   
-     shieldMax: 100,   
-     reserveMax:  8,   
-   };
+const STAT_CAPS = {
+  shootSpeed:       12,
+  ammoMax:         300,
+  shieldMax:       100,
+  reserveMax:        8,
+  ammoRefillRate:   10,   // each unit ≈ +3 ammo per interval
+};
+
 
 function updateShopStats() {
   if (!run) return;
@@ -3723,10 +3735,10 @@ function applyElementBuff(key) {
        case 'Ti': if (run.shieldMax >= STAT_CAPS.shieldMax) { showShopToast('SHIELD MAXED'); return; }
            run.shieldMax = Math.min(run.shieldMax + 8, STAT_CAPS.shieldMax);
            run.shield = Math.min(run.shield + 8, run.shieldMax); break;
-       case 'N': if (run.shootSpeed >= STAT_CAPS.shootSpeed) { showShopToast('SPEED MAXED'); return; }
-           run.shootSpeed = Math.min(run.shootSpeed + 3, STAT_CAPS.shootSpeed); break;
-	   case 'K': if (run.shootSpeed >= STAT_CAPS.shootSpeed) { showShopToast('SPEED MAXED'); return; }
-           run.shootSpeed = Math.min(run.shootSpeed + 5, STAT_CAPS.shootSpeed); break;
+       case 'N': if (run.ammoRefillRate >= STAT_CAPS.ammoRefillRate) { showShopToast('REFILL MAXED'); return; }
+    	   run.ammoRefillRate = Math.min(run.ammoRefillRate + 3, STAT_CAPS.ammoRefillRate); break;
+	   case 'K': if (run.ammoRefillRate >= STAT_CAPS.ammoRefillRate) { showShopToast('REFILL MAXED'); return; }
+    	   run.ammoRefillRate = Math.min(run.ammoRefillRate + 5, STAT_CAPS.ammoRefillRate); break;
        case 'Si': if (run.ammoMax >= STAT_CAPS.ammoMax) { showShopToast('AMMO MAXED'); return; }
            run.ammoMax = Math.min(run.ammoMax + 10, STAT_CAPS.ammoMax);
            run.ammo = Math.min(run.ammo + 10, run.ammoMax); break;
