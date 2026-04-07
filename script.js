@@ -2930,9 +2930,9 @@ function updateShopReserves() {
       if (Math.sin(angle) <= -0.1 && depthAlpha <= 0.3) return;
       decoCtx.save();
       decoCtx.globalAlpha = depthAlpha;
-      decoCtx.shadowColor = 'white';
+      decoCtx.shadowColor = 'rgba(255,215,0,0.9)';
       decoCtx.shadowBlur  = 4 * depthAlpha;
-      decoCtx.fillStyle   = 'white';
+      decoCtx.fillStyle   = 'rgba(255,215,0,0.9)';
       decoCtx.beginPath();
       decoCtx.arc(ox, oy, SMALL_R, 0, Math.PI * 2);
       decoCtx.fill();
@@ -2945,7 +2945,7 @@ function updateShopReserves() {
       decoCtx.save();
       decoCtx.shadowColor = 'white';
       decoCtx.shadowBlur  = 8;
-      decoCtx.strokeStyle = 'rgba(255,255,255,0.9)';
+      decoCtx.strokeStyle = 'rgba(255,215,0,0.9)';
       decoCtx.lineWidth   = 1;
       decoCtx.beginPath();
       decoCtx.arc(CX, CY, BODY_R, 0, Math.PI * 2);
@@ -2957,7 +2957,7 @@ function updateShopReserves() {
       const rippleR      = BODY_R + pingProgress * 18;
       const rippleAlpha  = (1 - pingProgress) * 0.3;
       decoCtx.save();
-      decoCtx.strokeStyle = `rgba(255,255,255,${rippleAlpha})`;
+      decoCtx.strokeStyle = `rgba(255,215,0,${rippleAlpha})`;
       decoCtx.lineWidth   = 1.5;
       decoCtx.beginPath();
       decoCtx.arc(CX, CY, rippleR, 0, Math.PI * 2);
