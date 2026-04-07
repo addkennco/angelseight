@@ -2787,7 +2787,7 @@ function showItemInfo(key, tier) {
           v.map(k => { const el = STRINGS.items[k]; return el ? `${el.sym} ${el.name}` : k; }).join(' + ')
         );
       }
-      price = 'BUY 150¢ · SELL 75¢';
+      price = 'BUY 150¢ · SELL 90¢';
     } else if (tier === 'alloy') {
       // Pull all variants from ALLOY_VARIANTS and render each as a line
       const variants = ALLOY_VARIANTS[key];
@@ -2799,7 +2799,7 @@ function showItemInfo(key, tier) {
           }).join(' + ')
         );
       }
-      price = key === 'OMEGITE' ? 'SELL 120¢' : 'SELL 100¢';
+      price = key === 'OMEGITE' ? 'SELL 250¢' : 'SELL 200¢';
     } else {
       price = 'BUY 150¢';
     }
