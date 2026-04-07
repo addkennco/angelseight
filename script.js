@@ -37,21 +37,21 @@ const STRINGS = {
     Be: { name:'Beryllium', sym:'β', effect:'Shield Max +6',  desc: 'A rare, thermal-resistant material used for shielding components that must withstand extreme reentry heat.' },
     Li: { name:'Lithium',   sym:'λ', effect:'Shield Max +4',  desc: 'A high-capacity energy storage medium used to power the grid for rapid shield cycling.' },
     Ti: { name:'Titanium',  sym:'τ', effect:'Shield Max +8',  desc: 'A high-tensile, non-corrosive plating used for primary hull reinforcement.' },
-    N:  { name:'Nitrogen',  sym:'𝜈', effect:'Ammo Refill +3', desc: 'A cryogenic propellant used for rapid-burst thruster cooling to achieve momentary speed spikes.' },
+    N:  { name:'Nitrogen',  sym:'𝜈', effect:'Ammo Refill +1', desc: 'A cryogenic propellant used for rapid-burst thruster cooling to achieve momentary speed spikes.' },
     Si: { name:'Silicon',   sym:'Σ', effect:'Ammo Max +10',   desc: "A refined semiconductor essential for the ship's tactical computer and targeting sub-routines." },
     Mg: { name:'Magnesium', sym:'μ', effect:'Reserve +1',     desc: 'A lightweight reactive metal that serves as the primary igniter for thermal-based weaponry.' },
-    K:  { name:'Potassium', sym:'κ', effect:'Ammo Refill +5', desc: 'A highly volatile ionic catalyst used to spark high-energy reactions in reactors.' },
+    K:  { name:'Potassium', sym:'κ', effect:'Ammo Refill +1', desc: 'A highly volatile ionic catalyst used to spark high-energy reactions in reactors.' },
     C:  { name:'Carbon',    sym:'ζ', effect:'Ammo Max +8',    desc: 'Used in its crystalline form to create ultra-hardened kinetic penetrators for standard ammo.' },
   },
   powerups: {
-      LITHEBRYL:   { sym:'Β',  name:'Lithebryl',     effect:'Shield Max +20, Ammo +8',             power:'Shield Restore',           puKey:'LITHEBRYL',    desc:  'An alloy of Lithium and Beryllium that absorbs and dissipates energy blasts.' },
-      NITROKALIUM: { sym:'Π',  name:'Nitrokalium',   effect:'Ammo Refill +12, Shield +6',          power:'Double Ammo Refill',       puKey:'NITROKALIUM',  desc:  'A Potassium-Nitrogen gas mixture used to puah the engines to run at dangerous but hyper-efficient levels.'},
-      CARBOSILICUM:{ sym:'Ξ',  name:'Carbosilicium', effect:'Ammo Max +18, Ammo Refill +3',        power:'Double Points',            puKey:'CARBOSILICUM', desc:  'A highly efficient superconductor, allowing fire-control systems to process at lightning speeds.'},
-      MAGNIUM:     { sym:'Μ',  name:'Magnium',       effect:'Reserve +2, Ammo Refill +6',          power:'Bomb',                     puKey:'MAGNIUM',      desc:  'A Magnesium-based unstable isotope that is highly volatile when impacted.'},
-      TITANE:      { sym:'Θ',  name:'Titane',        effect:'Shield Max +30, Ammo Refill +5',      power:'Invincibility',            puKey:'TITANE',       desc:  'A low-density, Titanium-based metal that provides near-indestructible hull integrity without adding significant mass.'},
-      ALKALIUM:    { sym:'α',  name:'Alkalium',      effect:'Ammo Max +22, Ammo Refill +8',        power:'Piercing Bullets',         puKey:'ALKALIUM',     desc:  'A Silicon-Potassium compound that uses ionized energy to give shots piercing capabilities.'},
-	  AZOLITHION:  { sym:'Λ',  name:'Azolithion',    effect: 'Ammo +20, Shield +8',                power:'Multishot',                puKey: 'AZOLITHION',  desc:  'A Lithium-Nitrogen composite used for cooling during high-velocity maneuvers.'},
-	  GAMMITE:     { sym:'Γ',  name:'Gammite',       effect: 'Ammo +8, Shield +8, Ammo Refill +4', power:'No Ammo Cost',             puKey: 'GAMMITE',     desc:  'A complex superconductor used to synchronize ammo and shield frequencies for balanced performance.'},
+      LITHEBRYL:   { sym:'Β',  name:'Lithebryl',     effect:'Shield Max +20, Ammo Max +8',           	   power:'Shield Restore',           puKey:'LITHEBRYL',    desc:  'An alloy of Lithium and Beryllium that absorbs and dissipates energy blasts.' },
+      NITROKALIUM: { sym:'Π',  name:'Nitrokalium',   effect:'Ammo Refill +1, Shield Max +6',       		   power:'Double Ammo Refill',       puKey:'NITROKALIUM',  desc:  'A Potassium-Nitrogen gas mixture used to puah the engines to run at dangerous but hyper-efficient levels.'},
+      CARBOSILICUM:{ sym:'Ξ',  name:'Carbosilicium', effect:'Ammo Max +18, Ammo Refill +1',       		   power:'Double Points',            puKey:'CARBOSILICUM', desc:  'A highly efficient superconductor, allowing fire-control systems to process at lightning speeds.'},
+      MAGNIUM:     { sym:'Μ',  name:'Magnium',       effect:'Reserve +2, Ammo Refill +1',         		   power:'Bomb',                     puKey:'MAGNIUM',      desc:  'A Magnesium-based unstable isotope that is highly volatile when impacted.'},
+      TITANE:      { sym:'Θ',  name:'Titane',        effect:'Shield Max +30, Ammo Refill +1',      		   power:'Invincibility',            puKey:'TITANE',       desc:  'A low-density, Titanium-based metal that provides near-indestructible hull integrity without adding significant mass.'},
+      ALKALIUM:    { sym:'α',  name:'Alkalium',      effect:'Ammo Max +22, Ammo Refill +1',        		   power:'Piercing Bullets',         puKey:'ALKALIUM',     desc:  'A Silicon-Potassium compound that uses ionized energy to give shots piercing capabilities.'},
+	  AZOLITHION:  { sym:'Λ',  name:'Azolithion',    effect: 'Ammo Max +20, Shield Max +8',                power:'Multishot',                puKey: 'AZOLITHION',  desc:  'A Lithium-Nitrogen composite used for cooling during high-velocity maneuvers.'},
+	  GAMMITE:     { sym:'Γ',  name:'Gammite',       effect: 'Ammo Max +8, Shield Max +8, Ammo Refill +1', power:'No Ammo Cost',             puKey: 'GAMMITE',     desc:  'A complex superconductor used to synchronize ammo and shield frequencies for balanced performance.'},
 	  OMEGITE: {
         sym: 'Ω', name: 'Omegite', puKey: 'OMEGITE',
         power:'Super Bomb',
@@ -3722,9 +3722,9 @@ function applyElementBuff(key) {
            run.shieldMax = Math.min(run.shieldMax + 8, STAT_CAPS.shieldMax);
            run.shield = Math.min(run.shield + 8, run.shieldMax); break;
        case 'N': if (run.ammoRefillRate >= STAT_CAPS.ammoRefillRate) { showShopToast('REFILL MAXED'); return; }
-    	   run.ammoRefillRate = Math.min(run.ammoRefillRate + 3, STAT_CAPS.ammoRefillRate); break;
+    	   run.ammoRefillRate = Math.min(run.ammoRefillRate + 1, STAT_CAPS.ammoRefillRate); break;
 	   case 'K': if (run.ammoRefillRate >= STAT_CAPS.ammoRefillRate) { showShopToast('REFILL MAXED'); return; }
-    	   run.ammoRefillRate = Math.min(run.ammoRefillRate + 5, STAT_CAPS.ammoRefillRate); break;
+    	   run.ammoRefillRate = Math.min(run.ammoRefillRate + 1, STAT_CAPS.ammoRefillRate); break;
        case 'Si': if (run.ammoMax >= STAT_CAPS.ammoMax) { showShopToast('AMMO MAXED'); return; }
            run.ammoMax = Math.min(run.ammoMax + 10, STAT_CAPS.ammoMax);
            run.ammo = Math.min(run.ammo + 10, run.ammoMax); break;
@@ -3749,7 +3749,7 @@ function applyElementBuff(key) {
 
       case 'NITROKALIUM':
         if (run.ammoRefillRate >= STAT_CAPS.ammoRefillRate) { showShopToast('REFILL MAXED'); return; }
-        run.ammoRefillRate = Math.min(run.ammoRefillRate + 12, STAT_CAPS.ammoRefillRate);
+        run.ammoRefillRate = Math.min(run.ammoRefillRate + 1, STAT_CAPS.ammoRefillRate);
         run.shield = Math.min(run.shield + 6, run.shieldMax);
         updateShieldBar(); break;
 
@@ -3757,28 +3757,28 @@ function applyElementBuff(key) {
         if (run.ammoMax >= STAT_CAPS.ammoMax) { showShopToast('AMMO MAXED'); return; }
         run.ammoMax        = Math.min(run.ammoMax + 18, STAT_CAPS.ammoMax);
         if (run.ammoRefillRate >= STAT_CAPS.ammoRefillRate) { showShopToast('REFILL MAXED'); return; }
-        run.ammoRefillRate = Math.min(run.ammoRefillRate + 3, STAT_CAPS.ammoRefillRate);
+        run.ammoRefillRate = Math.min(run.ammoRefillRate + 1, STAT_CAPS.ammoRefillRate);
         updateAmmoBar(); break;
 
       case 'MAGNIUM':
         if (run.reserveMax >= STAT_CAPS.reserveMax) { showShopToast('RESERVES MAXED'); return; }
         run.reserveMax     = Math.min(run.reserveMax + 2, STAT_CAPS.reserveMax);
         if (run.ammoRefillRate >= STAT_CAPS.ammoRefillRate) { showShopToast('REFILL MAXED'); return; }
-        run.ammoRefillRate = Math.min(run.ammoRefillRate + 6, STAT_CAPS.ammoRefillRate);
+        run.ammoRefillRate = Math.min(run.ammoRefillRate + 1, STAT_CAPS.ammoRefillRate);
         break;
 
       case 'TITANE':
         if (run.shieldMax >= STAT_CAPS.shieldMax) { showShopToast('SHIELD MAXED'); return; }
         run.shieldMax      = Math.min(run.shieldMax + 30, STAT_CAPS.shieldMax);
         if (run.ammoRefillRate >= STAT_CAPS.ammoRefillRate) { showShopToast('REFILL MAXED'); return; }
-        run.ammoRefillRate = Math.min(run.ammoRefillRate + 5, STAT_CAPS.ammoRefillRate);
+        run.ammoRefillRate = Math.min(run.ammoRefillRate + 1, STAT_CAPS.ammoRefillRate);
         updateShieldBar(); break;
 
       case 'ALKALIUM':
         if (run.ammoMax >= STAT_CAPS.ammoMax) { showShopToast('AMMO MAXED'); return; }
         run.ammoMax        = Math.min(run.ammoMax + 22, STAT_CAPS.ammoMax);
         if (run.ammoRefillRate >= STAT_CAPS.ammoRefillRate) { showShopToast('REFILL MAXED'); return; }
-        run.ammoRefillRate = Math.min(run.ammoRefillRate + 8, STAT_CAPS.ammoRefillRate);
+        run.ammoRefillRate = Math.min(run.ammoRefillRate + 1, STAT_CAPS.ammoRefillRate);
         updateAmmoBar(); break;
 
       case 'AZOLITHION':
@@ -3790,7 +3790,7 @@ function applyElementBuff(key) {
         run.ammo   = Math.min(run.ammo + 8,  run.ammoMax);
         run.shield = Math.min(run.shield + 8, run.shieldMax);
         if (run.ammoRefillRate >= STAT_CAPS.ammoRefillRate) { showShopToast('REFILL MAXED'); return; }
-        run.ammoRefillRate = Math.min(run.ammoRefillRate + 4, STAT_CAPS.ammoRefillRate);
+        run.ammoRefillRate = Math.min(run.ammoRefillRate + 1, STAT_CAPS.ammoRefillRate);
         updateAmmoBar(); updateShieldBar(); break;
 
       default:
