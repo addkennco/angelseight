@@ -177,7 +177,7 @@
     background: transparent;
     border: 1px double var(--purple);
     padding: 10px 28px;
-	margin-bottom 6px;
+	margin-bottom: 10px;
     cursor: pointer;
     transition: color 0.2s, border-color 0.2s;
   }
@@ -1034,9 +1034,10 @@
       <div class="menu-score-val" id="menu-highscore">000000</div>
     </div>
     <div class="menu-coords" id="menu-coords"> ∅ ⊷ ☈ ⏦ ☰ ⚸ ⏛ ☊ </div>
-    <button class="btn-sweep" id="btn-start">LAUNCH</button>
-    <button class="btn-secondary" id="btn-shop-menu">FUSION SHOP</button>
+	<button class="btn-secondary" id="btn-shop-menu">FUSION SHOP</button>
+	<button class="btn-sweep" id="btn-start">LAUNCH</button>
     <button class="btn-secondary" id="btn-tutorial-menu">OPERATOR'S MANUAL</button>
+
   </div>
 </div>
 
@@ -1090,11 +1091,7 @@
 
   <!-- Powerup bar -->
   <div id="powerup-bar">
-    <div id="pu-slots">
-      <div class="pu-slot" id="pu-0"><span class="pu-slot-name">EMPTY</span></div>
-      <div class="pu-slot" id="pu-1"><span class="pu-slot-name">EMPTY</span></div>
-      <div class="pu-slot" id="pu-2"><span class="pu-slot-name">EMPTY</span></div>
-    </div>
+    <div id="pu-slots"></div>
     <div id="pu-stash">STASH</div>
   </div>
 
@@ -1114,9 +1111,9 @@
   <!-- Death overlay -->
   <div class="game-overlay" id="overlay-death">
     <div class="overlay-title" style="color:var(--pink)">SIGNAL LOST</div>
-    <div class="overlay-sub">RUN TERMINATED</div>
+    <div class="overlay-sub">MISSION TERMINATED</div>
     <div class="overlay-score" id="death-score"></div>
-    <button class="btn-sweep" id="btn-retry" style="margin-top:8px">TRY AGAIN</button>
+    <button class="btn-sweep" id="btn-retry" style="margin-top:8px">RESTART MISSION</button>
     <button class="btn-secondary" id="btn-menu-from-death" style="margin-top:4px">MAIN MENU</button>
   </div>
 
@@ -1130,8 +1127,8 @@
 
   <!-- Boss defeated overlay -->
   <div class="game-overlay" id="overlay-boss-clear">
-    <div class="overlay-title" style="color:var(--gold)">ANGEL'S EIGHT DEFEATED</div>
-    <div class="overlay-sub">RUN COMPLETE</div>
+    <div class="overlay-title" style="color:var(--gold)">CONFIGURATION COMPLETE</div>
+    <div class="overlay-sub">MISSION COMPLETE</div>
     <div class="overlay-score" id="boss-clear-score"></div>
     <button class="btn-sweep" id="btn-boss-to-menu" style="margin-top:8px">MAIN MENU</button>
   </div>
@@ -1141,7 +1138,7 @@
   <div class="game-overlay" id="overlay-pause">
     <div class="overlay-title" style="color:var(--cyan)">PAUSED</div>
 	<button class="btn-secondary" id="btn-return" style="margin-top:4px">ABANDON MISSION</button>
-	<button class="btn-secondary" id="btn-tutorial-pause" style="margin-top:4px">HOW TO PLAY</button>
+	<button class="btn-secondary" id="btn-tutorial-pause" style="margin-top:4px">TUTORIAL</button>
 	<div class="volume-sliders">
 	VOL:<input type="range" id="volume" class="volume" min="0" max="100" value="50">
 	SFX:<input type="range" id="sfxvolume" class="volume" min="0" max="100" value="40">

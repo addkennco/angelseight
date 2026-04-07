@@ -1727,7 +1727,8 @@ function screenShake(magnitude, duration) {
       run.shield = run.shieldMax; updateShieldBar(); logPickup('SHIELD RESTORED');
     } else if (pu === 'NITROKALIUM') {
       run.ammoRefillRate *= 2;
-  	  setTimeout(() => { run.ammoRefillRate = Math.round(run.ammoRefillRate / 2); }, 30000);
+      const capturedRun = run;
+  	  setTimeout(() => { capturedRun.ammoRefillRate = Math.round(capturedRun.ammoRefillRate / 2); }, 10000);
   	  spawnFloatingText(W / 2, H / 2 - 30, 'NITROKALIUM', '#00f5ff');
   	  logPickup('DOUBLE AMMO REFILL');
 	} else if (pu === 'CARBOSILICUM') {
@@ -2269,21 +2270,21 @@ function screenShake(magnitude, duration) {
     else { el.classList.remove('active'); }
   }
   function updatePowerupBar() {
-    for (let i = 0; i < 3; i++) {
-      const slot = document.getElementById('pu-' + i);
-      const pu = run.powerups[i];
-      if (pu) {
-        const d = STRINGS.powerups[pu];
-        slot.classList.add('filled');
-        slot.innerHTML = `<span class="pu-slot-sym">${d.sym}</span><span class="pu-slot-name">${d.name}</span>`;
-      } else {
-        slot.classList.remove('filled');
-        slot.innerHTML = `<span class="pu-slot-name">EMPTY</span>`;
-      }
+    const slotsEl = document.getElementById('pu-slots');
+    if (!slotsEl || !run) return;
+    slotsEl.innerHTML = '';
+    for (let i = 0; i < run.reserveMax; i++) {
+      const slot = document.createElement('div');
+      const pu = run.powerups[i] ? STRINGS.powerups[run.powerups[i]] : null;
+      slot.className = 'pu-slot' + (pu ? ' filled' : '');
+      slot.dataset.idx = i;
+      slot.innerHTML = pu
+        ? `<span class="pu-slot-sym">${pu.sym}</span><span class="pu-slot-name">${pu.name}</span>`
+        : `<span class="pu-slot-name">EMPTY</span>`;
+      slotsEl.appendChild(slot);
     }
-    // Update stash box — count powerup keys stored in inventory
     const stashEl = document.getElementById('pu-stash');
-    if (stashEl && run) {
+    if (stashEl) {
       const puKeys = Object.keys(STRINGS.powerups);
       const stashCount = puKeys.reduce((n, k) => n + (run.inventory[k] || 0), 0);
       stashEl.textContent = stashCount > 0 ? `STASH  [${stashCount}]` : 'STASH';
@@ -3490,10 +3491,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const DRAG_THRESHOLD = 10; // px before we call it a drag vs a tap
 
     function slotIndexFromEl(el) {
-      for (let i = 0; i < 3; i++) {
-        if (document.getElementById('pu-' + i).contains(el)) return i;
-      }
-      return -1;
+      const slot = el.closest('.pu-slot');
+      if (!slot) return -1;
+      const idx = parseInt(slot.dataset.idx, 10);
+      return isNaN(idx) ? -1 : idx;
     }
 
     function stashSlot(idx) {
@@ -3718,7 +3719,7 @@ function setupShopDrag() {
       if (box) box.classList.add('drag-over');
       return;
     }
-    if (dragTier === 'element' && statsBlockAt(x, y)) {
+    if ((dragTier === 'element' || dragTier === 'compound') && statsBlockAt(x, y)) {
       const stats = document.getElementById('shop-stats-block');
       if (stats) stats.classList.add('drag-over');
     }
@@ -3751,6 +3752,69 @@ function applyElementBuff(key) {
            run.reserveMax = Math.min(8, run.reserveMax + 1); break;
      }
    }
+
+  // ── Compound stat buffs ──────────────────────────────────────
+  function applyCompoundBuff(key) {
+    if (!run) return;
+    switch (key) {
+
+      case 'LITHEBRYL':
+        if (run.shieldMax >= STAT_CAPS.shieldMax) { showShopToast('SHIELD MAXED'); return; }
+        run.shieldMax = Math.min(run.shieldMax + 20, STAT_CAPS.shieldMax);
+        run.ammo      = Math.min(run.ammo + 8, run.ammoMax);
+        updateAmmoBar(); updateShieldBar(); break;
+
+      case 'NITROKALIUM':
+        if (run.ammoRefillRate >= STAT_CAPS.ammoRefillRate) { showShopToast('REFILL MAXED'); return; }
+        run.ammoRefillRate = Math.min(run.ammoRefillRate + 12, STAT_CAPS.ammoRefillRate);
+        run.shield = Math.min(run.shield + 6, run.shieldMax);
+        updateShieldBar(); break;
+
+      case 'CARBOSILICUM':
+        if (run.ammoMax >= STAT_CAPS.ammoMax) { showShopToast('AMMO MAXED'); return; }
+        run.ammoMax        = Math.min(run.ammoMax + 18, STAT_CAPS.ammoMax);
+        if (run.ammoRefillRate >= STAT_CAPS.ammoRefillRate) { showShopToast('REFILL MAXED'); return; }
+        run.ammoRefillRate = Math.min(run.ammoRefillRate + 3, STAT_CAPS.ammoRefillRate);
+        updateAmmoBar(); break;
+
+      case 'MAGNIUM':
+        if (run.reserveMax >= STAT_CAPS.reserveMax) { showShopToast('RESERVES MAXED'); return; }
+        run.reserveMax     = Math.min(run.reserveMax + 2, STAT_CAPS.reserveMax);
+        if (run.ammoRefillRate >= STAT_CAPS.ammoRefillRate) { showShopToast('REFILL MAXED'); return; }
+        run.ammoRefillRate = Math.min(run.ammoRefillRate + 6, STAT_CAPS.ammoRefillRate);
+        break;
+
+      case 'TITANE':
+        if (run.shieldMax >= STAT_CAPS.shieldMax) { showShopToast('SHIELD MAXED'); return; }
+        run.shieldMax      = Math.min(run.shieldMax + 30, STAT_CAPS.shieldMax);
+        if (run.ammoRefillRate >= STAT_CAPS.ammoRefillRate) { showShopToast('REFILL MAXED'); return; }
+        run.ammoRefillRate = Math.min(run.ammoRefillRate + 5, STAT_CAPS.ammoRefillRate);
+        updateShieldBar(); break;
+
+      case 'ALKALIUM':
+        if (run.ammoMax >= STAT_CAPS.ammoMax) { showShopToast('AMMO MAXED'); return; }
+        run.ammoMax        = Math.min(run.ammoMax + 22, STAT_CAPS.ammoMax);
+        if (run.ammoRefillRate >= STAT_CAPS.ammoRefillRate) { showShopToast('REFILL MAXED'); return; }
+        run.ammoRefillRate = Math.min(run.ammoRefillRate + 8, STAT_CAPS.ammoRefillRate);
+        updateAmmoBar(); break;
+
+      case 'AZOLITHION':
+        run.ammo   = Math.min(run.ammo + 20, run.ammoMax);
+        run.shield = Math.min(run.shield + 8, run.shieldMax);
+        updateAmmoBar(); updateShieldBar(); break;
+
+      case 'GAMMITE':
+        run.ammo   = Math.min(run.ammo + 8,  run.ammoMax);
+        run.shield = Math.min(run.shield + 8, run.shieldMax);
+        if (run.ammoRefillRate >= STAT_CAPS.ammoRefillRate) { showShopToast('REFILL MAXED'); return; }
+        run.ammoRefillRate = Math.min(run.ammoRefillRate + 4, STAT_CAPS.ammoRefillRate);
+        updateAmmoBar(); updateShieldBar(); break;
+
+      default:
+        showShopToast('NO BUFF'); return;
+    }
+    updateShopStats();
+  }
 
   // ── Hit-test: craft tab compound/alloy cards ─────────────────
   function craftCardAt(x, y) {
@@ -3835,6 +3899,18 @@ function applyElementBuff(key) {
       if (qty > 0) {
         run.inventory[dragKey]--;
         applyElementBuff(dragKey);
+        refresh();
+        renderShopBody();
+      }
+      return;
+    }
+
+    // ── Compound card → stats block (buff) ────────────────────
+    if (dragSource === 'card' && dragTier === 'compound' && statsBlockAt(x, y)) {
+      const qty = run?.inventory[dragKey] || 0;
+      if (qty > 0) {
+        run.inventory[dragKey]--;
+        applyCompoundBuff(dragKey);
         refresh();
         renderShopBody();
       }
