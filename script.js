@@ -870,7 +870,7 @@ const Game = (() => {
     drops     = [];
     pods      = [];
     podSpawnTimer = 8 + Math.random() * 6; // first pod after 8-14s
-     = AMMO_REFILL_INTERVAL;   // reset timer each level
+    ammoRefillTimer = AMMO_REFILL_INTERVAL;   // reset timer each level
     ship.x = ship.targetX = W / 2;
     ship.y = H - 130;
     ship.invincible = 0;
