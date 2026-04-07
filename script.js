@@ -1008,7 +1008,7 @@ ammoRefillTimer -= dt;
 if (ammoRefillTimer <= 0) {
   ammoRefillTimer = AMMO_REFILL_INTERVAL;
   const refill = Math.min(
-    run.ammoRefillRate * 30,
+    run.ammoRefillRate * 10,
     run.ammoMax - run.ammo
   );
   if (refill > 0) {
@@ -2842,7 +2842,7 @@ const STAT_CAPS = {
   ammoMax:         300,
   shieldMax:       100,
   reserveMax:        8,
-  ammoRefillRate:   10,   // each unit ≈ +30 ammo per interval
+  ammoRefillRate:   10,   // each unit ≈ +10 ammo per interval
 };
 
 
