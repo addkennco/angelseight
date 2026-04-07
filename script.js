@@ -568,7 +568,7 @@ const Game = (() => {
   let waveLeft = [], waveRight = [];    // waveform bkg
   let pods = [];                        // powerup pods
   let podSpawnTimer = 0;
-  let ammoRefillTimer = 0;              // time-based ammo refill
+  let  = 0;              // time-based ammo refill
   const AMMO_REFILL_INTERVAL = 5;      // seconds between refill ticks
   let endSweepFired = false;            // end level sweep
   let shakeIntensity = 0;               // current shake magnitude in px
@@ -870,7 +870,7 @@ const Game = (() => {
     drops     = [];
     pods      = [];
     podSpawnTimer = 8 + Math.random() * 6; // first pod after 8-14s
-    ammoRefillTimer = AMMO_REFILL_INTERVAL;   // reset timer each level
+     = AMMO_REFILL_INTERVAL;   // reset timer each level
     ship.x = ship.targetX = W / 2;
     ship.y = H - 130;
     ship.invincible = 0;
@@ -1003,18 +1003,18 @@ const Game = (() => {
     }
 
     // Time-based ammo refill — wired to ammoRefillRate, capped at ammoMax
-	ammoRefillTimer -= dt;
-	if (ammoRefillTimer <= 0) {
-  	  ammoRefillTimer = AMMO_REFILL_INTERVAL;
-  	  const refill = Math.min(
-      run.ammoRefillRate * 30,        // 30 ammo per refill-unit
-      run.ammoMax - run.ammo         // never exceed ammoMax
+ammoRefillTimer -= dt;
+if (ammoRefillTimer <= 0) {
+  ammoRefillTimer = AMMO_REFILL_INTERVAL;
+  const refill = Math.min(
+    run.ammoRefillRate * 30,
+    run.ammoMax - run.ammo
   );
   if (refill > 0) {
     run.ammo += refill;
     updateAmmoBar();
     spawnFloatingText(W * 0.5, H - 160, '+ AMMO', '#00f5ff');
-	logPickup('AMMO REFILL +' + refill);
+    logPickup('AMMO REFILL +' + refill);
   }
 }
 
