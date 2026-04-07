@@ -568,7 +568,7 @@ const Game = (() => {
   let waveLeft = [], waveRight = [];    // waveform bkg
   let pods = [];                        // powerup pods
   let podSpawnTimer = 0;
-  let  = 0;              // time-based ammo refill
+  let ammoRefillTimer = 0;              // time-based ammo refill
   const AMMO_REFILL_INTERVAL = 5;      // seconds between refill ticks
   let endSweepFired = false;            // end level sweep
   let shakeIntensity = 0;               // current shake magnitude in px
