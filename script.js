@@ -2846,10 +2846,10 @@ const STAT_CAPS = {
 
 function updateShopStats() {
   if (!run) return;
-  // Shoot speed: default 3, max 12
-  const spd = run.shootSpeed;
-  document.getElementById('stat-val-speed').textContent  = spd.toFixed(1);
-  document.getElementById('stat-bar-speed').style.width  = Math.min(100, (spd / 12) * 100) + '%';
+  //Ammo refill rate, max needed!
+  const refRate = run.ammoRefillRate;
+  document.getElementById('stat-val-refill').textContent = refRate;
+  document.getElementById('stat-bar-refill').style.width = Math.min(100, (refRate / STAT_CAPS.ammoRefillRate) * 100) + '%';
   // Ammo max: default 50 (base 65 in newRun... using ammoMax), display cap 300
   const ammo = run.ammoMax;
   document.getElementById('stat-val-ammo').textContent   = ammo;
