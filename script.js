@@ -3800,7 +3800,7 @@ function applyElementBuff(key) {
         if (run.ammoMax < STAT_CAPS.ammoMax) {
           run.ammoMax = Math.min(run.ammoMax + 8, STAT_CAPS.ammoMax);
         } else { showShopToast('AMMO MAXED'); }
-        updateAmmoBar(); updateShieldBar(); break;
+         break;
 
       case 'NITROKALIUM':
         if (run.ammoRefillRate < STAT_CAPS.ammoRefillRate) {
@@ -3809,7 +3809,7 @@ function applyElementBuff(key) {
         if (run.shieldMax < STAT_CAPS.shieldMax) {
           run.shieldMax = Math.min(run.shieldMax + 6, STAT_CAPS.shieldMax);
         } else { showShopToast('SHIELD MAXED'); }
-        updateShieldBar(); break;
+         break;
 
       case 'CARBOSILICUM':
         if (run.ammoMax < STAT_CAPS.ammoMax) {
@@ -3818,7 +3818,7 @@ function applyElementBuff(key) {
         if (run.ammoRefillRate < STAT_CAPS.ammoRefillRate) {
           run.ammoRefillRate = Math.min(run.ammoRefillRate + 1, STAT_CAPS.ammoRefillRate);
         } else { showShopToast('REFILL MAXED'); }
-        updateAmmoBar(); break;
+         break;
 
       case 'MAGNIUM':
         if (run.reserveMax < STAT_CAPS.reserveMax) {
@@ -3836,7 +3836,7 @@ function applyElementBuff(key) {
         if (run.ammoRefillRate < STAT_CAPS.ammoRefillRate) {
           run.ammoRefillRate = Math.min(run.ammoRefillRate + 1, STAT_CAPS.ammoRefillRate);
         } else { showShopToast('REFILL MAXED'); }
-        updateShieldBar(); break;
+         break;
 
       case 'ALKALIUM':
         if (run.ammoMax < STAT_CAPS.ammoMax) {
@@ -3845,7 +3845,7 @@ function applyElementBuff(key) {
         if (run.ammoRefillRate < STAT_CAPS.ammoRefillRate) {
           run.ammoRefillRate = Math.min(run.ammoRefillRate + 1, STAT_CAPS.ammoRefillRate);
         } else { showShopToast('REFILL MAXED'); }
-        updateAmmoBar(); break;
+         break;
 
       case 'AZOLITHION':
         if (run.ammoMax < STAT_CAPS.ammoMax) {
@@ -3854,7 +3854,7 @@ function applyElementBuff(key) {
         if (run.shieldMax < STAT_CAPS.shieldMax) {
           run.shieldMax = Math.min(run.shieldMax + 8, STAT_CAPS.shieldMax);
         } else { showShopToast('SHIELD MAXED'); }
-        updateAmmoBar(); updateShieldBar(); break;
+         break;
 
       case 'GAMMITE':
         if (run.ammoMax < STAT_CAPS.ammoMax) {
@@ -3866,13 +3866,12 @@ function applyElementBuff(key) {
         if (run.ammoRefillRate < STAT_CAPS.ammoRefillRate) {
           run.ammoRefillRate = Math.min(run.ammoRefillRate + 1, STAT_CAPS.ammoRefillRate);
         } else { showShopToast('REFILL MAXED'); }
-        updateAmmoBar(); updateShieldBar(); break;
+         break;
 
       default:
         showShopToast('NO BUFF'); return;
     }
     updateShopStats();
-	refresh();
   }
 
   // ── Hit-test: craft tab compound/alloy cards ─────────────────
