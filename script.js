@@ -2699,21 +2699,15 @@ const ACTION_BOX_LABELS = {
   stash: { cls: ''          },
 };
 
-function toggleCraftSection(section) {
-  const allGrids = document.querySelectorAll('.craft-section');
-  const allLabels = document.querySelectorAll('.shop-section-label.collapsible');
-  
-  allGrids.forEach(grid => {
-    const isTarget = grid.dataset.section === section;
-    const wasOpen = grid.style.display !== 'none';
-    grid.style.display = (isTarget && !wasOpen) ? 'grid' : 'none';
+function switchCraftSection(openThis) {
+  document.querySelectorAll('.craft-section').forEach(grid => {
+    const isOpen = grid.dataset.section === openThis;
+    grid.style.display = isOpen ? 'grid' : 'none';
   });
 
-  allLabels.forEach(label => {
-    const isTarget = label.dataset.section === section;
-    const matchingGrid = document.querySelector(`.craft-section[data-section="${label.dataset.section}"]`);
-    const isNowOpen = matchingGrid && matchingGrid.style.display !== 'none';
-    label.textContent = label.textContent.replace(/[▸▾]/, isNowOpen ? '▾' : '▸');
+  document.querySelectorAll('.shop-section-label.collapsible').forEach(label => {
+    const isOpen = label.dataset.section === openThis;
+    label.textContent = label.textContent.replace(/[▸▾]/, isOpen ? '▾' : '▸');
   });
 }
 
@@ -3133,7 +3127,7 @@ function renderShopBody() {
     labelEl.textContent = 'ELEMENTS ▸';
     labelEl.dataset.section = 'craft-elements';
     body.appendChild(labelEl);
-	labelEl.addEventListener('click', () => toggleCraftSection('craft-elements'));
+	labelEl.addEventListener('click', () => switchCraftSection('craft-elements'));
     const gridEl = document.createElement('div');
     gridEl.className = 'shop-grid craft-section';
     gridEl.dataset.section = 'craft-elements';
@@ -3164,7 +3158,7 @@ function renderShopBody() {
     labelCo.className = 'shop-section-label collapsible';
     labelCo.textContent = 'COMPOUNDS ▸';
     labelCo.dataset.section = 'craft-compounds';
-    body.appendChild(labelCo); labelCo.addEventListener('click', () => toggleCraftSection('craft-compounds'));
+    body.appendChild(labelCo); labelCo.addEventListener('click', () => switchCraftSection('craft-compounds'));
     const gridCo = document.createElement('div');
     gridCo.className = 'shop-grid craft-section';
     gridCo.dataset.section = 'craft-compounds';
@@ -3188,7 +3182,7 @@ function renderShopBody() {
         card.classList.add('selected');
         showItemInfo(key, 'compound');
         highlightIngredientCards(key, 'compound');
-		toggleCraftSection('craft-elements');
+		switchCraftSection('craft-elements');
       };
       gridCo.appendChild(card);
     });
@@ -3291,7 +3285,7 @@ function renderShopBody() {
         card.classList.add('selected');
         showItemInfo(a.puKey, 'alloy');
         highlightIngredientCards(a.puKey, 'alloy');
-		toggleCraftSection('craft-compounds');
+		switchCraftSection('craft-compounds');
       };
       gridAlloy.appendChild(card);
     });
