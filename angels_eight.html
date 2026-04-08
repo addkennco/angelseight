@@ -318,18 +318,19 @@
   #pu-slots { display: flex; gap: 6px; }
 
   /* Stash box */
-   #pu-stash {
-   width: 122px; height: 28px;
-   font-family: var(--mono);
-   font-size: 10px;
-   color: var(--purple);
-   text-align: center;
-   line-height: 28px;
-   position: relative;
-   border: 1.5px solid var(--purple);
-   border-top: 10px double var(--purple);
-   user-select: none;
- }
+  #pu-stash {
+    width: 122px; height: 28px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--purple);
+    text-align: center;
+    line-height: 28px;
+    position: relative;
+    border: 1.5px solid var(--purple);
+    background: rgba(168,85,247,0.05);
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    user-select: none;
+  }
   #pu-stash.flash {
     --shadow-color: rgba(168,85,247,1);
   }
@@ -682,30 +683,12 @@
   /* ── Action box ── */
   .shop-action-box {
   --shadow-color: rgb(255, 255, 255);
-    width: 70%;
-	max-width: 250px;
-    height: 38px;
-	border-left: 8px double var(--shadow-color);
-	border-right: 2px solid var(--shadow-color);
-	border-bottom: 2px solid var(--shadow-color);
-	border-top: 8px double var(--shadow-color);
-	box-shadow: 
-    0 1px 0 0 var(--shadow-color), 
-    1px 0 0 0 var(--shadow-color),
-    1px 2px 0 0 var(--shadow-color), 
-    2px 1px 0 0 var(--shadow-color), 
-    2px 3px 0 0 var(--shadow-color),
-    3px 2px 0 0 var(--shadow-color), 
-    3px 4px 0 0 var(--shadow-color), 
-    4px 3px 0 0 var(--shadow-color),
-    4px 5px 0 0 var(--shadow-color), 
-    5px 4px 0 0 var(--shadow-color), 
-    5px 6px 0 0 var(--shadow-color),
-    6px 5px 0 0 var(--shadow-color), 
-    6px 7px 0 0 var(--shadow-color), 
-    7px 6px 0 0 var(--shadow-color),
-    7px 8px 0 0 var(--shadow-color),
-    8px 7px 0 0 var(--shadow-color);
+  width: 70%;
+  max-width: 250px;
+  height: 38px;
+  border: 2px solid var(--shadow-color);
+  background: rgba(255,255,255,0.03);
+  clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
 }
 
 .shop-action-box.buy-box   { --shadow-color: rgba(0, 245, 255, 0.3); }
