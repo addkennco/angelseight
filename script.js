@@ -2726,6 +2726,26 @@ function shopTab(tab) {
     const labels = { buy: 'BUY ALL', sell: 'SELL ALL', craft: 'CRAFT ALL' };
     confirmBtn.textContent = labels[tab] ?? '';
   }
+
+  // Toggle Craft ingredients
+  function toggleCraftSection(section) {
+  const allGrids = document.querySelectorAll('.craft-section');
+  const allLabels = document.querySelectorAll('.shop-section-label.collapsible');
+  
+  allGrids.forEach(grid => {
+    const isTarget = grid.dataset.section === section;
+    const wasOpen = grid.style.display !== 'none';
+    grid.style.display = (isTarget && !wasOpen) ? 'grid' : 'none';
+  });
+
+  allLabels.forEach(label => {
+    const isTarget = label.dataset.section === section;
+    const matchingGrid = document.querySelector(`.craft-section[data-section="${label.dataset.section}"]`);
+    const isNowOpen = matchingGrid && matchingGrid.style.display !== 'none';
+    label.textContent = label.textContent.replace(/[▸▾]/, isNowOpen ? '▾' : '▸');
+  });
+}
+	
   // Reset info panel
   clearItemInfo();
   clearIngredientHighlights();
@@ -3108,11 +3128,17 @@ function renderShopBody() {
 
   } else if (shopMode === 'craft') {
 
-    // ── INGREDIENTS — elements + compounds as always-visible draggable sources ──
-    const labelIngr = document.createElement('div');
-    labelIngr.className = 'shop-section-label'; labelIngr.textContent = 'INGREDIENTS';
-    body.appendChild(labelIngr);
-    const gridIngr = document.createElement('div'); gridIngr.className = 'shop-grid';
+    // ── INGREDIENTS — split into collapsible ELEMENTS and COMPOUNDS grids ──
+    const labelEl = document.createElement('div');
+    labelEl.className = 'shop-section-label collapsible';
+    labelEl.textContent = 'ELEMENTS ▸';
+    labelEl.dataset.section = 'craft-elements';
+    body.appendChild(labelEl);
+	labelEl.addEventListener('click', () => toggleCraftSection('craft-elements'));
+    const gridEl = document.createElement('div');
+    gridEl.className = 'shop-grid craft-section';
+    gridEl.dataset.section = 'craft-elements';
+    gridEl.style.display = 'none';
 
     // Elements
     Object.entries(STRINGS.items).forEach(([key, item]) => {
@@ -3131,8 +3157,19 @@ function renderShopBody() {
         showItemInfo(key, 'element');
         clearIngredientHighlights();
       };
-      gridIngr.appendChild(card);
+      gridEl.appendChild(card);
     });
+    body.appendChild(gridEl);
+
+    const labelCo = document.createElement('div');
+    labelCo.className = 'shop-section-label collapsible';
+    labelCo.textContent = 'COMPOUNDS ▸';
+    labelCo.dataset.section = 'craft-compounds';
+    body.appendChild(labelCo); labelCo.addEventListener('click', () => toggleCraftSection('craft-compounds'));
+    const gridCo = document.createElement('div');
+    gridCo.className = 'shop-grid craft-section';
+    gridCo.dataset.section = 'craft-compounds';
+    gridCo.style.display = 'none';
 
     // Compounds — always shown, draggable only when owned
     Object.keys(COMPOUND_VARIANTS).forEach(key => {
@@ -3153,10 +3190,9 @@ function renderShopBody() {
         showItemInfo(key, 'compound');
         highlightIngredientCards(key, 'compound');
       };
-      gridIngr.appendChild(card);
+      gridCo.appendChild(card);
     });
-
-    body.appendChild(gridIngr);
+    body.appendChild(gridCo);
 
     // ── CRAFT — compound target cards (progress lights) ───────────
     const labelCraft = document.createElement('div');
@@ -3205,7 +3241,7 @@ function renderShopBody() {
           { key: 'TITANE', label: 'Θ Titane'  },
         ],
         effect: 'Reserve +3, All Stats +3 — Super Bomb',
-		desc: 'A terrifyingly unstable material that exists in a state of constant decay.',
+        desc: 'A terrifyingly unstable material that exists in a state of constant decay.',
       },
       {
         sym: 'Χ', name: 'Axorite', puKey: 'AXORITE',
@@ -3214,7 +3250,7 @@ function renderShopBody() {
           { key: 'TITANE', label: 'Θ Titane' },
         ],
         effect: 'Shield Max +25, Reserve +2 — Full Restore',
-		desc: 'A highly versatile multi-application metal alloy that is used in both defense and munitions.',
+        desc: 'A highly versatile multi-application metal alloy that is used in both defense and munitions.',
       },
       {
         sym: 'Φ', name: 'PhiOmega', puKey: 'PHIOMEGA',
@@ -3223,7 +3259,7 @@ function renderShopBody() {
           { key: 'ALKALIUM',   label: 'α Alkalium'  },
         ],
         effect: 'Ammo Max +30, Shoot Spd +6 — Bullet Shift',
-		desc: 'A perfectly lossless superconductor that expels magnetic fields, ideal for maximizing ammo velocity and efficiency.',
+        desc: 'A perfectly lossless superconductor that expels magnetic fields, ideal for maximizing ammo velocity and efficiency.',
       },
       {
         sym: '∇', name: 'Deltalite', puKey: 'DELTALITE',
@@ -3232,7 +3268,7 @@ function renderShopBody() {
           { key: 'NITROKALIUM',   label: 'Π Nitrokalium'  },
         ],
         effect: 'Shield Max +20, Shoot Spd +10 — Time Dilation',
-		desc: 'A sophisticated Beryllium-based metal that can survive the friction of warp-speed travel.',
+        desc: 'A sophisticated Beryllium-based metal that can survive the friction of warp-speed travel.',
       },
     ];
 
@@ -3262,7 +3298,7 @@ function renderShopBody() {
 
   } else if (shopMode === 'stash') {
 
-    // ── ELEMENTS (display-only — not draggable) ──────────────────
+    // ── ELEMENTS ──────────────────
     const labelEl = document.createElement('div');
     labelEl.className = 'shop-section-label'; labelEl.textContent = 'ELEMENTS';
     body.appendChild(labelEl);
@@ -3298,18 +3334,17 @@ function renderShopBody() {
 
     const gridPu = document.createElement('div'); gridPu.className = 'shop-grid';
     Object.entries(STRINGS.powerups).forEach(([key, pu]) => {
-      const invQty   = run?.inventory[key] || 0;           // stashed (draggable)
-      const resCount = (run?.powerups || []).filter(k => k === key).length; // in active reserves
+      const invQty   = run?.inventory[key] || 0;
+      const resCount = (run?.powerups || []).filter(k => k === key).length;
       const totalQty = invQty + resCount;
-      const has = invQty > 0;                              // only inv qty enables drag
+      const has = invQty > 0;
       const card = document.createElement('div');
       card.className = 'shop-card obj pu-card ' + (totalQty > 0 ? 'stash-has' : 'stash-empty');
-	  card.dataset.puKey = key;
-	  card.dataset.cardKey  = key;
-	  card.dataset.cardTier = 'compound';
-	  card.dataset.draggable = has ? '1' : '0';
+      card.dataset.puKey = key;
+      card.dataset.cardKey  = key;
+      card.dataset.cardTier = 'compound';
+      card.dataset.draggable = has ? '1' : '0';
 
-      // Count badge: stash qty + reserve indicator
       let countHTML = '';
       if (invQty > 0 || resCount > 0) {
         const parts = [];
