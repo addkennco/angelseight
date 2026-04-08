@@ -2178,7 +2178,7 @@ function screenShake(magnitude, duration) {
           i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
         }
         ctx.closePath(); ctx.stroke();
-        // Symbol inside
+         // Symbol inside
         const pu = STRINGS.powerups[d.key];
         ctx.font = 'bold 11px Nova Square, monospace';
         ctx.fillStyle = `rgba(168,85,247,${pulse})`;
@@ -2191,7 +2191,8 @@ function screenShake(magnitude, duration) {
         ctx.strokeStyle = '#00f5ff'; ctx.lineWidth = 1; ctx.stroke();
         ctx.font = 'bold 9px Nova Square, monospace';
         ctx.fillStyle = '#00f5ff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillText(d.key, 0, 0);
+        const item = STRINGS.items[d.key];
+        ctx.fillText(item ? item.sym : '?', 0, 0);
       }
       ctx.restore();
     });
