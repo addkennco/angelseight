@@ -3796,7 +3796,6 @@ function applyElementBuff(key) {
       case 'LITHEBRYL':
         if (run.shieldMax < STAT_CAPS.shieldMax) {
           run.shieldMax = Math.min(run.shieldMax + 20, STAT_CAPS.shieldMax);
-          run.shield    = Math.min(run.shield + 20, run.shieldMax);
         } else { showShopToast('SHIELD MAXED'); }
         if (run.ammoMax < STAT_CAPS.ammoMax) {
           run.ammoMax = Math.min(run.ammoMax + 8, STAT_CAPS.ammoMax);
@@ -3809,7 +3808,6 @@ function applyElementBuff(key) {
         } else { showShopToast('REFILL MAXED'); }
         if (run.shieldMax < STAT_CAPS.shieldMax) {
           run.shieldMax = Math.min(run.shieldMax + 6, STAT_CAPS.shieldMax);
-          run.shield    = Math.min(run.shield + 6, run.shieldMax);
         } else { showShopToast('SHIELD MAXED'); }
         updateShieldBar(); break;
 
@@ -3834,7 +3832,6 @@ function applyElementBuff(key) {
       case 'TITANE':
         if (run.shieldMax < STAT_CAPS.shieldMax) {
           run.shieldMax = Math.min(run.shieldMax + 30, STAT_CAPS.shieldMax);
-          run.shield    = Math.min(run.shield + 30, run.shieldMax);
         } else { showShopToast('SHIELD MAXED'); }
         if (run.ammoRefillRate < STAT_CAPS.ammoRefillRate) {
           run.ammoRefillRate = Math.min(run.ammoRefillRate + 1, STAT_CAPS.ammoRefillRate);
@@ -3856,7 +3853,6 @@ function applyElementBuff(key) {
         } else { showShopToast('AMMO MAXED'); }
         if (run.shieldMax < STAT_CAPS.shieldMax) {
           run.shieldMax = Math.min(run.shieldMax + 8, STAT_CAPS.shieldMax);
-          run.shield    = Math.min(run.shield + 8, run.shieldMax);
         } else { showShopToast('SHIELD MAXED'); }
         updateAmmoBar(); updateShieldBar(); break;
 
@@ -3866,7 +3862,6 @@ function applyElementBuff(key) {
         } else { showShopToast('AMMO MAXED'); }
         if (run.shieldMax < STAT_CAPS.shieldMax) {
           run.shieldMax = Math.min(run.shieldMax + 8, STAT_CAPS.shieldMax);
-          run.shield    = Math.min(run.shield + 8, run.shieldMax);
         } else { showShopToast('SHIELD MAXED'); }
         if (run.ammoRefillRate < STAT_CAPS.ammoRefillRate) {
           run.ammoRefillRate = Math.min(run.ammoRefillRate + 1, STAT_CAPS.ammoRefillRate);
