@@ -3872,6 +3872,7 @@ function applyElementBuff(key) {
         showShopToast('NO BUFF'); return;
     }
     updateShopStats();
+	refresh();
   }
 
   // ── Hit-test: craft tab compound/alloy cards ─────────────────
