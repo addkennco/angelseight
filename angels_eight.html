@@ -327,26 +327,8 @@
    line-height: 28px;
    position: relative;
    border: 1.5px solid var(--purple);
-   border-top: none;
+   border-top: 10px double var(--purple);
    user-select: none;
- }
-
-/* Left side of top border (slot gap in middle) */
- #pu-stash::before {
-   content: '';
-   position: absolute;
-   top: -2px; left: 0;
-   width: 30%; height: 2px;
-   background: var(--purple);
- }
-
-/* Right side of top border */
- #pu-stash::after {
-   content: '';
-   position: absolute;
-   top: -2px; right: 0;
-   width: 30%; height: 2px;
-   background: var(--purple);
  }
   #pu-stash.flash {
     --shadow-color: rgba(168,85,247,1);
