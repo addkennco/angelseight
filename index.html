@@ -117,15 +117,30 @@
   </div>
 
 <script>
+// ── Shared DPR canvas setup helper ──────────────────────────────
+function setupCanvas(canvas) {
+  const dpr = window.devicePixelRatio || 1;
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  canvas.width  = w * dpr;
+  canvas.height = h * dpr;
+  canvas.style.width  = w + 'px';
+  canvas.style.height = h + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.scale(dpr, dpr);
+  return ctx;
+}
+
 // ═══════════════════════════════════════════════════════════════
 // GHOST TESSERACT BACKGROUND
 // ═══════════════════════════════════════════════════════════════
 (function ghostTesseract() {
   const canvas = document.getElementById('menu-bg');
-  const ctx = canvas.getContext('2d');
+  let ctx = setupCanvas(canvas);
 
-  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-  resize(); window.addEventListener('resize', resize);
+  function resize() { ctx = setupCanvas(canvas); }
+  window.addEventListener('resize', resize);
 
   // 16 vertices of a tesseract: all (±1,±1,±1,±1)
   const BASE_VERTS = Array.from({ length: 16 }, (_, i) => [
@@ -179,7 +194,7 @@
     if (!startTs) startTs = ts;
     const elapsed = (ts - startTs) / 1000;
 
-    const W = canvas.width, H = canvas.height;
+    const W = window.innerWidth, H = window.innerHeight;
     ctx.clearRect(0, 0, W, H);
 
     // ── Exit alpha ──────────────────────────────────────────────
@@ -318,13 +333,9 @@
 // ═══════════════════════════════════════════════════════════════
 (function scanimateText() {
   const canvas = document.getElementById('scanimate-canvas');
-  const ctx    = canvas.getContext('2d');
+  let ctx = setupCanvas(canvas);
 
-  function resize() {
-    canvas.width  = window.innerWidth;
-    canvas.height = window.innerHeight;
-  }
-  resize();
+  function resize() { ctx = setupCanvas(canvas); }
   window.addEventListener('resize', resize);
 
   // ── Timeline (seconds) ───────────────────────────────────────
@@ -354,10 +365,13 @@
 
   // ── Build an offscreen canvas for a single text element ──────
   function buildAngelsCanvas() {
-    const W = canvas.width, H = canvas.height;
+    const dpr = window.devicePixelRatio || 1;
+    const W = window.innerWidth, H = window.innerHeight;
     const off = document.createElement('canvas');
-    off.width = W; off.height = H;
+    off.width  = W * dpr;
+    off.height = H * dpr;
     const oc  = off.getContext('2d');
+    oc.scale(dpr, dpr);
     const titleSize   = getTitleSize();
     const cursiveSize = getCursiveSize();
     const cx = W / 2, cy = H / 2;
@@ -375,10 +389,13 @@
   }
 
   function buildEightCanvas() {
-    const W = canvas.width, H = canvas.height;
+    const dpr = window.devicePixelRatio || 1;
+    const W = window.innerWidth, H = window.innerHeight;
     const off = document.createElement('canvas');
-    off.width = W; off.height = H;
+    off.width  = W * dpr;
+    off.height = H * dpr;
     const oc  = off.getContext('2d');
+    oc.scale(dpr, dpr);
     const titleSize = getTitleSize();
     const cx = W / 2, cy = H / 2;
 
@@ -400,7 +417,7 @@
 
   // ── Scanimate-distort one source canvas onto ctx ─────────────
   function drawDistorted(src, scanAmt, t, alpha) {
-    const W = canvas.width, H = canvas.height;
+    const W = window.innerWidth, H = window.innerHeight;
     const sliceH   = 3;
     const rows     = Math.ceil(H / sliceH);
     const speed    = t * 4.5;
@@ -419,7 +436,7 @@
         Math.sin(r * warpFreq * 0.4 + speed * 0.5) * maxShift * 0.1;
       const glitchBand = (Math.sin(r * 0.7 + speed * 2.2) > 0.88) ? maxShift * 0.4 : 0;
       const dx = wave + glitchBand;
-      ctx.drawImage(src, 0, sy, W, sliceH, dx, sy, W, sliceH);
+      ctx.drawImage(src, 0, sy * (window.devicePixelRatio || 1), src.width, sliceH * (window.devicePixelRatio || 1), dx, sy, W, sliceH);
     }
 
     // Chromatic aberration
@@ -428,9 +445,9 @@
       ctx.globalAlpha = alpha * scanAmt * 0.35;
       ctx.globalCompositeOperation = 'screen';
       ctx.filter = 'saturate(3) hue-rotate(330deg)';
-      ctx.drawImage(src, -aberAmt, 0);
+      ctx.drawImage(src, 0, 0, src.width, src.height, -aberAmt, 0, W, H);
       ctx.filter = 'saturate(3) hue-rotate(150deg)';
-      ctx.drawImage(src,  aberAmt, 0);
+      ctx.drawImage(src, 0, 0, src.width, src.height,  aberAmt, 0, W, H);
       ctx.filter = 'none';
       ctx.globalCompositeOperation = 'source-over';
     }
@@ -440,10 +457,11 @@
 
   // ── Draw one element: clean or distorted ─────────────────────
   function drawElement(src, scanAmt, alpha) {
+    const W = window.innerWidth, H = window.innerHeight;
     if (scanAmt <= 0) {
       ctx.save();
       ctx.globalAlpha = alpha;
-      ctx.drawImage(src, 0, 0);
+      ctx.drawImage(src, 0, 0, src.width, src.height, 0, 0, W, H);
       ctx.restore();
     } else {
       drawDistorted(src, scanAmt, elapsed, alpha);
@@ -471,7 +489,7 @@
       return;
     }
 
-    const W = canvas.width, H = canvas.height;
+    const W = window.innerWidth, H = window.innerHeight;
     ctx.clearRect(0, 0, W, H);
 
     const t = elapsed;
