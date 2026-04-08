@@ -3182,7 +3182,6 @@ function renderShopBody() {
         card.classList.add('selected');
         showItemInfo(key, 'compound');
         highlightIngredientCards(key, 'compound');
-		switchCraftSection('craft-elements');
       };
       gridCo.appendChild(card);
     });
