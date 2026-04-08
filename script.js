@@ -2689,7 +2689,6 @@ function isValidIngredientForAnyVariant(puKey, tier, dragKey, dragTier, progress
     return false;
   }
   return false;
-}
 
 // ── Action box labels per tab ────────────────────────────────────
 const ACTION_BOX_LABELS = {
@@ -2698,6 +2697,24 @@ const ACTION_BOX_LABELS = {
   craft: { cls: 'craft-box' },
   stash: { cls: ''          },
 };
+
+function toggleCraftSection(section) {
+  const allGrids = document.querySelectorAll('.craft-section');
+  const allLabels = document.querySelectorAll('.shop-section-label.collapsible');
+  
+  allGrids.forEach(grid => {
+    const isTarget = grid.dataset.section === section;
+    const wasOpen = grid.style.display !== 'none';
+    grid.style.display = (isTarget && !wasOpen) ? 'grid' : 'none';
+  });
+
+  allLabels.forEach(label => {
+    const isTarget = label.dataset.section === section;
+    const matchingGrid = document.querySelector(`.craft-section[data-section="${label.dataset.section}"]`);
+    const isNowOpen = matchingGrid && matchingGrid.style.display !== 'none';
+    label.textContent = label.textContent.replace(/[▸▾]/, isNowOpen ? '▾' : '▸');
+  });
+}
 
 function shopTab(tab) {
   shopMode = tab;
@@ -2726,25 +2743,6 @@ function shopTab(tab) {
     const labels = { buy: 'BUY ALL', sell: 'SELL ALL', craft: 'CRAFT ALL' };
     confirmBtn.textContent = labels[tab] ?? '';
   }
-
-  // Toggle Craft ingredients
-  function toggleCraftSection(section) {
-  const allGrids = document.querySelectorAll('.craft-section');
-  const allLabels = document.querySelectorAll('.shop-section-label.collapsible');
-  
-  allGrids.forEach(grid => {
-    const isTarget = grid.dataset.section === section;
-    const wasOpen = grid.style.display !== 'none';
-    grid.style.display = (isTarget && !wasOpen) ? 'grid' : 'none';
-  });
-
-  allLabels.forEach(label => {
-    const isTarget = label.dataset.section === section;
-    const matchingGrid = document.querySelector(`.craft-section[data-section="${label.dataset.section}"]`);
-    const isNowOpen = matchingGrid && matchingGrid.style.display !== 'none';
-    label.textContent = label.textContent.replace(/[▸▾]/, isNowOpen ? '▾' : '▸');
-  });
-}
 	
   // Reset info panel
   clearItemInfo();
