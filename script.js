@@ -3794,55 +3794,83 @@ function applyElementBuff(key) {
     switch (key) {
 
       case 'LITHEBRYL':
-        if (run.shieldMax >= STAT_CAPS.shieldMax) { showShopToast('SHIELD MAXED'); return; }
-        run.shieldMax = Math.min(run.shieldMax + 20, STAT_CAPS.shieldMax);
-        run.ammo      = Math.min(run.ammo + 8, run.ammoMax);
+        if (run.shieldMax < STAT_CAPS.shieldMax) {
+          run.shieldMax = Math.min(run.shieldMax + 20, STAT_CAPS.shieldMax);
+          run.shield    = Math.min(run.shield + 20, run.shieldMax);
+        } else { showShopToast('SHIELD MAXED'); }
+        if (run.ammoMax < STAT_CAPS.ammoMax) {
+          run.ammoMax = Math.min(run.ammoMax + 8, STAT_CAPS.ammoMax);
+        } else { showShopToast('AMMO MAXED'); }
         updateAmmoBar(); updateShieldBar(); break;
 
       case 'NITROKALIUM':
-        if (run.ammoRefillRate >= STAT_CAPS.ammoRefillRate) { showShopToast('REFILL MAXED'); return; }
-        run.ammoRefillRate = Math.min(run.ammoRefillRate + 1, STAT_CAPS.ammoRefillRate);
-        run.shield = Math.min(run.shield + 6, run.shieldMax);
+        if (run.ammoRefillRate < STAT_CAPS.ammoRefillRate) {
+          run.ammoRefillRate = Math.min(run.ammoRefillRate + 1, STAT_CAPS.ammoRefillRate);
+        } else { showShopToast('REFILL MAXED'); }
+        if (run.shieldMax < STAT_CAPS.shieldMax) {
+          run.shieldMax = Math.min(run.shieldMax + 6, STAT_CAPS.shieldMax);
+          run.shield    = Math.min(run.shield + 6, run.shieldMax);
+        } else { showShopToast('SHIELD MAXED'); }
         updateShieldBar(); break;
 
       case 'CARBOSILICUM':
-        if (run.ammoMax >= STAT_CAPS.ammoMax) { showShopToast('AMMO MAXED'); return; }
-        run.ammoMax        = Math.min(run.ammoMax + 18, STAT_CAPS.ammoMax);
-        if (run.ammoRefillRate >= STAT_CAPS.ammoRefillRate) { showShopToast('REFILL MAXED'); return; }
-        run.ammoRefillRate = Math.min(run.ammoRefillRate + 1, STAT_CAPS.ammoRefillRate);
+        if (run.ammoMax < STAT_CAPS.ammoMax) {
+          run.ammoMax = Math.min(run.ammoMax + 18, STAT_CAPS.ammoMax);
+        } else { showShopToast('AMMO MAXED'); }
+        if (run.ammoRefillRate < STAT_CAPS.ammoRefillRate) {
+          run.ammoRefillRate = Math.min(run.ammoRefillRate + 1, STAT_CAPS.ammoRefillRate);
+        } else { showShopToast('REFILL MAXED'); }
         updateAmmoBar(); break;
 
       case 'MAGNIUM':
-        if (run.reserveMax >= STAT_CAPS.reserveMax) { showShopToast('RESERVES MAXED'); return; }
-        run.reserveMax     = Math.min(run.reserveMax + 2, STAT_CAPS.reserveMax);
-        if (run.ammoRefillRate >= STAT_CAPS.ammoRefillRate) { showShopToast('REFILL MAXED'); return; }
-        run.ammoRefillRate = Math.min(run.ammoRefillRate + 1, STAT_CAPS.ammoRefillRate);
+        if (run.reserveMax < STAT_CAPS.reserveMax) {
+          run.reserveMax = Math.min(run.reserveMax + 2, STAT_CAPS.reserveMax);
+        } else { showShopToast('RESERVES MAXED'); }
+        if (run.ammoRefillRate < STAT_CAPS.ammoRefillRate) {
+          run.ammoRefillRate = Math.min(run.ammoRefillRate + 1, STAT_CAPS.ammoRefillRate);
+        } else { showShopToast('REFILL MAXED'); }
         break;
 
       case 'TITANE':
-        if (run.shieldMax >= STAT_CAPS.shieldMax) { showShopToast('SHIELD MAXED'); return; }
-        run.shieldMax      = Math.min(run.shieldMax + 30, STAT_CAPS.shieldMax);
-        if (run.ammoRefillRate >= STAT_CAPS.ammoRefillRate) { showShopToast('REFILL MAXED'); return; }
-        run.ammoRefillRate = Math.min(run.ammoRefillRate + 1, STAT_CAPS.ammoRefillRate);
+        if (run.shieldMax < STAT_CAPS.shieldMax) {
+          run.shieldMax = Math.min(run.shieldMax + 30, STAT_CAPS.shieldMax);
+          run.shield    = Math.min(run.shield + 30, run.shieldMax);
+        } else { showShopToast('SHIELD MAXED'); }
+        if (run.ammoRefillRate < STAT_CAPS.ammoRefillRate) {
+          run.ammoRefillRate = Math.min(run.ammoRefillRate + 1, STAT_CAPS.ammoRefillRate);
+        } else { showShopToast('REFILL MAXED'); }
         updateShieldBar(); break;
 
       case 'ALKALIUM':
-        if (run.ammoMax >= STAT_CAPS.ammoMax) { showShopToast('AMMO MAXED'); return; }
-        run.ammoMax        = Math.min(run.ammoMax + 22, STAT_CAPS.ammoMax);
-        if (run.ammoRefillRate >= STAT_CAPS.ammoRefillRate) { showShopToast('REFILL MAXED'); return; }
-        run.ammoRefillRate = Math.min(run.ammoRefillRate + 1, STAT_CAPS.ammoRefillRate);
+        if (run.ammoMax < STAT_CAPS.ammoMax) {
+          run.ammoMax = Math.min(run.ammoMax + 22, STAT_CAPS.ammoMax);
+        } else { showShopToast('AMMO MAXED'); }
+        if (run.ammoRefillRate < STAT_CAPS.ammoRefillRate) {
+          run.ammoRefillRate = Math.min(run.ammoRefillRate + 1, STAT_CAPS.ammoRefillRate);
+        } else { showShopToast('REFILL MAXED'); }
         updateAmmoBar(); break;
 
       case 'AZOLITHION':
-        run.ammo   = Math.min(run.ammo + 20, run.ammoMax);
-        run.shield = Math.min(run.shield + 8, run.shieldMax);
+        if (run.ammoMax < STAT_CAPS.ammoMax) {
+          run.ammoMax = Math.min(run.ammoMax + 20, STAT_CAPS.ammoMax);
+        } else { showShopToast('AMMO MAXED'); }
+        if (run.shieldMax < STAT_CAPS.shieldMax) {
+          run.shieldMax = Math.min(run.shieldMax + 8, STAT_CAPS.shieldMax);
+          run.shield    = Math.min(run.shield + 8, run.shieldMax);
+        } else { showShopToast('SHIELD MAXED'); }
         updateAmmoBar(); updateShieldBar(); break;
 
       case 'GAMMITE':
-        run.ammo   = Math.min(run.ammo + 8,  run.ammoMax);
-        run.shield = Math.min(run.shield + 8, run.shieldMax);
-        if (run.ammoRefillRate >= STAT_CAPS.ammoRefillRate) { showShopToast('REFILL MAXED'); return; }
-        run.ammoRefillRate = Math.min(run.ammoRefillRate + 1, STAT_CAPS.ammoRefillRate);
+        if (run.ammoMax < STAT_CAPS.ammoMax) {
+          run.ammoMax = Math.min(run.ammoMax + 8, STAT_CAPS.ammoMax);
+        } else { showShopToast('AMMO MAXED'); }
+        if (run.shieldMax < STAT_CAPS.shieldMax) {
+          run.shieldMax = Math.min(run.shieldMax + 8, STAT_CAPS.shieldMax);
+          run.shield    = Math.min(run.shield + 8, run.shieldMax);
+        } else { showShopToast('SHIELD MAXED'); }
+        if (run.ammoRefillRate < STAT_CAPS.ammoRefillRate) {
+          run.ammoRefillRate = Math.min(run.ammoRefillRate + 1, STAT_CAPS.ammoRefillRate);
+        } else { showShopToast('REFILL MAXED'); }
         updateAmmoBar(); updateShieldBar(); break;
 
       default:
