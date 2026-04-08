@@ -3304,8 +3304,10 @@ function renderShopBody() {
       const has = invQty > 0;                              // only inv qty enables drag
       const card = document.createElement('div');
       card.className = 'shop-card obj pu-card ' + (totalQty > 0 ? 'stash-has' : 'stash-empty');
-      card.dataset.puKey = key;
-      card.dataset.draggable = has ? '1' : '0';
+	  card.dataset.puKey = key;
+	  card.dataset.cardKey  = key;
+	  card.dataset.cardTier = 'compound';
+	  card.dataset.draggable = has ? '1' : '0';
 
       // Count badge: stash qty + reserve indicator
       let countHTML = '';
@@ -3958,7 +3960,7 @@ function applyElementBuff(key) {
     }
 
     // ── Stash card → reserve slot ──────────────────────────────
-    if (dragSource === 'stash' && targetSlot) {
+    if ((dragSource === 'stash' || (dragSource === 'card' && shopMode === 'stash')) && targetSlot) {
       const slotIdx = parseInt(targetSlot.dataset.slot);
       while (run.powerups.length < run.reserveMax) run.powerups.push(null);
       const existingKey = run.powerups[slotIdx] || null;
