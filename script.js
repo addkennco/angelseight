@@ -341,8 +341,16 @@ const AudioManager = (() => {
   let startTs = null;
   const WAVE_FADE_MS = 800; // waveform fades in over this window
 
-  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-  resize(); window.addEventListener('resize', resize);
+  function resize() {
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width  = window.innerWidth  * dpr;
+  canvas.height = window.innerHeight * dpr;
+  canvas.style.width  = window.innerWidth  + 'px';
+  canvas.style.height = window.innerHeight + 'px';
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.scale(dpr, dpr);
+}
+resize(); window.addEventListener('resize', resize);
 
   function draw(ts) {
     if (!startTs) startTs = ts;
@@ -851,15 +859,19 @@ const Game = (() => {
 
   function resize() {
     if (!canvas) return;
+    const dpr  = window.devicePixelRatio || 1;
     const maxW = Math.min(window.innerWidth, 430);
     const maxH = window.innerHeight;
-    canvas.width  = maxW;
-    canvas.height = maxH;
+    canvas.width  = maxW * dpr;
+    canvas.height = maxH * dpr;
+    canvas.style.width  = maxW + 'px';
+    canvas.style.height = maxH + 'px';
     W = maxW; H = maxH;
-    // center canvas
+	ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(dpr, dpr);
     canvas.style.marginLeft = ((window.innerWidth - maxW) / 2) + 'px';
-    if (run) { ship.x = W / 2; ship.y = H - 130; ship.targetX = ship.x; }
-  }
+  if (run) { ship.x = W / 2; ship.y = H - 130; ship.targetX = ship.x; }
+}
 
   function startLevel() {
     state = 'playing';
@@ -2889,9 +2901,15 @@ function updateShopReserves() {
   function initShopDeco() {
     const cv = document.getElementById('shop-powerup-deco');
     if (!cv) return;
+    const dpr = window.devicePixelRatio || 1;
+    cv.width  = DECO_SIZE * dpr;
+    cv.height = DECO_SIZE * dpr;
+    cv.style.width  = DECO_SIZE + 'px';
+    cv.style.height = DECO_SIZE + 'px';
     decoCtx = cv.getContext('2d');
-    if (!decoRAF) decoRAF = requestAnimationFrame(renderShopDeco);
-  }
+    decoCtx.scale(dpr, dpr);
+  if (!decoRAF) decoRAF = requestAnimationFrame(renderShopDeco);
+}
 
   function stopShopDeco() {
     if (decoRAF) { cancelAnimationFrame(decoRAF); decoRAF = null; }
