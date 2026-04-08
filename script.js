@@ -3959,6 +3959,7 @@ function applyElementBuff(key) {
         applyElementBuff(dragKey);
         refresh();
         renderShopBody();
+		updateShopStats();
       }
       return;
     }
@@ -3971,6 +3972,7 @@ function applyElementBuff(key) {
         applyCompoundBuff(dragKey);
         refresh();
         renderShopBody();
+		updateShopStats();
       }
       return;
     }
