@@ -3123,6 +3123,7 @@ function renderShopBody() {
       card.dataset.cardKey = key; card.dataset.cardTier = 'element'; card.dataset.draggable = has ? '1' : '0';
       card.innerHTML =
         `<div class="shop-card-sym">${item.sym}</div>` +
+        `<div class="shop-card-name">${item.name}</div>` +
         `<span class="stash-count">${qty}</span>`;
       card.onclick = () => {
         document.querySelectorAll('.shop-card.obj.selected').forEach(c => c.classList.remove('selected'));
@@ -3144,6 +3145,7 @@ function renderShopBody() {
       card.dataset.cardKey = key; card.dataset.cardTier = 'compound'; card.dataset.draggable = has ? '1' : '0';
       card.innerHTML =
         `<div class="shop-card-sym" style="color:${has ? 'var(--purple)' : 'rgba(168,85,247,0.25)'}">${pu.sym}</div>` +
+        `<div class="shop-card-name">${pu.name}</div>` +
         `<span class="stash-count" style="color:var(--purple)">${qty}</span>`;
       card.onclick = () => {
         document.querySelectorAll('.shop-card.obj.selected').forEach(el => el.classList.remove('selected'));
