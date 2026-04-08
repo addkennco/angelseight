@@ -318,33 +318,36 @@
   #pu-slots { display: flex; gap: 6px; }
 
   /* Stash box */
-  #pu-stash {
-    --shadow-color: var(--purple);
-    width: 122px; height: 20px;
-	font-family: var(--mono);
-    font-size: 10px;
-	color: var(--purple);
-	text-align: center;
-	border-left: 3px double var(--shadow-color);
-	border-right: 2px solid var(--shadow-color);
-	border-bottom: 2px solid var(--shadow-color);
-	border-top: 3px double var(--shadow-color);
-	box-shadow: 
-    0 1px 0 0 var(--shadow-color), 
-    1px 0 0 0 var(--shadow-color),
-    1px 2px 0 0 var(--shadow-color), 
-    2px 1px 0 0 var(--shadow-color), 
-    2px 3px 0 0 var(--shadow-color),
-    3px 2px 0 0 var(--shadow-color), 
-    3px 4px 0 0 var(--shadow-color), 
-    4px 3px 0 0 var(--shadow-color),
-    4px 5px 0 0 var(--shadow-color), 
-    5px 4px 0 0 var(--shadow-color), 
-    5px 6px 0 0 var(--shadow-color),
-    6px 5px 0 0 var(--shadow-color), 
-    transition: background 0.2s, border-color 0.2s;
-    user-select: none;
-  }
+   #pu-stash {
+   width: 122px; height: 28px;
+   font-family: var(--mono);
+   font-size: 10px;
+   color: var(--purple);
+   text-align: center;
+   line-height: 28px;
+   position: relative;
+   border: 1.5px solid var(--purple);
+   border-top: none;
+   user-select: none;
+ }
+
+/* Left side of top border (slot gap in middle) */
+ #pu-stash::before {
+   content: '';
+   position: absolute;
+   top: -2px; left: 0;
+   width: 30%; height: 2px;
+   background: var(--purple);
+ }
+
+/* Right side of top border */
+ #pu-stash::after {
+   content: '';
+   position: absolute;
+   top: -2px; right: 0;
+   width: 30%; height: 2px;
+   background: var(--purple);
+ }
   #pu-stash.flash {
     --shadow-color: rgba(168,85,247,1);
   }
