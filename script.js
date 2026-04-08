@@ -1286,7 +1286,7 @@ if (ammoRefillTimer <= 0) {
     }
 
     // End level sweep
-    if (!endSweepFired && enemiesSpawned >= maxEnemies && levelTimer >= levelDuration - 2) {
+    if (!endSweepFired && enemiesSpawned >= maxEnemies && levelTimer >= levelDuration - 3) {
       endSweepFired = true;
       triggerSweep({ silent: false });
     }
