@@ -3189,6 +3189,7 @@ function renderShopBody() {
         card.classList.add('selected');
         showItemInfo(key, 'compound');
         highlightIngredientCards(key, 'compound');
+		toggleCraftSection('craft-elements');
       };
       gridCo.appendChild(card);
     });
@@ -3291,6 +3292,7 @@ function renderShopBody() {
         card.classList.add('selected');
         showItemInfo(a.puKey, 'alloy');
         highlightIngredientCards(a.puKey, 'alloy');
+		toggleCraftSection('craft-compounds');
       };
       gridAlloy.appendChild(card);
     });
