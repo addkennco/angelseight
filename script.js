@@ -2689,6 +2689,7 @@ function isValidIngredientForAnyVariant(puKey, tier, dragKey, dragTier, progress
     return false;
   }
   return false;
+}	
 
 // ── Action box labels per tab ────────────────────────────────────
 const ACTION_BOX_LABELS = {
