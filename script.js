@@ -1002,11 +1002,19 @@ const Game = (() => {
 
     // Shooting
     shootTimer -= dt;
-    if (shootTimer <= 0 && run.ammo > 0 && !endSweepFired) {
-      fireBullet();
-      shootTimer = 1 / run.shootSpeed;
-      if (noAmmoCostTimer <= 0) { run.ammo = Math.max(0, run.ammo - 1); updateAmmoBar(); }
+	if (shootTimer <= 0 && run.ammo > 0 && !endSweepFired) {
+ 	 fireBullet();
+	 shootTimer = 1 / run.shootSpeed;
+  	 if (noAmmoCostTimer <= 0) {
+      const prevAmmo = run.ammo;
+      run.ammo = Math.max(0, run.ammo - 1);
+      updateAmmoBar();
+      // Show "RELOADING" text when ammo hits 0
+   	  if (prevAmmo > 0 && run.ammo === 0) {
+      	spawnFloatingText(ship.x, ship.y - 30, 'RELOADING', '#ff6b35');
     }
+  }
+}
 
     // Spawn powerup pods
     podSpawnTimer -= dt;
