@@ -2999,7 +2999,7 @@ function renderShopBody() {
       const price = 80;
       const card = document.createElement('div'); card.className = 'shop-card obj';
       card.dataset.cardKey = key; card.dataset.cardTier = 'element'; card.dataset.draggable = '1';
-      card.innerHTML = `<div class="shop-card-sym">${item.sym}</div><div class="shop-card-name">${item.name}</div><div class="shop-card-corner"><div class="shop-card-count">${(run?.inventory[key]||0)}/99</div><div class="shop-card-price">${price}¢</div></div>`;
+      card.innerHTML = `<div class="shop-card-sym">${item.sym}</div><div class="shop-card-corner"><div class="shop-card-count">${(run?.inventory[key]||0)}/99</div><div class="shop-card-price">${price}¢</div></div>`;
       card.onclick = () => {
         document.querySelectorAll('.shop-card.obj.selected').forEach(c => c.classList.remove('selected'));
         card.classList.add('selected');
