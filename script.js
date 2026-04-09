@@ -569,7 +569,7 @@ const Game = (() => {
   let waveT = 0;
   let levelTimer = 0;
   let spawnTimer = 0;
-  let levelDuration = 60; // seconds
+  let levelDuration = 45; // seconds
   let enemiesSpawned = 0;
   let maxEnemies = 0;
   let touchX = -1;                      // touch drag
@@ -902,7 +902,7 @@ const Game = (() => {
     shakeDuration  = 0;
     run.bulletType = 'standard';
     maxEnemies = 24 + run.level * 8;          // enemy increase per level
-    levelDuration = 60 + run.level * 4;       // time increase per level
+    levelDuration = 45 + run.level * 4;       // time increase per level
     updateHUD();
     document.getElementById('overlay-death').classList.remove('active');
     document.getElementById('overlay-clear').classList.remove('active');
