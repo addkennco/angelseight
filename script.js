@@ -635,8 +635,8 @@ const Game = (() => {
   // ═══════════════════════════════════════════════════════════════
   // BOSS STATE
   // ═══════════════════════════════════════════════════════════════
-  const BOSS_MAX_HP = 500;
-  const PHASE_NAMES  = ['PHASE I — EMERGENCE', 'PHASE II — RESONANCE', 'PHASE III — COLLAPSE'];
+  const BOSS_MAX_HP = 2500;
+  const PHASE_NAMES  = ['PHASE I', 'PHASE II', 'PHASE III'];
   const PHASE_COLORS = ['#a855f7', '#d42b6a', '#ffd700'];
   const ELEMENT_ATTACK_INTERVAL = [8, 5, 3]; // seconds between element attacks per phase
 
