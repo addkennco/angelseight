@@ -901,7 +901,7 @@ const Game = (() => {
 	shakeIntensity = 0;
     shakeDuration  = 0;
     run.bulletType = 'standard';
-    maxEnemies = 14 + run.level * 5;          // enemy increase per level
+    maxEnemies = 24 + run.level * 8;          // enemy increase per level
     levelDuration = 60 + run.level * 4;       // time increase per level
     updateHUD();
     document.getElementById('overlay-death').classList.remove('active');
