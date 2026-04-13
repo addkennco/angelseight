@@ -1679,7 +1679,7 @@ function spawnPod() {
   function triggerSweep(opts = {}) {
   const silent = opts.silent || false;
 
-  document.getElementById('powerup-bar').style.pointerEvents = 'none';
+  if (!silent) document.getElementById('powerup-bar').style.pointerEvents = 'none';
 
   enemies.forEach(e => spawnParticles(e.x, e.y, e.color, 8));
   mines.forEach(m => spawnParticles(m.x, m.y, '#ff2020', 6));
@@ -3670,9 +3670,11 @@ function setupShopDrag() {
   let lastTapCard = null;
   let lastTapTime = 0;
 
-  // ── Double-drag to apply full stack to stats block ───────────
-  let lastStatsDragKey  = null;  // key of last drag dropped onto statsBlock
-  let lastStatsDragTime = 0;     // timestamp of that drop
+  // ── Double-tap/drag to apply full stack to stats block ────────
+  // Shared by both the tap path (onEnd) and the drag path (commitDrop).
+  // First interaction records key+time; second within DOUBLE_TAP_MS applies the stack.
+  let lastStatsKey  = null;
+  let lastStatsTime = 0;
 
   // ── Ghost ────────────────────────────────────────────────────
   const ghost = document.createElement('div');
@@ -3974,10 +3976,10 @@ function applyElementBuff(key) {
 
         // Double-drag: if this key was just dropped onto the stats block, apply the full stack
         const now = Date.now();
-        const isDoubleDrag = lastStatsDragKey === dragKey && (now - lastStatsDragTime) < DOUBLE_TAP_MS;
-        lastStatsDragKey = dragKey; lastStatsDragTime = now;
+        const isDoubleAction = lastStatsKey === dragKey && (now - lastStatsTime) < DOUBLE_TAP_MS;
+        lastStatsKey = dragKey; lastStatsTime = now;
 
-        const applyCount = isDoubleDrag ? (run?.inventory[dragKey] || 0) + 1 : 1; // +1 includes the current item
+        const applyCount = isDoubleAction ? (run?.inventory[dragKey] || 0) + 1 : 1; // +1 includes current item
         for (let i = 0; i < applyCount; i++) {
           if ((run?.inventory[dragKey] || 0) <= 0) break;
           if (isElementCapped()) break; // stat hit cap mid-stack — stop, leave remainder
@@ -4016,10 +4018,10 @@ function applyElementBuff(key) {
 
         // Double-drag: if this key was just dropped onto the stats block, apply the full stack
         const now = Date.now();
-        const isDoubleDrag = lastStatsDragKey === dragKey && (now - lastStatsDragTime) < DOUBLE_TAP_MS;
-        lastStatsDragKey = dragKey; lastStatsDragTime = now;
+        const isDoubleAction = lastStatsKey === dragKey && (now - lastStatsTime) < DOUBLE_TAP_MS;
+        lastStatsKey = dragKey; lastStatsTime = now;
 
-        const applyCount = isDoubleDrag ? (run?.inventory[dragKey] || 0) + 1 : 1; // +1 includes the current item
+        const applyCount = isDoubleAction ? (run?.inventory[dragKey] || 0) + 1 : 1; // +1 includes current item
         for (let i = 0; i < applyCount; i++) {
           if ((run?.inventory[dragKey] || 0) <= 0) break;
           if (isCompoundFullyCapped()) break; // all stats hit cap mid-stack — stop, leave remainder
@@ -4201,6 +4203,37 @@ function applyElementBuff(key) {
           lastTapTime = Date.now();
         }
       }
+      // Check for double-tap to apply full stack to stats block.
+      // Applies to element and compound cards in the buy tab (dragSource === 'card'),
+      // NOT reserves/stash. qty > 1 guard: single-item stacks don't need bulk apply.
+      const isStatEligible = dragSource === 'card'
+        && (dragTier === 'element' || dragTier === 'compound')
+        && (run?.inventory[dragKey] || 0) > 1;
+
+      if (isStatEligible) {
+        const now = Date.now();
+        if (lastStatsKey === dragKey && (now - lastStatsTime) < DOUBLE_TAP_MS) {
+          // Double-tap confirmed — apply full stack to stats block
+          lastStatsKey = null; lastStatsTime = 0;
+          hideGhost();
+          // Reuse commitDrop machinery: synthesise a drop onto the stats block centre
+          const statsBlock = document.getElementById('shop-stats-block');
+          if (statsBlock) {
+            const r = statsBlock.getBoundingClientRect();
+            commitDrop(r.left + r.width / 2, r.top + r.height / 2);
+          }
+          reset();
+          return;
+        }
+        // First tap — record and show ghost anchored to card as affordance
+        lastStatsKey = dragKey; lastStatsTime = Date.now();
+        if (dragEl) {
+          const r = dragEl.getBoundingClientRect();
+          showGhost(r.left + r.width / 2, r.top - 10, dragKey, dragTier);
+          setTimeout(() => hideGhost(), 600); // ghost fades after 600ms
+        }
+      }
+
       // Single tap — show info only, no action
       const tier = dragSource === 'reserve' ? 'compound'
                  : dragTier || 'element';
