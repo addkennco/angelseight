@@ -904,6 +904,7 @@ const Game = (() => {
     maxEnemies = 24 + run.level * 8;          // enemy increase per level
     levelDuration = 45 + run.level * 4;       // time increase per level
     updateHUD();
+    document.getElementById('powerup-bar').style.pointerEvents = 'all';
     document.getElementById('overlay-death').classList.remove('active');
     document.getElementById('overlay-clear').classList.remove('active');
     if (animId) cancelAnimationFrame(animId);
@@ -1597,11 +1598,15 @@ function spawnPod() {
         bullets.push({ x:bx, y:by, speed:spd, vx:Math.cos(a)*spd, vy:Math.sin(a)*spd, dmg:1, enemy:false, color:'#a855f7' });
       });
     } else if (run.bulletType === '12spread') {
-      for (let i = 0; i < 12; i++) {
-        const a = (i/12)*Math.PI*2;
-        const spd = 400;
-        bullets.push({ x:bx, y:by, speed:spd, vx:Math.cos(a)*spd, vy:Math.sin(a)*spd, dmg:1, enemy:false, color:'#d42b6a' });
-      }
+      // PHIOMEGA — 7-shot bloom fan. Wide forward arc (±0.35 rad, ~2.5× the 3spread),
+      // outer shots travel faster so the pattern blooms open as it travels — GW feel.
+      const base = Math.atan2(ady, adx);
+      const offsets = [-0.35, -0.23, -0.11, 0, 0.11, 0.23, 0.35];
+      offsets.forEach((offset, i) => {
+        const a   = base + offset;
+        const spd = 460 + Math.abs(offset) * 120; // centre: 460, outer tips: ~502
+        bullets.push({ x:bx, y:by, speed:spd, vx:Math.cos(a)*spd, vy:Math.sin(a)*spd, dmg:1, enemy:false, color:'#ff2d78' });
+      });
     } else {
       const spd = 560;
       bullets.push({ x:bx, y:by, speed:spd, vx:adx*spd, vy:ady*spd, dmg:1, enemy:false, color:'#00f5ff' });
@@ -1609,6 +1614,7 @@ function spawnPod() {
   }
 
   function takeDamage(amt) {
+    if (ship.invincible > 0 || invincibleTimer > 0) return;
     run.shield = Math.max(0, run.shield - amt);
     run.noHitKills = 0; run.combo = 1;
     updateShieldBar(); updateCombo();
@@ -1672,6 +1678,8 @@ function spawnPod() {
   // opts.silent = true suppresses the log message
   function triggerSweep(opts = {}) {
   const silent = opts.silent || false;
+
+  document.getElementById('powerup-bar').style.pointerEvents = 'none';
 
   enemies.forEach(e => spawnParticles(e.x, e.y, e.color, 8));
   mines.forEach(m => spawnParticles(m.x, m.y, '#ff2020', 6));
@@ -3031,25 +3039,27 @@ function renderShopBody() {
     });
     body.appendChild(grid);
 
-    // Powerups
-    const label2 = document.createElement('div');
-    label2.className = 'shop-section-label'; label2.style.marginTop='16px'; label2.textContent = 'POWERUPS';
-    body.appendChild(label2);
-    const grid2 = document.createElement('div'); grid2.className = 'shop-grid';
-    const BUY_EXCLUDED_POWERUPS = new Set(['OMEGITE','AXORITE','PHIOMEGA','DELTALITE']);
-    Object.entries(STRINGS.powerups).filter(([key]) => !BUY_EXCLUDED_POWERUPS.has(key)).forEach(([key, pu]) => {
-      const price = 150;
-      const card = document.createElement('div'); card.className = 'shop-card obj';
-      card.dataset.cardKey = key; card.dataset.cardTier = 'compound'; card.dataset.draggable = '1';
-      card.innerHTML = `<div class="shop-card-sym">${pu.sym}</div><div class="shop-card-name">${pu.name}</div><div class="shop-card-corner"><div class="shop-card-count">${(run?.inventory[key]||0)}/99</div><div class="shop-card-price">${price}¢</div></div>`;
-      card.onclick = () => {
-        document.querySelectorAll('.shop-card.obj.selected').forEach(c => c.classList.remove('selected'));
-        card.classList.add('selected');
-        showItemInfo(key, 'compound');
-      };
-      grid2.appendChild(card);
-    });
-    body.appendChild(grid2);
+    // Powerups — unlocked after the player has completed level 4
+    if (save.storyFlags >= 4) {
+      const label2 = document.createElement('div');
+      label2.className = 'shop-section-label'; label2.style.marginTop='16px'; label2.textContent = 'POWERUPS';
+      body.appendChild(label2);
+      const grid2 = document.createElement('div'); grid2.className = 'shop-grid';
+      const BUY_EXCLUDED_POWERUPS = new Set(['OMEGITE','AXORITE','PHIOMEGA','DELTALITE']);
+      Object.entries(STRINGS.powerups).filter(([key]) => !BUY_EXCLUDED_POWERUPS.has(key)).forEach(([key, pu]) => {
+        const price = 150;
+        const card = document.createElement('div'); card.className = 'shop-card obj';
+        card.dataset.cardKey = key; card.dataset.cardTier = 'compound'; card.dataset.draggable = '1';
+        card.innerHTML = `<div class="shop-card-sym">${pu.sym}</div><div class="shop-card-name">${pu.name}</div><div class="shop-card-corner"><div class="shop-card-count">${(run?.inventory[key]||0)}/99</div><div class="shop-card-price">${price}¢</div></div>`;
+        card.onclick = () => {
+          document.querySelectorAll('.shop-card.obj.selected').forEach(c => c.classList.remove('selected'));
+          card.classList.add('selected');
+          showItemInfo(key, 'compound');
+        };
+        grid2.appendChild(card);
+      });
+      body.appendChild(grid2);
+    }
 
   } else if (shopMode === 'sell') {
 
@@ -3644,22 +3654,6 @@ function refresh() {
 // SHOP DRAG & DROP — powerup stash ↔ reserve slots
 // ═══════════════════════════════════════════════════════════════
 function setupShopDrag() {
-  // Inject long-press style once
-  if (!document.getElementById('craft-longpress-style')) {
-    const s = document.createElement('style');
-    s.id = 'craft-longpress-style';
-    s.textContent = `
-      @keyframes longPressCharge {
-        0%   { box-shadow: 0 0 0 0 rgba(255,45,120,0); border-color: rgba(255,45,120,0.3); }
-        100% { box-shadow: 0 0 0 6px rgba(255,45,120,0); border-color: rgba(255,45,120,0.9); }
-      }
-      .long-press-charging {
-        animation: longPressCharge 0.5s ease-out forwards;
-        border-color: rgba(255,45,120,0.9) !important;
-      }
-    `;
-    document.head.appendChild(s);
-  }
   const DRAG_THRESHOLD = 8;
 
   // ── shared state ────────────────────────────────────────────
@@ -3671,10 +3665,14 @@ function setupShopDrag() {
   let startX = 0, startY = 0;
   let dragging     = false;
 
-  // ── Long-press to clear craft card ──────────────────────────
-  const LONG_PRESS_MS = 500;
-  let longPressTimer  = null;
-  let longPressCard   = null;
+  // ── Double-tap to clear craft card ──────────────────────────
+  const DOUBLE_TAP_MS = 350;
+  let lastTapCard = null;
+  let lastTapTime = 0;
+
+  // ── Double-drag to apply full stack to stats block ───────────
+  let lastStatsDragKey  = null;  // key of last drag dropped onto statsBlock
+  let lastStatsDragTime = 0;     // timestamp of that drop
 
   // ── Ghost ────────────────────────────────────────────────────
   const ghost = document.createElement('div');
@@ -3963,8 +3961,29 @@ function applyElementBuff(key) {
     if (dragSource === 'card' && dragTier === 'element' && statsBlockAt(x, y)) {
       const qty = run?.inventory[dragKey] || 0;
       if (qty > 0) {
-        run.inventory[dragKey]--;
-        applyElementBuff(dragKey);
+        const isElementCapped = () => run && (() => {
+          switch (dragKey) {
+            case 'Be': case 'Li': case 'Ti': return run.shieldMax >= STAT_CAPS.shieldMax;
+            case 'N':  case 'K':             return run.ammoRefillRate >= STAT_CAPS.ammoRefillRate;
+            case 'Si': case 'C':             return run.ammoMax >= STAT_CAPS.ammoMax;
+            case 'Mg':                       return run.reserveMax >= STAT_CAPS.reserveMax;
+            default:                         return false;
+          }
+        })();
+        if (isElementCapped()) { applyElementBuff(dragKey); return; } // show toast, leave inventory intact
+
+        // Double-drag: if this key was just dropped onto the stats block, apply the full stack
+        const now = Date.now();
+        const isDoubleDrag = lastStatsDragKey === dragKey && (now - lastStatsDragTime) < DOUBLE_TAP_MS;
+        lastStatsDragKey = dragKey; lastStatsDragTime = now;
+
+        const applyCount = isDoubleDrag ? (run?.inventory[dragKey] || 0) + 1 : 1; // +1 includes the current item
+        for (let i = 0; i < applyCount; i++) {
+          if ((run?.inventory[dragKey] || 0) <= 0) break;
+          if (isElementCapped()) break; // stat hit cap mid-stack — stop, leave remainder
+          run.inventory[dragKey]--;
+          applyElementBuff(dragKey);
+        }
         refresh();
         renderShopBody();
 		updateShopStats();
@@ -3976,8 +3995,37 @@ function applyElementBuff(key) {
     if (dragSource === 'card' && dragTier === 'compound' && statsBlockAt(x, y)) {
       const qty = run?.inventory[dragKey] || 0;
       if (qty > 0) {
-        run.inventory[dragKey]--;
-        applyCompoundBuff(dragKey);
+        const isCompoundFullyCapped = () => run && (() => {
+          const sh = run.shieldMax      >= STAT_CAPS.shieldMax;
+          const am = run.ammoMax        >= STAT_CAPS.ammoMax;
+          const rf = run.ammoRefillRate >= STAT_CAPS.ammoRefillRate;
+          const rv = run.reserveMax     >= STAT_CAPS.reserveMax;
+          switch (dragKey) {
+            case 'LITHEBRYL':    return sh && am;
+            case 'NITROKALIUM':  return rf && sh;
+            case 'CARBOSILICUM': return am && rf;
+            case 'MAGNIUM':      return rv && rf;
+            case 'TITANE':       return sh && rf;
+            case 'ALKALIUM':     return am && rf;
+            case 'AZOLITHION':   return am && sh;
+            case 'GAMMITE':      return am && sh && rf;
+            default:             return false;
+          }
+        })();
+        if (isCompoundFullyCapped()) { applyCompoundBuff(dragKey); return; } // show toast, leave inventory intact
+
+        // Double-drag: if this key was just dropped onto the stats block, apply the full stack
+        const now = Date.now();
+        const isDoubleDrag = lastStatsDragKey === dragKey && (now - lastStatsDragTime) < DOUBLE_TAP_MS;
+        lastStatsDragKey = dragKey; lastStatsDragTime = now;
+
+        const applyCount = isDoubleDrag ? (run?.inventory[dragKey] || 0) + 1 : 1; // +1 includes the current item
+        for (let i = 0; i < applyCount; i++) {
+          if ((run?.inventory[dragKey] || 0) <= 0) break;
+          if (isCompoundFullyCapped()) break; // all stats hit cap mid-stack — stop, leave remainder
+          run.inventory[dragKey]--;
+          applyCompoundBuff(dragKey);
+        }
         refresh();
         renderShopBody();
 		updateShopStats();
@@ -4064,7 +4112,7 @@ function applyElementBuff(key) {
     document.querySelectorAll('.shop-card.drag-source').forEach(c => c.classList.remove('drag-source'));
   }
 
-  // ── Clear a craft card's progress (long-press) ───────────────
+  // ── Clear a craft card's progress (double-tap) ───────────────
   function clearCraftCard(puKey, tier) {
     if (!craftProgress[puKey] || craftProgress[puKey].length === 0) return;
     // Refund ingredients back to inventory
@@ -4080,10 +4128,6 @@ function applyElementBuff(key) {
     renderShopBody();
   }
 
-  function cancelLongPress() {
-    if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
-    if (longPressCard)  { longPressCard.classList.remove('long-press-charging'); longPressCard = null; }
-  }
 
   // ── Pointer start ────────────────────────────────────────────
   function onStart(x, y, target) {
@@ -4098,21 +4142,6 @@ function applyElementBuff(key) {
       return true;
     }
 
-    // Long-press on a craft card with in-progress ingredients → clear it
-    if (shopMode === 'craft' && card) {
-      const puKey = card.dataset.cardKey;
-      const tier  = card.dataset.cardTier;
-      if (puKey && (tier === 'compound' || tier === 'alloy') && craftProgress[puKey]?.length > 0) {
-        longPressCard = card;
-        card.classList.add('long-press-charging');
-        longPressTimer = setTimeout(() => {
-          cancelLongPress();
-          clearCraftCard(puKey, tier);
-        }, LONG_PRESS_MS);
-        startX = x; startY = y;
-        return true; // consume the event so it doesn't fall through
-      }
-    }
     // Stash tab powerup card
     const puCard = target.closest('[data-pu-key]');
     if (puCard && puCard.dataset.draggable === '1') {
@@ -4138,11 +4167,6 @@ function applyElementBuff(key) {
   }
 
   function onMove(x, y) {
-    // Any movement cancels a pending long-press
-    if (longPressTimer) {
-      const d = Math.sqrt((x - startX) ** 2 + (y - startY) ** 2);
-      if (d > DRAG_THRESHOLD) cancelLongPress();
-    }
     if (!dragKey) return;
     if (!dragging) {
       const d = Math.sqrt((x-startX)**2 + (y-startY)**2);
@@ -4156,12 +4180,28 @@ function applyElementBuff(key) {
   }
 
   function onEnd(x, y) {
-    cancelLongPress(); // always clean up any pending hold
     if (!dragKey) return;
     if (dragging) {
       commitDrop(x, y);
     } else {
-      // Tap — show info only, no action
+      // Tap — check for double-tap on a craft card first
+      if (shopMode === 'craft' && dragEl) {
+        const puKey = dragEl.dataset.cardKey;
+        const tier  = dragEl.dataset.cardTier;
+        if (puKey && (tier === 'compound' || tier === 'alloy') && craftProgress[puKey]?.length > 0) {
+          const now = Date.now();
+          if (lastTapCard === dragEl && (now - lastTapTime) < DOUBLE_TAP_MS) {
+            // Double-tap confirmed — clear the card
+            lastTapCard = null; lastTapTime = 0;
+            clearCraftCard(puKey, tier);
+            reset();
+            return;
+          }
+          lastTapCard = dragEl;
+          lastTapTime = Date.now();
+        }
+      }
+      // Single tap — show info only, no action
       const tier = dragSource === 'reserve' ? 'compound'
                  : dragTier || 'element';
       showItemInfo(dragKey, tier);
