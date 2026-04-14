@@ -1046,9 +1046,9 @@ const fakePodDrop   = {};
 function drawScene() {
     // lets try assigning fresh coordinates each draw
 	Object.assign(ship, { x: W / 2, y: H - 130 }); // you silly thing, you go here, I said
-    Object.assign(fakePod,   { x: W * 0.78, y: H * 0.50, r: 16 });
+    Object.assign(fakePod,   { x: W * 0.78, y: H * 0.40, r: 16 });
     Object.assign(fakeMine,  { x: W * 0.22, y: H * 0.38, r: 11 });
-    Object.assign(fakeScout, { x: W * 0.65, y: H * 0.28, r: 12, color: '#e8600a', angle: Math.PI });
+    Object.assign(fakeScout, { x: W * 0.65, y: H * 0.58, r: 12, color: '#e8600a', angle: Math.PI });
     Object.assign(fakeDrone, { x: W * 0.50, y: H * 0.18, r: 14, color: '#a855f7', angle: Math.PI / 4 });
 	Object.assign(fakeEnemyDrop, { x: W * 0.35, y: H * 0.62, r: 10 });
 	Object.assign(fakePodDrop,   { x: W * 0.72, y: H * 0.70, r: 13 });
@@ -1074,20 +1074,19 @@ function drawScene() {
   // TUTORIAL TOAST SYSTEM
   // ══════════════════════════════════════
   const TOAST_CONTENT = {
-    score:     { title: 'SCORE',          body: 'Placeholder — score info goes here.' },
-    combo:     { title: 'COMBO',          body: 'Placeholder — combo info goes here.' },
-    level:     { title: 'LEVEL',          body: 'Placeholder — level info goes here.' },
-    bars:      { title: 'SHIELD & AMMO',  body: 'Placeholder — shield and ammo info goes here.' },
-    enemies:   { title: 'ENEMIES',        body: 'Placeholder — enemy info goes here.' },
-    mine:      { title: 'MINE',           body: 'Placeholder — mine info goes here.' },
-    ship:      { title: 'YOUR SHIP',      body: 'Placeholder — ship info goes here.' },
-    log:       { title: 'PICKUP LOG',     body: 'Placeholder — pickup log info goes here.' },
-    reserves:  { title: 'RESERVES BAR',   body: 'Placeholder — reserves info goes here.' },
-    stash:     { title: 'STASH',          body: 'Placeholder — stash info goes here.' },
-    radio:     { title: 'RADIO',          body: 'Placeholder — radio info goes here.' },
-	pod:       { title: 'POWER-UP POD',   body: 'Placeholder — pod info goes here.' },
-	enemydrop: { title: 'ELEMENT DROP',   body: 'Placeholder — element drop info goes here.' },
-    poddrop:   { title: 'POWERUP DROP',   body: 'Placeholder — powerup drop info goes here.' },
+    score:     { title: 'SCORE & COMBO',  body: 'Current Score & Combo Multiplier. Combo resets on taking Shield Damage.' },
+    level:     { title: 'LEVEL',          body: 'Current Sector Level and Progress Gauge. Fill the gauge by clearing Enemies.' },
+    bars:      { title: 'SHIELD & AMMO',  body: 'Shield and Ammo Readouts. Regular Ammo Reloads are based on your stats. Use Compounds to restore shields, completely reload, negate ammo cost, or increase reload amounts.' },
+    enemies:   { title: 'ENEMIES',        body: 'Enemies have different behaviors and attack patterns. Shoot them to clear the level and aquire Elements.' },
+    mine:      { title: 'MINE',           body: 'Obstacles found throughout the corridor. Mines are not targetable without crafting special Alloys.' },
+    ship:      { title: 'YOUR SHIP',      body: 'Standard Issue Alpha Lyrae Aerospace Division Eagle026 Spacecraft.' },
+    log:       { title: 'PICKUP LOG',     body: 'Personal Log. Displays Pickups and Deployments.' },
+    reserves:  { title: 'RESERVES',       body: 'Active Loadout for deploying Compounds and Alloys.' },
+    stash:     { title: 'STASH',          body: 'Direct line to inventory. Drag Pickups here to sell or craft with later.' },
+    radio:     { title: 'RADIO',          body: 'Radio tuner. Find your favorite station.' },
+	pod:       { title: 'COMPOUND POD',   body: 'Resources from Alpha Lyrae Areospace Divison. Shoot to release Compound.' },
+	enemydrop: { title: 'ELEMENT',        body: 'Resources from downed Enemies. Magentic pickup enabled.' },
+    poddrop:   { title: 'COMPOUND',       body: 'Resources from Alpha Lyrae Areospace Divison. Magnetic pickup enabled.' },
   };
 
   const toast      = document.getElementById('tut-toast');
