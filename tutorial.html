@@ -1010,12 +1010,11 @@
     ctx.restore();
   }
 
+  function drawScene() {
   const fakePod = { x: W * 0.78, y: H * 0.50, r: 16 };
   const fakeMine  = { x: W * 0.22, y: H * 0.38, r: 11 };
   const fakeScout = { x: W * 0.65, y: H * 0.28, r: 12, color: '#e8600a', angle: Math.PI };
   const fakeDrone = { x: W * 0.50, y: H * 0.18, r: 14, color: '#a855f7', angle: Math.PI / 4 };
-
-  function drawScene() {
     ctx.fillStyle = '#050510';
     ctx.fillRect(0, 0, W, H);
     drawSynthwaveScene();
