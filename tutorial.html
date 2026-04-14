@@ -8,7 +8,7 @@
   @import url('https://fonts.googleapis.com/css2?family=Monoton&family=Nova+Square&family=Carattere&family=Noto+Emoji&display=swap');
 
   /* ══════════════════════════════════════
-     CSS CUSTOM PROPERTIES (design tokens)
+     CSS CUSTOM PROPERTIES
   ══════════════════════════════════════ */
   :root {
     --bg:       #050510;
@@ -39,7 +39,6 @@
 
   /* ══════════════════════════════════════
      SLIDE SYSTEM
-     Lifted from tutorial.html
   ══════════════════════════════════════ */
   #tut-wrap {
     position: absolute; inset: 0;
@@ -62,7 +61,6 @@
 
   /* ══════════════════════════════════════
      SLIDE 0: TITLE COVER
-     Lifted from tutorial.html #slide-0
   ══════════════════════════════════════ */
   #slide-0 {
     background: radial-gradient(ellipse at 50% 30%, #1a0a3a 0%, #050510 70%);
@@ -348,7 +346,7 @@
   .tut-tap { pointer-events: all; cursor: pointer; }
 
   /* ══════════════════════════════════════
-     SHOP / CRAFT — lifted from angels_eight.html
+     SHOP / CRAFT 
   ══════════════════════════════════════ */
 
   /* Grid background */
@@ -610,8 +608,7 @@
   #shop-toast.visible { opacity:1; }
 
   /* ══════════════════════════════════════
-     SHARED BUTTONS
-     (pause button style; kept for parity)
+     BUTTONS
   ══════════════════════════════════════ */
   .btn-sweep {
     font-family: var(--display);
@@ -656,9 +653,9 @@
       Ver 25.04-A0V<br>
       Calibration: Zero-Magnitude Standard<br>
       Vehicle Class: Eagle026<br>
-      Disclaimer: Distribution to unauthorized parties outside of the Castor Moving Group is strictly prohibited.
+      Disclaimer: Distribution to unauthorized parties outside of the Castor Moving Group is strictly prohibited. If found, please return.
     </div>
-    <div class="tut-hint">TAP TO CONTINUE</div>
+    <div class="tut-hint">SWIPE →</div>
   </div>
 
   <!-- ════ SLIDE 1: GAME SCREEN ════ -->
@@ -740,7 +737,6 @@
 <script>
   // ══════════════════════════════════════
   // SLIDE NAVIGATION
-  // Lifted from tutorial.html — dots removed
   // ══════════════════════════════════════
   const SLIDES = document.querySelectorAll('.slide');
   const N = SLIDES.length;
@@ -775,7 +771,7 @@
     handleGesture();
   });
 
-  // Tap to advance on non-touch (mouse). Canvas & tut-tap elements stop propagation.
+  // Tap to advance for devtesting. Canvas & tut-tap elements stop propagation.
   document.addEventListener('pointerdown', e => {
     if (e.target.closest('button')) return;
     if (e.target.closest('.tut-tap')) return;
@@ -808,12 +804,10 @@
   window.addEventListener('resize', () => { resize(); drawScene(); });
 
   // ── Waveform background ──
-  // Lifted exactly from script.js drawSynthwaveScene() / hexToRgb().
-  // waveOffset and waveT are frozen at 0 for a still frame.
   const waveOffset = 0;
   const waveT      = 0;
 
-  const LEVEL_PALETTES = [
+  const LEVEL_PALETTES = [ // what if you want to change the color Jen
     { skyT:'#0d0020', skyB:'#1a0040', sun:'#ff6ec7', sunG:'#d42b6a', grid:'#2255ff', mtn:'#1133cc' }, // 1
     { skyT:'#0a0025', skyB:'#1e0050', sun:'#ff8c42', sunG:'#ff4500', grid:'#00ccff', mtn:'#0066cc' }, // 2
     { skyT:'#100015', skyB:'#300030', sun:'#d42b6a', sunG:'#cc0055', grid:'#cc44ff', mtn:'#8800cc' }, // 3
@@ -835,7 +829,7 @@
     const lvl  = 1;
     const pal  = LEVEL_PALETTES[(lvl - 1) % LEVEL_PALETTES.length];
 
-    // ── WAVEFORM — full canvas, flat centre, wavy sides ─
+    // ── WAVEFORM —
     const rows    = 38;
     const rowSpan = H / rows;
     const sideW   = W * 0.30;
@@ -882,7 +876,6 @@
   }
 
   // ── Ship ──
-  // Position matches script.js exactly: centred X, H-130 Y, nose pointing up (aimAngle=0)
   const ship = { x: W / 2, y: H - 130 };
   const aimAngle = 0;
 
@@ -921,7 +914,6 @@
   }
 
   // ── Mine ──
-  // Lifted exactly from script.js drawMines(). r:11 matches spawn default.
   function drawMine(m) {
     ctx.save(); ctx.translate(m.x, m.y);
     ctx.shadowColor = '#ff0000'; ctx.shadowBlur = 18;
@@ -1011,10 +1003,45 @@
     ctx.restore();
   }
 
+		// ── Enemy drop (Silicon — Σ) ──
+function drawDrop() {
+ctx.save();
+ctx.translate(fakeEnemyDrop.x, fakeEnemyDrop.y);
+ctx.shadowColor = '#00f5ff'; ctx.shadowBlur = 10;
+ctx.beginPath(); ctx.arc(0, 0, fakeEnemyDrop.r, 0, Math.PI * 2);
+ctx.strokeStyle = '#00f5ff'; ctx.lineWidth = 1; ctx.stroke();
+ctx.font = 'bold 9px Nova Square, monospace';
+ctx.fillStyle = '#00f5ff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+ctx.fillText('Σ', 0, 0);
+ctx.restore();
+}
+// ── Pod drop (powerup hexagon) ──
+function drawPodDrop() {	
+ctx.save();
+ctx.translate(fakePodDrop.x, fakePodDrop.y);
+ctx.shadowColor = '#a855f7'; ctx.shadowBlur = 14;
+ctx.strokeStyle = 'rgba(168,85,247,0.9)';
+ctx.lineWidth = 1.5;
+ctx.beginPath();
+for (let i = 0; i < 6; i++) {
+  const a = (i / 6) * Math.PI * 2 - Math.PI / 6;
+  const px = Math.cos(a) * fakePodDrop.r, py = Math.sin(a) * fakePodDrop.r;
+  i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+}
+ctx.closePath(); ctx.stroke();
+ctx.font = 'bold 11px Nova Square, monospace';
+ctx.fillStyle = 'rgba(168,85,247,0.9)';
+ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+ctx.fillText('Θ', 0, 0);
+ctx.restore();
+}
+
 const fakePod   = {};
 const fakeMine  = {};
 const fakeScout = {};
 const fakeDrone = {};
+const fakeEnemyDrop = {};
+const fakePodDrop   = {};
 
 function drawScene() {
     // lets try assigning fresh coordinates each draw
@@ -1023,6 +1050,8 @@ function drawScene() {
     Object.assign(fakeMine,  { x: W * 0.22, y: H * 0.38, r: 11 });
     Object.assign(fakeScout, { x: W * 0.65, y: H * 0.28, r: 12, color: '#e8600a', angle: Math.PI });
     Object.assign(fakeDrone, { x: W * 0.50, y: H * 0.18, r: 14, color: '#a855f7', angle: Math.PI / 4 });
+	Object.assign(fakeEnemyDrop, { x: W * 0.35, y: H * 0.62, r: 10 });
+	Object.assign(fakePodDrop,   { x: W * 0.72, y: H * 0.70, r: 13 });
     ctx.fillStyle = '#050510';
     ctx.fillRect(0, 0, W, H);
     drawSynthwaveScene();
@@ -1030,6 +1059,8 @@ function drawScene() {
     drawScout(fakeScout);
     drawDrone(fakeDrone);
     drawPod(fakePod);
+    drawDrop ();
+	drawPodDrop ();
     drawShip();
   }
 
@@ -1043,18 +1074,20 @@ function drawScene() {
   // TUTORIAL TOAST SYSTEM
   // ══════════════════════════════════════
   const TOAST_CONTENT = {
-    score:    { title: 'SCORE',           body: 'Placeholder — score info goes here.' },
-    combo:    { title: 'COMBO MULTIPLIER',body: 'Placeholder — combo info goes here.' },
-    level:    { title: 'LEVEL',           body: 'Placeholder — level info goes here.' },
-    bars:     { title: 'SHIELD & AMMO',   body: 'Placeholder — shield and ammo info goes here.' },
-    enemies:  { title: 'ENEMIES',         body: 'Placeholder — enemy info goes here.' },
-    mine:     { title: 'MINE',            body: 'Placeholder — mine info goes here.' },
-    ship:     { title: 'YOUR SHIP',       body: 'Placeholder — ship info goes here.' },
-    log:      { title: 'PICKUP LOG',      body: 'Placeholder — pickup log info goes here.' },
-    reserves: { title: 'RESERVES BAR',    body: 'Placeholder — reserves info goes here.' },
-    stash:    { title: 'STASH',           body: 'Placeholder — stash info goes here.' },
-    radio:    { title: 'RADIO',           body: 'Placeholder — radio info goes here.' },
-	pod:      { title: 'POWER-UP POD',    body: 'Placeholder — pod info goes here.' },
+    score:     { title: 'SCORE',          body: 'Placeholder — score info goes here.' },
+    combo:     { title: 'COMBO',          body: 'Placeholder — combo info goes here.' },
+    level:     { title: 'LEVEL',          body: 'Placeholder — level info goes here.' },
+    bars:      { title: 'SHIELD & AMMO',  body: 'Placeholder — shield and ammo info goes here.' },
+    enemies:   { title: 'ENEMIES',        body: 'Placeholder — enemy info goes here.' },
+    mine:      { title: 'MINE',           body: 'Placeholder — mine info goes here.' },
+    ship:      { title: 'YOUR SHIP',      body: 'Placeholder — ship info goes here.' },
+    log:       { title: 'PICKUP LOG',     body: 'Placeholder — pickup log info goes here.' },
+    reserves:  { title: 'RESERVES BAR',   body: 'Placeholder — reserves info goes here.' },
+    stash:     { title: 'STASH',          body: 'Placeholder — stash info goes here.' },
+    radio:     { title: 'RADIO',          body: 'Placeholder — radio info goes here.' },
+	pod:       { title: 'POWER-UP POD',   body: 'Placeholder — pod info goes here.' },
+	enemydrop: { title: 'ELEMENT DROP',   body: 'Placeholder — element drop info goes here.' },
+    poddrop:   { title: 'POWERUP DROP',   body: 'Placeholder — powerup drop info goes here.' },
   };
 
   const toast      = document.getElementById('tut-toast');
@@ -1096,6 +1129,8 @@ function drawScene() {
     { key: 'enemies', hitR: 20, get x() { return fakeScout.x; },  get y() { return fakeScout.y; } },
     { key: 'enemies', hitR: 22, get x() { return fakeDrone.x; },  get y() { return fakeDrone.y; } },
 	{ key: 'pod', hitR: 20, get x() { return fakePod.x; }, get y() { return fakePod.y; } },
+	{ key: 'enemydrop', hitR: 16, get x() { return fakeEnemyDrop.x; }, get y() { return fakeEnemyDrop.y; } },
+    { key: 'poddrop',   hitR: 18, get x() { return fakePodDrop.x; },   get y() { return fakePodDrop.y; } },
   ];
 
   canvas.addEventListener('pointerdown', e => {
