@@ -279,7 +279,7 @@
   #pickup-log {
     position: absolute;
     bottom: 100px; left: 14px;
-    z-index: 10; pointer-events:none;
+    z-index: 10;
     display: flex; flex-direction: column-reverse; gap: 3px;
   }
   .pickup-entry {
@@ -1053,6 +1053,7 @@ function drawScene() {
     reserves: { title: 'RESERVES BAR',    body: 'Placeholder — reserves info goes here.' },
     stash:    { title: 'STASH',           body: 'Placeholder — stash info goes here.' },
     radio:    { title: 'RADIO',           body: 'Placeholder — radio info goes here.' },
+	pod:      { title: 'POWER-UP POD',    body: 'Placeholder — pod info goes here.' },
   };
 
   const toast      = document.getElementById('tut-toast');
@@ -1093,6 +1094,7 @@ function drawScene() {
     { key: 'mine',    hitR: 18, get x() { return fakeMine.x; },   get y() { return fakeMine.y; } },
     { key: 'enemies', hitR: 20, get x() { return fakeScout.x; },  get y() { return fakeScout.y; } },
     { key: 'enemies', hitR: 22, get x() { return fakeDrone.x; },  get y() { return fakeDrone.y; } },
+	{ key: 'pod', hitR: 20, get x() { return fakePod.x; }, get y() { return fakePod.y; } },
   ];
 
   canvas.addEventListener('pointerdown', e => {
