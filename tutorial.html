@@ -3,24 +3,30 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Angel's Eight — Tutorial</title>
+<title>Angel's Eight — Tutorial Shell</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Monoton&family=Reddit+Mono&family=Mrs+Saint+Delafield&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Monoton&family=Nova+Square&family=Carattere&family=Noto+Emoji&display=swap');
 
+  /* ══════════════════════════════════════
+     CSS CUSTOM PROPERTIES (design tokens)
+  ══════════════════════════════════════ */
   :root {
-    --bg:      #050510;
-    --bg2:     #0a0a20;
-    --pink:    #ff2d78;
-    --cyan:    #00f5ff;
-    --purple:  #a855f7;
-    --gold:    #ffd700;
-    --dim:     #ffffff22;
-    --mono:    'Reddit Mono', monospace;
-    --display: 'Monoton', sans-serif;
-    --cursive: 'Mrs Saint Delafield', cursive;
+    --bg:       #050510;
+    --bg2:      #0a0a20;
+    --pink:     #d42b6a;
+    --cyan:     #00f5ff;
+    --purple:   #a855f7;
+    --gold:     #ffd700;
+    --dim:      #ffffff22;
+    --mono:     'Nova Square', monospace;
+    --display:  'Monoton', sans-serif;
+    --cursive:  'Carattere', cursive;
   }
 
-  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; user-select:none; }
+  /* ══════════════════════════════════════
+     RESET & BASE
+  ══════════════════════════════════════ */
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
 
   html, body {
     width:100%; height:100%;
@@ -31,13 +37,10 @@
     touch-action: none;
   }
 
-  /* scanlines */
-  body::after {
-    content:''; position:fixed; inset:0; pointer-events:none; z-index:9999;
-    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px);
-  }
-
-  /* ══ SLIDE SYSTEM ══ */
+  /* ══════════════════════════════════════
+     SLIDE SYSTEM
+     Lifted from tutorial.html
+  ══════════════════════════════════════ */
   #tut-wrap {
     position: absolute; inset: 0;
     display: flex; flex-direction: column;
@@ -57,83 +60,10 @@
     pointer-events: all;
   }
 
-  /* ══ PROGRESS DOTS ══ */
-  #progress {
-    position: fixed;
-    bottom: 18px; left: 50%;
-    transform: translateX(-50%);
-    display: flex; gap: 8px;
-    z-index: 200;
-    pointer-events: none;
-  }
-  .dot {
-    width: 5px; height: 5px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.15);
-    transition: background 0.3s;
-  }
-  .dot.active { background: var(--cyan); box-shadow: 0 0 6px var(--cyan); }
-
-  /* ══ CALLOUT BADGE SYSTEM ══ */
-  .cbadge {
-    position: absolute;
-    width: 16px; height: 16px;
-    border-radius: 50%;
-    background: var(--bg);
-    border: 1.5px solid var(--cyan);
-    display: flex; align-items: center; justify-content: center;
-    font-family: var(--mono);
-    font-size: 9px; font-weight: 700;
-    color: var(--cyan);
-    line-height: 1;
-    pointer-events: none;
-    z-index: 10;
-    box-shadow: 0 0 6px rgba(0,245,255,0.35);
-  }
-  .cbadge.gold { border-color: var(--gold); color: var(--gold); box-shadow: 0 0 6px rgba(255,215,0,0.35); }
-  .cbadge.purple { border-color: var(--purple); color: var(--purple); box-shadow: 0 0 6px rgba(168,85,247,0.35); }
-  .cbadge.pink { border-color: var(--pink); color: var(--pink); box-shadow: 0 0 6px rgba(255,45,120,0.35); }
-
-  /* ══ LEGEND GRID ══ */
-  .legend-grid {
-    width: 100%;
-    max-width: min(360px, 96vw);
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 5px 10px;
-    padding: 8px 0 0;
-    flex-shrink: 0;
-  }
-  .legend-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 7px;
-  }
-  .legend-badge {
-    width: 15px; height: 15px;
-    border-radius: 50%;
-    border: 1.5px solid var(--cyan);
-    display: flex; align-items: center; justify-content: center;
-    font-family: var(--mono); font-size: 8px; font-weight: 700;
-    color: var(--cyan); flex-shrink: 0;
-    margin-top: 1px;
-  }
-  .legend-badge.gold  { border-color: var(--gold);   color: var(--gold); }
-  .legend-badge.purple{ border-color: var(--purple);  color: var(--purple); }
-  .legend-badge.pink  { border-color: var(--pink);    color: var(--pink); }
-  .legend-text {
-    display: flex; flex-direction: column; gap: 1px;
-  }
-  .legend-name {
-    font-size: 9px; letter-spacing: 0.16em;
-    color: rgba(255,255,255,0.8); text-transform: uppercase; line-height: 1.2;
-  }
-  .legend-desc {
-    font-size: 8px; letter-spacing: 0.05em;
-    color: rgba(255,255,255,0.35); line-height: 1.4;
-  }
-
-  /* ══ SLIDE 0: TITLE ══ */
+  /* ══════════════════════════════════════
+     SLIDE 0: TITLE COVER
+     Lifted from tutorial.html #slide-0
+  ══════════════════════════════════════ */
   #slide-0 {
     background: radial-gradient(ellipse at 50% 30%, #1a0a3a 0%, #050510 70%);
   }
@@ -143,455 +73,316 @@
   }
   .tut-title-wrap {
     position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: flex; align-items: center; justify-content: center;
     margin-bottom: 28px;
   }
   .tut-title {
     font-family: var(--display);
     font-size: clamp(30px, 10vw, 64px);
-    font-weight: 900;
-    line-height: 0.9;
-    letter-spacing: -0.02em;
+    font-weight: 900; line-height: 0.9; letter-spacing: -0.02em;
     background: linear-gradient(135deg, var(--cyan) 0%, var(--purple) 50%, var(--pink) 100%);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     filter: drop-shadow(0 0 30px rgba(168,85,247,0.4));
-    padding: 12px 16px;
-    margin-bottom: 0px; text-align: center;
+    padding: 12px 16px; margin-bottom: 0; text-align: center;
   }
   .tut-cursive {
     font-family: var(--cursive);
     font-size: clamp(30px, 7vw, 56px);
     color: var(--gold);
     text-shadow: 0 0 20px rgba(255,45,120,0.7), 0 0 50px rgba(168,85,247,0.4);
-    line-height: 1;
-    position: absolute;
-    z-index: 2;
-    pointer-events: none;
-    white-space: nowrap;
+    line-height: 1; position: absolute; z-index: 2;
+    pointer-events: none; white-space: nowrap;
   }
   .tut-intro {
     font-size: 12px; line-height: 1.8;
     color: rgba(255,255,255,0.55);
-    text-align: left;
-    max-width: 300px;
-    margin-bottom: 32px;
+    text-align: left; max-width: 300px; margin-bottom: 32px;
+  }
+  .tut-hint {
+    font-size: 9px; letter-spacing: 0.3em;
+    color: rgba(255,255,255,0.2);
+    animation: hintPulse 2.5s ease-in-out infinite;
+  }
+  @keyframes hintPulse {
+    0%,100% { opacity: 0.4; }
+    50%      { opacity: 1; }
   }
 
-  /* ══ SHARED SCENE FRAME ══ */
-  .scene-frame {
-    position: relative;
-    border: 1px solid rgba(0,245,255,0.18);
-    background: rgba(0,0,0,0.55);
-    overflow: visible;
-    flex-shrink: 0;
+  /* ══════════════════════════════════════
+     SLIDE 1: GAME SCREEN
+  ══════════════════════════════════════ */
+  #slide-1 {
+    background: var(--bg);
+    flex-direction: column;
+    justify-content: flex-start;
   }
 
-  /* ══ SLIDE 1: MOVEMENT ══ */
-  #slide-1 { gap: 0; padding: 20px; }
-  .slide-title {
-    font-family: var(--display);
-    font-size: clamp(13px, 4vw, 20px);
-    color: var(--cyan);
-    letter-spacing: 0.12em;
-    margin-bottom: 6px;
-    text-align: center;
-  }
-  .slide-body {
-    font-size: 13px; line-height: 1.0;
-    color: var(--gold);
-	font-style: italic;
-    text-align: left;
-    max-width: 300px;
+  /* Content wrapper */
+  .screen-content {
+    display: flex; flex-direction: column;
+    align-items: stretch; justify-content: flex-start;
+    flex: 1; width: 100%; min-height: 0;
+    position: relative; z-index: 1;
+    overflow: hidden;
   }
 
-  /* ══ SLIDE 2: HUD ══ */
-  #slide-2 { padding: 10px 16px 8px; gap: 0; }
+  /* ── Canvas ── */
+  #game-canvas {
+    display: block;
+    touch-action: none;
+    cursor: none;
+  }
 
-  /* Mock HUD bar */
-  .mock-hud {
-    width: 100%;
-    max-width: 380px;
-    padding: 10px 14px 10px;
+  /* ══════════════════════════════════════
+     HUD OVERLAY
+  ══════════════════════════════════════ */
+  #hud {
+    position: absolute;
+    top:0; left:0; right:0;
+    padding: 10px 14px 0;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    background: rgba(5,5,16,0.9);
-    border: 1px solid rgba(0,245,255,0.2);
-    position: relative;
-    flex-shrink: 0;
-  }
-  .mock-hud-left, .mock-hud-right { display:flex; flex-direction:column; gap:4px; }
-  .mock-hud-center { display:flex; flex-direction:column; align-items:center; gap:3px; }
-  .m-label { font-size:8px; letter-spacing:0.2em; color:rgba(255,255,255,0.3); text-transform:uppercase; }
-  .m-val   { font-family:var(--display); font-size:18px; font-weight:700; color:var(--cyan); line-height:1; }
-  .m-val.gold { color: var(--gold); }
-  .m-bar-wrap { width: 80px; }
-  .m-bar {
-    height:4px; background:rgba(255,255,255,0.1); border-radius:2px; overflow:hidden; margin-top:2px;
-  }
-  .m-bar-fill { height:100%; border-radius:2px; }
-  .shield-f { width:70%; background:linear-gradient(90deg,var(--cyan),var(--purple)); }
-  .ammo-f   { width:45%; background:linear-gradient(90deg,var(--pink),var(--gold)); }
-  .m-pause {
-    font-family:var(--mono); font-size:13px; letter-spacing:0.2em;
-    color:var(--purple); border:1px solid var(--purple);
-    background:transparent; padding:4px 10px;
-    align-self: flex-start;
-  }
-
-  /* Mock radio — inline in slide 2 */
-  .mock-radio {
-    display: flex; flex-direction:column; align-items:center; gap:4px;
-    background: rgba(5,5,16,0.85);
-    padding: 6px 10px;
-    border: 1px solid rgba(0,245,255,0.2);
-    position: relative;
-  }
-  .m-radio-label { font-size:7px; letter-spacing:0.25em; color:rgba(255,255,255,0.3); }
-  .m-radio-dial {
-    width:38px; height:38px;
-    border:1px solid rgba(0,245,255,0.3); border-radius:50%;
-    display:flex; align-items:center; justify-content:center;
-    background:rgba(0,245,255,0.04); position:relative;
-  }
-  .m-radio-needle {
-    position:absolute; width:2px; height:12px;
-    background:var(--cyan); top:5px; left:50%;
-    transform-origin:bottom center;
-    transform: translateX(-50%) rotate(-20deg);
-    border-radius:1px;
-  }
-  .m-radio-track { font-size:8px; color:var(--cyan); opacity:0.7; letter-spacing:0.1em; }
-
-  /* Mock powerup bar — inline in slide 2 */
-  .mock-pubar {
-    display: inline-flex;
-    flex-direction: column; align-items: center; gap: 4px;
-    position: relative;
-  }
-  .mock-pu-slots { display:flex; gap:6px; }
-  .mock-pu-slot {
-    width:34px; height:34px;
-    border:1px solid rgba(168,85,247,0.5);
-    display:flex; align-items:center; justify-content:center;
-    flex-direction:column; gap:1px;
-    clip-path:polygon(5px 0%,100% 0%,calc(100%-5px) 100%,0% 100%);
-    background:rgba(168,85,247,0.08);
-    font-size:5px; letter-spacing:0.05em; color:rgba(255,255,255,0.5);
-  }
-  .mock-pu-sym { font-family:var(--display); font-size:11px; font-weight:700; color:var(--purple); }
-  .mock-stash {
-    width:114px; height:18px;
-    border:1px dashed rgba(168,85,247,0.35);
-    display:flex; align-items:center; justify-content:center;
-    font-size:6px; letter-spacing:0.25em; color:rgba(168,85,247,0.45);
-    background:rgba(168,85,247,0.04);
-  }
-
-  /* HUD mockup wrapper (relative for badge overlay) */
-  #mock-hud-wrap {
-    position: relative;
-    width: 100%;
-    max-width: min(360px, 96vw);
-    flex-shrink: 0;
-  }
-
-  /* ══ SLIDE 3: COMBAT ══ */
-  #slide-3 { padding: 20px; }
-  .combat-scene {
-    width: 280px; height: 180px;
-    position: relative;
-    background: radial-gradient(ellipse at 50% 50%, #0a0a25 0%, #050510 100%);
-    border: 1px solid rgba(0,245,255,0.15);
-    overflow: hidden;
-    flex-shrink: 0;
-    margin-bottom: 18px;
-  }
-
-  /* Starfield dots in combat scene */
-  .star { position:absolute; border-radius:50%; background:#fff; }
-
-  /* Enemy icon — scout triangle matching game canvas draw */
-  .enemy-icon {
-    position: absolute;
-    width: 24px; height: 24px;
-    display: flex; align-items:center; justify-content:center;
-    filter: drop-shadow(0 0 6px #ff6b35);
-  }
-
-  /* Mine icon — black circle + red crosshair matching game canvas draw */
-  .mine-icon {
-    position: absolute;
-    width: 22px; height: 22px;
-    display: flex; align-items:center; justify-content:center;
-    filter: drop-shadow(0 0 8px #ff2020);
-  }
-
-  /* Bullet */
-  .bullet {
-    position: absolute;
-    width: 3px; height: 10px;
-    background: var(--cyan);
-    border-radius: 2px;
-    box-shadow: 0 0 6px var(--cyan);
-    opacity: 0;
-  }
-
-  /* Explosion particle */
-  .explode-ring {
-    position: absolute;
-    border-radius: 50%;
-    border: 2px solid var(--pink);
-    opacity: 0;
-    transform: scale(0);
-  }
-
-  /* Mine warning */
-  .mine-x {
-    position: absolute;
-    font-family: var(--display);
-    font-size: 13px;
-    color: var(--gold);
-    opacity: 0;
-  }
-
-  /* ══ SLIDE 4: POWERUPS ══ */
-  #slide-4 { padding: 20px; }
-  .pu-demo-scene {
-    width: 280px; height: 160px;
-    position: relative;
-    background: var(--bg2);
-    border: 1px solid rgba(168,85,247,0.2);
-    overflow: visible;
-    flex-shrink: 0;
-    margin-bottom: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    padding: 16px;
-  }
-  .pu-float {
-    display: flex; flex-direction:column; align-items:center; gap:4px;
-  }
-  .pu-orb {
-    width: 36px; height: 36px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 35% 35%, rgba(168,85,247,0.9), rgba(168,85,247,0.2));
-    border: 1px solid var(--purple);
-    box-shadow: 0 0 12px rgba(168,85,247,0.6);
-    display: flex; align-items:center; justify-content:center;
-    font-family: var(--display); font-size: 13px; color: #fff;
-    animation: bobPU 2.2s ease-in-out infinite;
-  }
-  .pu-orb:nth-child(1) { animation-delay: 0s; }
-  .pu-orb:nth-child(2) { animation-delay: 0.7s; }
-  .pu-orb:nth-child(3) { animation-delay: 1.4s; }
-  @keyframes bobPU {
-    0%,100% { transform: translateY(0); }
-    50%      { transform: translateY(-6px); }
-  }
-  .pu-name { font-size: 7px; letter-spacing: 0.1em; color: var(--purple); }
-
-  /* Arrow showing drag */
-  .drag-arrow {
-    position: absolute;
-    bottom: -50px; left: 50%; transform: translateX(-50%);
-    display: flex; flex-direction: column; align-items: center; gap: 4px;
-  }
-  .drag-label {
-    font-size: 9px; letter-spacing: 0.2em; color: var(--purple);
-  }
-
-  /* Stash target demo */
-  .stash-target {
-    position: absolute;
-    bottom: -90px; left: 50%; transform: translateX(-50%);
-    width: 120px; height: 20px;
-    border: 1px dashed rgba(168,85,247,0.6);
-    display: flex; align-items:center; justify-content:center;
-    font-size: 6px; letter-spacing: 0.25em; color: var(--purple);
-    background: rgba(168,85,247,0.06);
-    animation: pulseStash 2s ease-in-out infinite;
-  }
-  @keyframes pulseStash {
-    0%,100%{ border-color:rgba(168,85,247,0.35); color:rgba(168,85,247,0.4); }
-    50%{ border-color:rgba(168,85,247,0.9); color:var(--purple); box-shadow:0 0 10px rgba(168,85,247,0.3); }
-  }
-
-  /* ══ SLIDE 5: SHOP ══ */
-  #slide-5 { padding: 10px 14px; }
-
-  .mock-shop-header {
-    width: 100%;
-    max-width: 360px;
-    padding: 10px 12px 8px;
-    display: flex; align-items:center; justify-content:space-between;
-    border-bottom: 1px solid var(--dim);
-    background: rgba(5,5,16,0.95);
-    border: 1px solid rgba(168,85,247,0.2);
-    flex-shrink: 0;
-  }
-  .mock-shop-supergraph {
-    width: 100%; max-width: 360px;
-    display: flex; flex-direction:column; flex-shrink:0;
-    gap:0; line-height:0;
-  }
-  .sg-o { background:#e8600a; height:4px; }
-  .sg-p { background:#d42b6a; height:5px; }
-  .sg-pu { background:#5b1a8a; height:8px; }
-  .sg-b { background:#0e0b12; height:10px; }
-
-  .mock-shop-layout {
-    width: 100%; max-width: 360px;
-    display: grid; grid-template-columns: 1fr 1fr;
-    border: 1px solid rgba(168,85,247,0.15);
-    border-top: none;
-    background: rgba(5,5,16,0.9);
-    flex-shrink: 0;
-    position: relative;
-  }
-
-  .mock-shop-left {
-    border-right: 1px solid var(--dim);
-    overflow: hidden;
-  }
-  .mock-shop-tabs {
-    display:flex; border-bottom:1px solid var(--dim);
-  }
-  .m-tab {
-    flex:1; padding:7px 0;
-    font-family:var(--mono); font-size:7px; letter-spacing:0.15em;
-    color:rgba(255,255,255,0.3); background:transparent; border:none;
-    border-right:1px solid rgba(255,255,255,0.06);
-    text-align:center;
-  }
-  .m-tab.active { color:var(--cyan); border-bottom:1px solid var(--cyan); background:rgba(0,245,255,0.04); }
-  .mock-cards {
-    display:flex; flex-wrap:wrap; gap:5px; padding:8px;
-  }
-  .mock-card {
-    width:68px;
-    border:1px solid rgba(255,255,255,0.12);
-    padding:7px 6px;
-    display:flex; flex-direction:column; gap:2px;
-    position: relative;
-    background:rgba(255,255,255,0.02);
-  }
-  .mc-sym { font-family:var(--display); font-size:14px; font-weight:700; color:var(--cyan); }
-  .mc-name { font-size:7px; color:#fff; letter-spacing:0.04em; }
-  .mc-eff { font-size:6px; color:rgba(255,255,255,0.35); line-height:1.35; }
-  .mc-price { font-family:var(--display); font-size:8px; color:var(--gold); margin-top:2px; }
-
-  .mock-shop-right {
-    padding: 8px; display:flex; flex-direction:column; gap:8px;
-    overflow: hidden;
-  }
-  .mock-stats-block {
-    border:1px solid var(--dim); position:relative; padding:10px 8px 6px;
-  }
-  .mock-stats-block::before {
-    content:'STATS'; position:absolute; top:-7px; left:6px;
-    background:#0a0a20; padding:0 4px;
-    font-size:7px; letter-spacing:0.3em; color:var(--cyan); opacity:0.6;
-  }
-  .m-stat-row { display:flex; justify-content:space-between; align-items:baseline; padding:3px 0; }
-  .m-stat-label { font-size:6px; letter-spacing:0.1em; color:rgba(255,255,255,0.4); }
-  .m-stat-val { font-family:var(--display); font-size:11px; color:var(--cyan); }
-  .mock-reserves {
-    border:1px solid var(--dim); position:relative; padding:10px 6px 6px;
-  }
-  .mock-reserves::before {
-    content:'RESERVES'; position:absolute; top:-7px; left:6px;
-    background:#0a0a20; padding:0 4px;
-    font-size:7px; letter-spacing:0.3em; color:var(--purple); opacity:0.6;
-  }
-  .mock-res-slots { display:flex; flex-wrap:wrap; gap:4px; }
-  .mock-res-slot {
-    width:26px; height:26px;
-    border:1px solid rgba(168,85,247,0.25);
-    display:flex; align-items:center; justify-content:center;
-    clip-path:polygon(4px 0%,100% 0%,calc(100% - 4px) 100%,0% 100%);
-    background:rgba(168,85,247,0.04);
-    font-family:var(--display); font-size:10px; font-weight:700; color:var(--purple);
-  }
-  .mock-res-slot.filled { border-color:rgba(168,85,247,0.7); background:rgba(168,85,247,0.12); }
-  .mock-button {
-    text-align:center;
-	font-family:var(--display); font-size:10px; letter-spacing:0.15em;
-    color:var(--cyan); border:2px solid var(--cyan);
-    background:transparent; padding:8px 0;
-    width:100%; cursor:default;
-    margin-top:auto;
-  }
-
-  /* Shop mockup wrapper (relative for badge overlay) */
-  #mock-shop-wrap {
-    position: relative;
-    width: 100%;
-    max-width: min(360px, 96vw);
-    flex-shrink: 0;
-  }
-
-  /* ══ COMBAT ANIMATIONS ══ */
-  @keyframes shootBullet {
-    0%   { opacity:1; transform:translateX(-50%) translateY(0); }
-    100% { opacity:0; transform:translateX(-50%) translateY(-80px); }
-  }
-  @keyframes explodeRing {
-    0%   { opacity:0.9; transform:scale(0); }
-    100% { opacity:0;   transform:scale(2.5); }
-  }
-  @keyframes flashMineWarn {
-    0%,100% { opacity:0; }
-    30%,70% { opacity:1; }
-  }
-  @keyframes shipShake {
-    0%,100% { transform: translate(-50%,-50%); }
-    25%      { transform: translate(calc(-50% - 4px),-50%); }
-    75%      { transform: translate(calc(-50% + 4px),-50%); }
-  }
-  @keyframes driftEnemy {
-    0%,100% { transform: translate(0,0); }
-    50%      { transform: translate(-8px,5px); }
-  }
-
-  /* ══ DRAG ANIM for powerup demo ══ */
-  .pu-dragging {
-    position: absolute;
-    width: 34px; height: 34px;
-    border:1px solid rgba(168,85,247,0.5);
-    display:flex; align-items:center; justify-content:center;
-    flex-direction:column; gap:1px;
-    clip-path:polygon(5px 0%,100% 0%,calc(100%-5px) 100%,0% 100%);
-    background:rgba(168,85,247,0.08);
-    font-family:var(--display); font-size:5px; font-weight:500; color:var(--purple);
-    opacity: 0;
     pointer-events: none;
     z-index: 10;
   }
 
-  /* ══ MOVEMENT DEMO ══ */
-  .move-scene {
-    width: 260px; height: 160px;
-    position: relative;
-    background: radial-gradient(ellipse at 50% 50%, #0a0a25 0%, #050510 100%);
-    border: 1px solid rgba(0,245,255,0.15);
-    overflow: hidden;
-    flex-shrink: 0;
-    margin-bottom: 16px;
+  .hud-left, .hud-right { display:flex; flex-direction:column; gap:4px; }
+  .hud-center { display:flex; flex-direction:column; align-items:center; gap:3px; }
+
+  .hud-label {
+    font-size: 8px; letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.3); text-transform:uppercase;
   }
+  .hud-value {
+    font-family: var(--display);
+    font-size: 18px; font-weight:700;
+    color: var(--cyan);
+    line-height:1;
+  }
+  .hud-value.gold { color: var(--gold); }
+  .hud-value.pink { color: var(--pink); }
+
+  .hud-bar-wrap { width: 90px; }
+  .hud-bar {
+    height: 4px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 3px;
+  }
+  .hud-bar-fill {
+    height:100%; border-radius:2px;
+    transition: width 0.15s;
+  }
+  .shield-fill { background: linear-gradient(90deg, var(--cyan), var(--purple)); }
+  .ammo-fill   { background: linear-gradient(90deg, var(--pink), var(--gold)); }
+
+  /* Combo */
+  .hud-combo {
+    font-family: var(--display);
+    font-size: 11px; font-weight:700;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .hud-combo.active { opacity:1; }
+
+  /* ══════════════════════════════════════
+     RADIO TUNER
+  ══════════════════════════════════════ */
+  #radio-tuner {
+    position: absolute;
+    bottom: 110px; right: 14px;
+    z-index: 20;
+    pointer-events: all;
+    display: flex; flex-direction:column; align-items:center; gap:4px;
+    touch-action: none;
+  }
+  .radio-label { font-size:7px; letter-spacing:0.25em; color:rgba(255,255,255,0.3); }
+  .radio-dial {
+    width: 44px; height: 44px;
+    border: 1px solid rgba(0,245,255,0.3);
+    border-radius: 50%;
+    display: flex; align-items:center; justify-content:center;
+    position: relative;
+    background: rgba(0,245,255,0.04);
+  }
+  .radio-needle {
+    position:absolute;
+    width:2px; height:14px;
+    background: var(--cyan);
+    top: 5px; left: 50%; transform-origin: bottom center;
+    transform: translateX(-50%) rotate(0deg);
+    transition: transform 0.2s;
+    border-radius: 1px;
+  }
+  .radio-track-name {
+    font-size: 8px; color: var(--cyan); opacity:0.7;
+    letter-spacing:0.1em; max-width:60px; text-align:center;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  /* ══════════════════════════════════════
+     POWERUP SLOTS
+  ══════════════════════════════════════ */
+  .pu-slot {
+    width: 36px; height: 36px;
+    border: 1px solid rgba(255,255,255,0.15);
+    display: flex; align-items:center; justify-content:center;
+    font-size: 8px; letter-spacing:0.05em;
+    color: rgba(255,255,255,0.5);
+    clip-path: polygon(5px 0%, 100% 0%, calc(100% - 5px) 100%, 0% 100%);
+    background: rgba(255,255,255,0.03);
+    cursor: pointer;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .pu-slot.filled {
+    border-color: rgba(168,85,247,0.6);
+    background: rgba(168,85,247,0.1);
+    color: #fff;
+  }
+  .pu-slot-sym { font-family: var(--display); font-size:11px; font-weight:700; color: var(--purple); }
+  .pu-slot-name { font-size: 5px; letter-spacing:0.05em; color:rgba(255,255,255,0.4); text-align:center; line-height:1.2; }
+
+  /* Powerup bar wrapper */
+  #powerup-bar {
+    position: absolute;
+    bottom: 14px; left:50%; transform:translateX(-50%);
+    display: flex; flex-direction: column; align-items: center;
+    gap: 4px;
+    z-index: 20;
+    pointer-events: all;
+  }
+  #pu-slots { display: flex; gap: 6px; }
+
+  /* Stash box */
+  #pu-stash {
+    width: 122px; height: 28px;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--purple);
+    text-align: center;
+    line-height: 28px;
+    position: relative;
+    border: 1.5px solid var(--purple);
+    background: rgba(168,85,247,0.05);
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    user-select: none;
+  }
+
+  /* ══════════════════════════════════════
+     PICKUP LOG
+  ══════════════════════════════════════ */
+  #pickup-log {
+    position: absolute;
+    bottom: 100px; left: 14px;
+    z-index: 10; pointer-events:none;
+    display: flex; flex-direction: column-reverse; gap: 3px;
+  }
+  .pickup-entry {
+    font-size: 9px; letter-spacing:0.1em;
+    color: var(--cyan);
+  }
+
+  /* ══════════════════════════════════════
+     PAUSE BUTTON
+  ══════════════════════════════════════ */
+  .pause-wrapper {
+    position: absolute;
+    top: 10px; left: 95%; transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #btn-pause {
+    font-family: Noto Emoji;
+    font-size: 14px; letter-spacing: 0.25em;
+    color: var(--purple);
+    background: transparent;
+    border: 0px;
+    padding: 4px 8px; cursor: pointer;
+    pointer-events: all;
+    z-index: 20;
+    transition: color 0.15s;
+  }
+  #btn-pause:active { color: var(--cyan); }
+
+  /* ══════════════════════════════════════
+     TUTORIAL TOAST
+  ══════════════════════════════════════ */
+  #tut-toast {
+    position: absolute;
+    bottom: 80px; left: 50%; transform: translateX(-50%);
+    background: var(--bg2);
+    border: 1px solid var(--cyan);
+    box-shadow: 0 0 24px rgba(0,245,255,0.2);
+    padding: 10px 18px;
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.6;
+    letter-spacing: 0.08em;
+    color: #fff;
+    text-align: center;
+    max-width: 260px;
+    width: max-content;
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  #tut-toast.visible { opacity: 1; }
+  #tut-toast-title {
+    font-family: var(--display);
+    font-size: 10px;
+    color: var(--cyan);
+    letter-spacing: 0.18em;
+    margin-bottom: 5px;
+  }
+
+  /* Make HUD elements tappable */
+  .tut-tap { pointer-events: all; cursor: pointer; }
+
+  /* ══════════════════════════════════════
+     SHARED BUTTONS
+     (pause button style; kept for parity)
+  ══════════════════════════════════════ */
+  .btn-sweep {
+    font-family: var(--display);
+    font-size: 14px; font-weight: bold; letter-spacing: 0.2em;
+    color: var(--cyan); border: 2px solid var(--cyan);
+    padding: 10px 48px; cursor: pointer;
+    background: transparent; position: relative;
+    transition: 0.2s; overflow: hidden; margin-bottom: 10px;
+  }
+  .btn-sweep.sweeping { color: var(--bg); }
+  .btn-sweep::before {
+    content: ""; position: absolute;
+    height: 100%; width: 0%; top: 0; left: -40px;
+    transform: skewX(45deg); background-color: var(--cyan);
+    z-index: -1; transition: 0.2s;
+  }
+  .btn-sweep.sweeping::before { width: 160%; }
+  .btn-sweep:active { transform: scale(0.97); }
+
+  .btn-secondary {
+    font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em;
+    color: var(--purple); background: transparent;
+    border: 1px double var(--purple); padding: 10px 28px; margin-bottom: 10px;
+    cursor: pointer; transition: color 0.2s, border-color 0.2s;
+  }
+  .btn-secondary:active { color: var(--cyan); border-color: var(--cyan); }
 
 </style>
 </head>
 <body>
 
-<div id="progress"></div>
-
 <div id="tut-wrap">
 
-  <!-- ════ SLIDE 0: TITLE ════ -->
+  <!-- ════ SLIDE 0: COVER ════ -->
   <div class="slide active" id="slide-0">
     <div class="tut-eyebrow">ALPHA LYRAE AEROSPACE DIVISION</div>
     <div class="tut-title-wrap">
@@ -600,457 +391,114 @@
     </div>
     <div class="tut-intro">
       Ver 25.04-A0V<br>
-	  Calibration: Zero-Magnitude Standard<br>
-	  Vehicle Class: Eagle026<br>
-      Disclaimer: Distribution to unauthorized parties outside of the Castor Moving Group is strictly prohibited. 
+      Calibration: Zero-Magnitude Standard<br>
+      Vehicle Class: Eagle026<br>
+      Disclaimer: Distribution to unauthorized parties outside of the Castor Moving Group is strictly prohibited.
     </div>
+    <div class="tut-hint">TAP TO CONTINUE</div>
   </div>
 
-  <!-- ════ SLIDE 1: MOVEMENT ════ -->
+  <!-- ════ SLIDE 1: GAME SCREEN ════ -->
   <div class="slide" id="slide-1">
-    <div class="slide-title">MOVEMENT &amp; AIMING</div>
-    <div class="move-scene" id="move-scene">
-      <canvas id="move-canvas" width="260" height="160" style="position:absolute;top:0;left:0;width:100%;height:100%"></canvas>
-    </div>
-	    <div class="slide-body">
-      Move left & right to dodge and aim.
-    </div>
+  <div class="screen-content">
+    <!-- Canvas -->
+    <canvas id="game-canvas"></canvas>
+
+    <!-- HUD -->
+    <div id="hud">
+      <div class="hud-left">
+        <div class="hud-label tut-tap" id="tap-score">SCORE
+          <div class="hud-value" id="hud-score">48200</div>
+          <div class="hud-combo active" id="hud-combo">× 3</div>
+        </div>
       </div>
-    </div>
-</div>
-
-  <!-- ════ SLIDE 2: HUD ════ -->
-  <div class="slide" id="slide-2">
-    <div class="slide-title" style="margin-bottom:8px">HUD READOUT</div>
-
-    <!-- Mock HUD with numbered badges overlaid -->
-    <div id="mock-hud-wrap">
-      <div class="mock-hud" id="mock-hud-el">
-        <div class="mock-hud-left">
-          <div class="m-label">SCORE</div>
-          <div class="m-val" id="m-score">4820</div>
-          <div style="font-family:var(--display);font-size:10px;color:var(--gold);letter-spacing:0.1em">× 3</div>
+      <div class="pause-wrapper">
+        <button id="btn-pause">⏸︎</button>
+      </div>
+      <div class="hud-center">
+        <div class="hud-label tut-tap" id="tap-level">LEVEL
+          <div class="hud-value" id="hud-level">2</div>
         </div>
-        <div class="mock-hud-center">
-          <div class="m-label">LEVEL</div>
-          <div class="m-val">2</div>
-        </div>
-        <div class="mock-hud-right">
-          <div class="m-label">BEST</div>
-          <div class="m-val gold">9100</div>
-          <div style="margin-top:5px">
-            <div class="m-label">SHIELD</div>
-            <div class="m-bar-wrap"><div class="m-bar"><div class="m-bar-fill shield-f" id="mock-shield-bar"></div></div></div>
+      </div>
+      <div class="hud-right">
+        <div class="hud-label">BEST</div>
+        <div class="hud-value gold" id="hud-best">91000</div>
+        <div class="tut-tap" id="tap-bars" style="margin-top:6px">
+          <div class="hud-label">SHIELD</div>
+          <div class="hud-bar-wrap">
+            <div class="hud-bar"><div class="hud-bar-fill shield-fill" id="shield-bar" style="width:70%"></div></div>
           </div>
-          <div style="margin-top:3px">
-            <div class="m-label">AMMO</div>
-            <div class="m-bar-wrap"><div class="m-bar"><div class="m-bar-fill ammo-f" id="mock-ammo-bar"></div></div></div>
+          <div class="hud-label" style="margin-top:4px">AMMO</div>
+          <div class="hud-bar-wrap">
+            <div class="hud-bar"><div class="hud-bar-fill ammo-fill" id="ammo-bar" style="width:55%"></div></div>
           </div>
         </div>
-        <!-- Numbered callout badges -->
-        <div class="cbadge" style="bottom:-8px;left:2px">1</div>
-        <div class="cbadge purple" style="bottom:-8px;left:50%;transform:translateX(-50%)">2</div>
-        <div class="cbadge gold" style="bottom:-8px;right:44px">3</div>
-        <div class="cbadge" style="bottom:-8px;right:2px">4</div>
-      </div>
-
-      <!-- Powerup bar + Radio below HUD, also badged -->
-      <div style="position:relative;margin-top:18px;display:flex;justify-content:space-between;align-items:flex-start;padding:0 2px">
-        <!-- Powerup bar -->
-        <div style="position:relative;display:inline-flex;flex-direction:column;align-items:center;gap:4px">
-          <div class="mock-pu-slots">
-            <div class="mock-pu-slot"><div class="mock-pu-sym">Β</div><div>LITHEBRYL</div></div>
-            <div class="mock-pu-slot"><div class="mock-pu-sym">Μ</div><div>MAGNIUM</div></div>
-            <div class="mock-pu-slot" style="border-color:rgba(255,255,255,0.12);background:rgba(255,255,255,0.02)"><div style="font-size:6px;color:rgba(255,255,255,0.3)">EMPTY</div></div>
-          </div>
-          <div class="mock-stash">STASH</div>
-          <div class="cbadge pink" style="top:-8px;right:-8px">5</div>
-        </div>
-        <!-- Radio -->
-        <div style="position:relative;display:inline-flex;flex-direction:column;align-items:center;gap:4px;background:rgba(5,5,16,0.85);padding:6px 10px;border:1px solid rgba(0,245,255,0.2)">
-          <div class="m-radio-label">RADIO</div>
-          <div class="m-radio-dial"><div class="m-radio-needle"></div></div>
-          <div class="m-radio-track">SIGNAL DRIFT</div>
-          <div class="cbadge" style="top:-8px;right:-8px">6</div>
-        </div>
       </div>
     </div>
 
-    <!-- Legend -->
-    <div class="legend-grid" style="margin-top:14px">
-      <div class="legend-row">
-        <div class="legend-badge">1</div>
-        <div class="legend-text">
-          <div class="legend-name">Score &amp; Combo</div>
-          <div class="legend-desc">Current run points. ×multiplier stacks with kills.</div>
-        </div>
+    <!-- Radio -->
+    <div id="radio-tuner" class="tut-tap" data-tut="radio">
+      <div class="radio-label">RADIO</div>
+      <div class="radio-dial">
+        <div class="radio-needle" id="radio-needle" style="transform:translateX(-50%) rotate(45deg)"></div>
       </div>
-      <div class="legend-row">
-        <div class="legend-badge gold">3</div>
-        <div class="legend-text">
-          <div class="legend-name">High Score</div>
-          <div class="legend-desc">Your all-time best, saved across runs.</div>
-        </div>
-      </div>
-      <div class="legend-row">
-        <div class="legend-badge purple">2</div>
-        <div class="legend-text">
-          <div class="legend-name">Level</div>
-          <div class="legend-desc">Current sector level.</div>
-        </div>
-      </div>
-      <div class="legend-row">
-        <div class="legend-badge">4</div>
-        <div class="legend-text">
-          <div class="legend-name">Shield &amp; Ammo</div>
-          <div class="legend-desc">Shield = health. Ammo refills at score milestones.</div>
-        </div>
-      </div>
-      <div class="legend-row">
-        <div class="legend-badge pink">5</div>
-        <div class="legend-text">
-          <div class="legend-name">Powerups / Stash</div>
-          <div class="legend-desc">Tap a slot to activate. Drag down to stash for later.</div>
-        </div>
-      </div>
-      <div class="legend-row">
-        <div class="legend-badge">6</div>
-        <div class="legend-text">
-          <div class="legend-name">Radio</div>
-          <div class="legend-desc">Swipe the dial to switch music tracks mid-game.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ════ SLIDE 3: COMBAT ════ -->
-  <div class="slide" id="slide-3">
-    <div class="slide-title">ENEMIES &amp; MINES</div>
-    <div class="combat-scene" id="combat-scene">
-      <!-- populated by JS -->
-    </div>
-	    <div class="slide-body">
-      Shoot enemies. Dodge mines.
-    </div>
-  </div>
-
-  <!-- ════ SLIDE 4: RESERVES ════ -->
-  <div class="slide" id="slide-4">
-    <div class="slide-title">RESERVES</div>
-    <div class="pu-demo-scene" id="pu-scene" style="flex-direction:column;gap:6px">
-      <div class="mock-pu-slots">
-        <div class="mock-pu-slot"><div class="mock-pu-sym">Β</div><div>LITHEBRYL</div></div>
-        <div class="mock-pu-slot"><div class="mock-pu-sym">Μ</div><div>MAGNIUM</div></div>
-        <div class="mock-pu-slot" style="border-color:rgba(255,255,255,0.12);background:rgba(255,255,255,0.02)"><div style="font-size:6px;color:rgba(255,255,255,0.3)">EMPTY</div></div>
-      </div>
-      <div class="mock-stash">STASH</div>
-
-      <!-- animated drag ghost -->
-      <div class="pu-dragging" id="pu-ghost">M</div>
-    </div>
-	  <div class="slide-body">
-      Click to activate Compounds/Alloys in your RESERVES.<br>
-	  Drag them into your STASH for crafting, buffing your stats, or a later sector.<br>
-	  When RESERVES are full, Compounds and Alloys are automatically sent to your STASH.<br>
-    </div>
-  </div>
-
-  <!-- ════ SLIDE 5: SHOP ════ -->
-  <div class="slide" id="slide-5">
-    <div class="slide-title" style="margin-bottom:4px">THE FUSION SHOP</div>
-    <!-- Mock shop, wrapped for badge overlay -->
-    <div id="mock-shop-wrap">
-
-      <!-- Header -->
-      <div class="mock-shop-header" style="max-width:min(360px,96vw)">
-        <div>
-          <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--purple);letter-spacing:0.1em">FUSION SHOP</div>
-          <div style="font-size:8px;letter-spacing:0.2em;color:rgba(255,255,255,0.3)">MODE: IN TRANSIT | LOCATION: SECTOR 2</div>
-        </div>
-        <div style="text-align:right">
-          <div style="font-size:7px;letter-spacing:0.2em;color:rgba(255,255,255,0.3)">CREDITS</div>
-          <div style="font-family:var(--display);font-size:13px;color:var(--gold)">340¢</div>
-        </div>
-      </div>
-      <div class="mock-shop-supergraph" style="max-width:min(360px,96vw)">
-        <div class="sg-o"></div><div class="sg-p"></div><div class="sg-pu"></div><div class="sg-b"></div>
-      </div>
-
-      <!-- Two-column body, position:relative for badges -->
-      <div class="mock-shop-layout" style="max-width:min(360px,96vw);position:relative">
-        <!-- Left -->
-        <div class="mock-shop-left">
-          <div class="mock-shop-tabs">
-            <div class="m-tab active">BUY</div>
-            <div class="m-tab">SELL</div>
-            <div class="m-tab">CRAFT</div>
-            <div class="m-tab">STASH</div>
-          </div>
-          <div class="mock-cards">
-            <div class="mock-card">
-              <div class="mc-sym" style="color:var(--cyan)">β</div>
-              <div class="mc-name">Beryllium</div>
-              <div class="mc-eff">Shield Max +6</div>
-              <div class="mc-price">80¢</div>
-            </div>
-            <div class="mock-card" style="border-color:rgba(0,245,255,0.35);background:rgba(0,245,255,0.04)">
-              <div class="mc-sym" style="color:var(--purple)">Β</div>
-              <div class="mc-name">Lithebryl</div>
-              <div class="mc-eff">Shield +20</div>
-              <div class="mc-price">150¢</div>
-            </div>
-            <div class="mock-card">
-              <div class="mc-sym" style="color:var(--cyan)">𝜈</div>
-              <div class="mc-name">Nitrogen</div>
-              <div class="mc-eff">Shoot Spd +3</div>
-              <div class="mc-price">80¢</div>
-            </div>
-          </div>
-          <!-- badge A: tabs -->
-          <div class="cbadge purple" style="top:-8px;left:50%;transform:translateX(-50%)">A</div>
-          <!-- badge B: cards -->
-          <div class="cbadge" style="bottom:-8px;left:50%;transform:translateX(-50%)">B</div>
-        </div>
-        <!-- Right -->
-        <div class="mock-shop-right">
-          <div class="mock-stats-block">
-            <div class="m-stat-row"><div class="m-stat-label">SHOOT SPD</div><div class="m-stat-val">3/s</div></div>
-            <div class="m-stat-row"><div class="m-stat-label">AMMO MAX</div><div class="m-stat-val">50</div></div>
-            <div class="m-stat-row"><div class="m-stat-label">SHIELD MAX</div><div class="m-stat-val">10</div></div>
-          </div>
-          <div class="mock-reserves">
-            <div class="mock-res-slots">
-              <div class="mock-res-slot filled">Β</div>
-              <div class="mock-res-slot filled">Μ</div>
-              <div class="mock-res-slot"></div>
-            </div>
-          </div>
-          <div class="mock-button">LAUNCH</div>
-          <!-- badge C: stats -->
-          <div class="cbadge gold" style="top:-8px;right:4px">C</div>
-          <!-- badge D: reserves -->
-          <div class="cbadge pink" style="top:60px;right:4px">D</div>
-        </div>
-      </div>
+      <div class="radio-track-name" id="radio-track-name">TRACK 2</div>
     </div>
 
-    <!-- Legend -->
-    <div class="legend-grid" style="margin-top:12px">
-      <div class="legend-row">
-        <div class="legend-badge purple">A</div>
-        <div class="legend-text">
-          <div class="legend-name">Tabs</div>
-          <div class="legend-desc">Buy, Sell, Craft, or view your Stash.</div>
+    <!-- Powerup bar -->
+    <div id="powerup-bar">
+      <div id="pu-slots">
+        <div class="pu-slot filled tut-tap" data-tut="reserves">
+          <span class="pu-slot-sym">Θ</span>
+          <span class="pu-slot-name">TITANE</span>
         </div>
+        <div class="pu-slot tut-tap" data-tut="reserves"></div>
+        <div class="pu-slot tut-tap" data-tut="reserves"></div>
       </div>
-      <div class="legend-row">
-        <div class="legend-badge gold">C</div>
-        <div class="legend-text">
-          <div class="legend-name">Stats Panel</div>
-          <div class="legend-desc">Current stats. Drag Elements, Compounds, and Alloys here to apply buffs.</div>
-        </div>
-      </div>
-      <div class="legend-row">
-        <div class="legend-badge">B</div>
-        <div class="legend-text">
-          <div class="legend-name">Item Cards</div>
-          <div class="legend-desc">Drag a card to the action box to buy, sell, or craft. Hit Go to Finalize.</div>
-        </div>
-      </div>
-      <div class="legend-row">
-        <div class="legend-badge pink">D</div>
-        <div class="legend-text">
-          <div class="legend-name">Reserves</div>
-          <div class="legend-desc">Compounds and Alloys you carry into Sectors. Drag to rearrange.</div>
-        </div>
-      </div>
-    </div>
-	  <div class="slide-body">
-      Buy, Sell, Craft, and view your STASH to upgrade stats and equip Compounds and Alloys.
-    </div>
-  </div>
-
-  <!-- ════ SLIDE 6: CRAFTING ════ -->
-  <div class="slide" id="slide-6">
-    <div class="slide-title" style="margin-bottom:4px">CRAFTING</div>
-    <!-- Mock shop, wrapped for badge overlay -->
-    <div style="max-width:min(360px,96vw);position:relative">
-
-      <!-- Header -->
-      <div class="mock-shop-header" style="max-width:min(360px,96vw)">
-        <div>
-          <div style="font-family:var(--display);font-size:13px;font-weight:700;color:var(--purple);letter-spacing:0.1em">FUSION SHOP</div>
-          <div style="font-size:8px;letter-spacing:0.2em;color:rgba(255,255,255,0.3)">MODE: IN TRANSIT | LOCATION: SECTOR 6</div>
-        </div>
-        <div style="text-align:right">
-          <div style="font-size:7px;letter-spacing:0.2em;color:rgba(255,255,255,0.3)">CREDITS</div>
-          <div style="font-family:var(--display);font-size:13px;color:var(--gold)">340¢</div>
-        </div>
-      </div>
-      <div class="mock-shop-supergraph" style="max-width:min(360px,96vw)">
-        <div class="sg-o"></div><div class="sg-p"></div><div class="sg-pu"></div><div class="sg-b"></div>
-      </div>
-
-      <!-- Two-column body, position:relative for badges -->
-      <div class="mock-shop-layout" style="max-width:min(360px,96vw);position:relative">
-        <!-- Left -->
-        <div class="mock-shop-left">
-          <div class="mock-shop-tabs">
-            <div class="m-tab">BUY</div>
-            <div class="m-tab">SELL</div>
-            <div class="m-tab active">CRAFT</div>
-            <div class="m-tab">STASH</div>
-          </div>
-          <div class="mock-cards">
-            <!-- Compound target card with recipes -->
-            <div class="mock-card" style="border-color:rgba(168,85,247,0.35);background:rgba(168,85,247,0.04);position:relative">
-              <div class="mc-sym" style="color:var(--purple)">Β</div>
-              <div class="mc-name">Lithebryl</div>
-              <div class="mc-eff" style="font-size:6px;line-height:1.3">
-                <div style="color:rgba(255,255,255,0.3);margin-bottom:2px">RECIPES:</div>
-                <div style="color:rgba(0,245,255,0.7)">β+τ • λ+τ • β+β</div>
-              </div>
-              <div style="position:absolute;top:6px;right:6px;font-size:8px;color:var(--gold)">0/2</div>
-              <!-- Progress lights -->
-              <div style="display:flex;gap:2px;position:absolute;bottom:6px;right:6px">
-                <div style="width:6px;height:6px;border-radius:50%;border:1px solid rgba(255,255,255,0.2);background:rgba(0,0,0,0.3)"></div>
-                <div style="width:6px;height:6px;border-radius:50%;border:1px solid rgba(255,255,255,0.2);background:rgba(0,0,0,0.3)"></div>
-              </div>
-              <div class="cbadge purple" style="top:-6px;left:-6px">A</div>
-            </div>
-            <!-- Available element source cards -->
-            <div class="mock-card" style="border-color:rgba(0,245,255,0.4);background:rgba(0,245,255,0.06)">
-              <div class="mc-sym" style="color:var(--cyan)">β</div>
-              <div class="mc-name">Beryllium</div>
-              <div class="mc-eff">Owned: 2</div>
-            </div>
-            <div class="mock-card">
-              <div class="mc-sym" style="color:var(--cyan)">τ</div>
-              <div class="mc-name">Titanium</div>
-              <div class="mc-eff">Owned: 1</div>
-            </div>
-          </div>
-          <!-- badge B: ingredient cards -->
-          <div class="cbadge" style="bottom:-8px;left:50%;transform:translateX(-50%)">B</div>
-        </div>
-        <!-- Right -->
-        <div class="mock-shop-right">
-          <!-- Action box with GO button -->
-          <div style="border:1px solid rgba(0,245,255,0.25);background:rgba(0,0,0,0.4);padding:8px;margin-bottom:8px;position:relative">
-            <div style="font-size:7px;letter-spacing:0.2em;color:rgba(255,255,255,0.3);margin-bottom:6px;text-align:center">ACTION BOX</div>
-            <div style="min-height:40px;display:flex;align-items:center;justify-content:center;margin-bottom:8px">
-              <div style="font-size:7px;color:rgba(255,255,255,0.3);text-align:center;line-height:1.4">
-                Drag items here
-              </div>
-            </div>
-            <!-- GO button -->
-            <div class="mock-button">
-              GO
-            </div>
-            <div class="cbadge gold" style="top:-6px;right:-6px">C</div>
-          </div>
-          <div class="mock-reserves">
-            <div class="mock-res-slots">
-              <div class="mock-res-slot filled">Β</div>
-              <div class="mock-res-slot filled">Μ</div>
-              <div class="mock-res-slot"></div>
-            </div>
-          </div>
-          <div class="mock-button">LAUNCH</div>
-        </div>
-      </div>
+      <div id="pu-stash" class="tut-tap" data-tut="stash">STASH</div>
     </div>
 
-    <!-- Legend -->
-    <div class="legend-grid" style="margin-top:12px">
-      <div class="legend-row">
-        <div class="legend-badge purple">A</div>
-        <div class="legend-text">
-          <div class="legend-name">Recipe Variants</div>
-          <div class="legend-desc">Tap compound to see all recipes. Progress lights track ingredients.</div>
-        </div>
-      </div>
-      <div class="legend-row">
-        <div class="legend-badge gold">C</div>
-        <div class="legend-text">
-          <div class="legend-name">Action Box</div>
-          <div class="legend-desc">Drag ingredients here. Hit GO when ready to craft.</div>
-        </div>
-      </div>
-      <div class="legend-row">
-        <div class="legend-badge">B</div>
-        <div class="legend-text">
-          <div class="legend-name">Ingredient Cards</div>
-          <div class="legend-desc">Highlighted when in selected recipe. Drag to action box.</div>
-        </div>
-      </div>
-      <div class="legend-row">
-        <div style="width:15px;height:15px;border-radius:50%;border:1.5px solid var(--cyan);background:rgba(0,245,255,0.1);flex-shrink:0;margin-top:1px"></div>
-        <div class="legend-text">
-          <div class="legend-name">Progress Lights</div>
-          <div class="legend-desc">Fill as you add ingredients. Complete all to enable crafting.</div>
-        </div>
-      </div>
+    <!-- Pickup log -->
+    <div id="pickup-log" class="tut-tap" data-tut="log">
+      <div class="pickup-entry">+ TITANE</div>
     </div>
-	  <div class="slide-body">
-      Drag Elements onto Compound cards, or Compounds onto Alloy Cards.<br>
-	  Drag completed Craft cards to the right and click GO to craft.<br>
-	  Double click a Craft card to clear it of all loaded Elements or Compounds.<br>
-	  Tap a card to see recipe variants.
-    </div>
-  </div>
 
-</div><!-- /tut-wrap -->
+    <!-- Tutorial toast -->
+    <div id="tut-toast">
+      <div id="tut-toast-title"></div>
+      <div id="tut-toast-body"></div>
+    </div>
+
+  </div><!-- /.screen-content -->
+  </div><!-- /#slide-1 -->
+
+</div><!-- /#tut-wrap -->
 
 <script>
-(function(){
+  // ══════════════════════════════════════
+  // SLIDE NAVIGATION
+  // Lifted from tutorial.html — dots removed
+  // ══════════════════════════════════════
   const SLIDES = document.querySelectorAll('.slide');
   const N = SLIDES.length;
   let cur = 0;
 
-  // Build progress dots
-  const prog = document.getElementById('progress');
-  for(let i=0;i<N;i++){
-    const d = document.createElement('div');
-    d.className = 'dot' + (i===0?' active':'');
-    prog.appendChild(d);
-  }
-  const dots = prog.querySelectorAll('.dot');
-
-  function goto(idx){
-    if(idx < 0 || idx >= N) return; // bounds check
+  function goto(idx) {
+    if (idx < 0 || idx >= N) return;
     SLIDES[cur].classList.remove('active');
-    dots[cur].classList.remove('active');
     cur = idx;
     SLIDES[cur].classList.add('active');
-    dots[cur].classList.add('active');
-    // trigger animations for new slide
-    if(cur===1) startMoveDemo();
-    if(cur===2) startHudAnimate();
-    if(cur===3) startCombat();
-    if(cur===4) startPUDemo();
   }
 
   // Swipe gesture detection
-  let touchStartX = 0;
-  let touchStartY = 0;
-  let touchEndX = 0;
-  let touchEndY = 0;
-  const minSwipeDistance = 50; // minimum distance for a swipe
+  let touchStartX = 0, touchStartY = 0, touchEndX = 0, touchEndY = 0;
+  const minSwipeDistance = 50;
 
   function handleGesture() {
     const deltaX = touchEndX - touchStartX;
     const deltaY = touchEndY - touchStartY;
-    
-    // Only register as swipe if horizontal movement is greater than vertical
     if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minSwipeDistance) {
-      if (deltaX > 0) {
-        // Swipe right - go to previous slide
-        goto(cur - 1);
-      } else {
-        // Swipe left - go to next slide
-        goto(cur + 1);
-      }
+      deltaX > 0 ? goto(cur - 1) : goto(cur + 1);
     }
   }
 
@@ -1058,60 +506,141 @@
     touchStartX = e.changedTouches[0].screenX;
     touchStartY = e.changedTouches[0].screenY;
   });
-
   document.addEventListener('touchend', e => {
     touchEndX = e.changedTouches[0].screenX;
     touchEndY = e.changedTouches[0].screenY;
     handleGesture();
   });
 
-  // Tap to advance (existing functionality)
-  document.addEventListener('pointerdown', e=>{
-    if(e.target.closest('button')) return;
-    // Only advance on tap if it's not part of a swipe gesture
-    // The swipe handler will take care of navigation
-    if(cur < N-1 && e.pointerType !== 'touch') goto(cur+1);
+  // Tap to advance on non-touch (mouse). Canvas & tut-tap elements stop propagation.
+  document.addEventListener('pointerdown', e => {
+    if (e.target.closest('button')) return;
+    if (e.target.closest('.tut-tap')) return;
+    if (e.pointerType !== 'touch') goto(cur + 1);
   });
 
-  // Reset to slide 0 when tutorial is opened
-  // This function should be called from the parent context when opening the tutorial
-  window.resetTutorial = function() {
-    // Cancel all running animation loops so they restart cleanly on next visit
-    if(moveRAF)   { cancelAnimationFrame(moveRAF);   moveRAF   = null; }
-    if(hudRAF)    { cancelAnimationFrame(hudRAF);    hudRAF    = null; }
-    if(combatRAF) { cancelAnimationFrame(combatRAF); combatRAF = null; }
-    if(puRAF)     { cancelAnimationFrame(puRAF);     puRAF     = null; }
-    goto(0);
-  };
+  // ══════════════════════════════════════
+  // CANVAS + DRAWING
+  // ══════════════════════════════════════
+  const canvas = document.getElementById('game-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H;
 
-  // ──────────────────────────────────
-  // SLIDE 1: Movement demo
-  // ──────────────────────────────────
-  const moveCanvas = document.getElementById('move-canvas');
-  const mctx = moveCanvas.getContext('2d');
-  const MW = 260, MH = 160;
+  function resize() {
+    if (!canvas) return;
+    const dpr  = window.devicePixelRatio || 1;
+    const maxW = Math.min(window.innerWidth, 430);
+    const maxH = window.innerHeight;
+    canvas.width  = maxW * dpr;
+    canvas.height = maxH * dpr;
+    canvas.style.width  = maxW + 'px';
+    canvas.style.height = maxH + 'px';
+    W = maxW; H = maxH;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(dpr, dpr);
+    canvas.style.marginLeft = ((window.innerWidth - maxW) / 2) + 'px';
+  }
 
-  // Seed stars once
-  const moveStars = Array.from({length:30}, () => ({
-    x: Math.random()*MW, y: Math.random()*MH,
-    r: Math.random()*0.8+0.3, o: Math.random()*0.5+0.1
-  }));
+  resize();
+  window.addEventListener('resize', resize);
 
-  // Bullets for move demo
-  let moveBullets = [];
-  let moveShootTimer = 0;
+  // ── Waveform background ──
+  // Lifted exactly from script.js drawSynthwaveScene() / hexToRgb().
+  // waveOffset and waveT are frozen at 0 for a still frame.
+  const waveOffset = 0;
+  const waveT      = 0;
 
-  function drawDemoShip(ctx, x, y, aimAngle) {
+  const LEVEL_PALETTES = [
+    { skyT:'#0d0020', skyB:'#1a0040', sun:'#ff6ec7', sunG:'#d42b6a', grid:'#2255ff', mtn:'#1133cc' }, // 1
+    { skyT:'#0a0025', skyB:'#1e0050', sun:'#ff8c42', sunG:'#ff4500', grid:'#00ccff', mtn:'#0066cc' }, // 2
+    { skyT:'#100015', skyB:'#300030', sun:'#d42b6a', sunG:'#cc0055', grid:'#cc44ff', mtn:'#8800cc' }, // 3
+    { skyT:'#1a0800', skyB:'#3d1200', sun:'#ffd700', sunG:'#ff8c00', grid:'#ff6b35', mtn:'#cc3300' }, // 4
+    { skyT:'#200010', skyB:'#450020', sun:'#ff4500', sunG:'#ff0000', grid:'#d42b6a', mtn:'#cc0044' }, // 5
+    { skyT:'#05001a', skyB:'#150040', sun:'#a855f7', sunG:'#6600cc', grid:'#8800ff', mtn:'#550099' }, // 6
+    { skyT:'#001510', skyB:'#003322', sun:'#00ff9f', sunG:'#00cc66', grid:'#00ffcc', mtn:'#009966' }, // 7
+    { skyT:'#1a0000', skyB:'#400000', sun:'#ffffff', sunG:'#ff0040', grid:'#ff0040', mtn:'#990020' }, // 8
+  ];
+
+  function hexToRgb(hex) {
+    const r = parseInt(hex.slice(1,3),16);
+    const g = parseInt(hex.slice(3,5),16);
+    const b = parseInt(hex.slice(5,7),16);
+    return {r,g,b};
+  }
+
+  function drawSynthwaveScene() {
+    const lvl  = 1;
+    const pal  = LEVEL_PALETTES[(lvl - 1) % LEVEL_PALETTES.length];
+
+    // ── WAVEFORM — full canvas, flat centre, wavy sides ─
+    const rows    = 38;
+    const rowSpan = H / rows;
+    const sideW   = W * 0.30;
+    const c1 = hexToRgb(pal.grid);
+    const c2 = hexToRgb(pal.sun);
+
+    for (let r = 0; r < rows; r++) {
+      const baseY = (r * rowSpan + rowSpan * 0.5 + waveOffset) % H;
+      const screenPct = baseY / H;
+      const amp   = (4 + screenPct * rows * 1.4 + lvl * 0.8) * (0.4 + screenPct * 0.6);
+      const freq  = 0.022 + screenPct * rows * 0.001;
+      const cycle  = waveOffset / H;
+      const localT = cycle < 1 ? cycle : 2 - cycle;
+      const ph    = localT * 30 * 0.5 + screenPct * rows * 0.3;
+      const ph2   = localT * 30 * 0.3 + screenPct * rows * 0.18;
+
+      const rr = Math.round(c1.r + (c2.r - c1.r) * screenPct);
+      const gg = Math.round(c1.g + (c2.g - c1.g) * screenPct);
+      const bb = Math.round(c1.b + (c2.b - c1.b) * screenPct);
+      const alpha = 0.14 + screenPct * 0.38;
+
+      ctx.strokeStyle = `rgba(${rr},${gg},${bb},${alpha})`;
+      ctx.lineWidth = 0.85;
+      ctx.beginPath();
+      for (let px = 0; px <= W; px += 2) {
+        let blend;
+        if (px <= sideW) {
+          const t = 1 - px / sideW;
+          blend = 0.5 - 0.5 * Math.cos(t * Math.PI);
+        } else if (px >= W - sideW) {
+          const t = (px - (W - sideW)) / sideW;
+          blend = 0.5 - 0.5 * Math.cos(t * Math.PI);
+        } else {
+          blend = 0;
+        }
+        const wave = Math.sin(px * freq + ph)             * amp
+                   + Math.sin(px * freq * 2.1 + ph2)      * amp * 0.4
+                   + Math.sin(px * freq * 0.5 + ph * 0.7) * amp * 0.2;
+        const py = baseY - wave * blend;
+        px === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+    }
+  }
+
+  // ── Ship ──
+  // Position matches script.js exactly: centred X, H-130 Y, nose pointing up (aimAngle=0)
+  const ship = { x: W / 2, y: H - 130 };
+  const aimAngle = 0;
+
+  function drawShip() {
+    const x = ship.x, y = ship.y;
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(aimAngle);
     ctx.shadowColor = '#00f5ff'; ctx.shadowBlur = 16;
+
     // Main body
     ctx.beginPath();
-    ctx.moveTo(0, -18); ctx.lineTo(-12, 8); ctx.lineTo(-5, 4);
-    ctx.lineTo(0, 10); ctx.lineTo(5, 4); ctx.lineTo(12, 8);
+    ctx.moveTo(0, -18);
+    ctx.lineTo(-12, 8);
+    ctx.lineTo(-5, 4);
+    ctx.lineTo(0, 10);
+    ctx.lineTo(5, 4);
+    ctx.lineTo(12, 8);
     ctx.closePath();
     ctx.strokeStyle = '#00f5ff'; ctx.lineWidth = 1.5; ctx.stroke();
+
     // Wing accents
     ctx.beginPath();
     ctx.moveTo(-12, 8); ctx.lineTo(-18, 2); ctx.lineTo(-10, -2);
@@ -1119,281 +648,193 @@
     ctx.beginPath();
     ctx.moveTo(12, 8); ctx.lineTo(18, 2); ctx.lineTo(10, -2);
     ctx.stroke();
-    // Engine glow
+
+    // Engine glow (frozen — no Date.now() pulse)
     ctx.beginPath();
-    ctx.arc(0, 10, 3 + Math.sin(Date.now()*0.01)*1, 0, Math.PI*2);
-    ctx.fillStyle = '#ff2d78'; ctx.fill();
+    ctx.arc(0, 10, 3, 0, Math.PI*2);
+    ctx.fillStyle = '#d42b6a'; ctx.fill();
+
     ctx.restore();
   }
 
-  let moveRAF=null, moveT=0, shipX=MW/2, targetX=MW/2;
-  function startMoveDemo(){
-    if(moveRAF) return;
-    const MAX_ANGLE = 55 * Math.PI / 180;
-    function tick(ts){
-      moveT += 0.018;
-      mctx.clearRect(0, 0, MW, MH);
-
-      // Stars
-      moveStars.forEach(s => {
-        mctx.beginPath(); mctx.arc(s.x, s.y, s.r, 0, Math.PI*2);
-        mctx.fillStyle = `rgba(255,255,255,${s.o})`; mctx.fill();
-      });
-
-      // Ship Movement - horizontal only with smooth interpolation (matches game)
-      const shipY = MH*0.75; // Fixed Y position near bottom
-      targetX = MW/2 + Math.sin(moveT*0.35)*90; // Smooth left-right movement
-      shipX += (targetX - shipX) * 0.18; // Smooth interpolation like the real game
-
-      // Aim angle based on ship position
-      const t = Math.max(0, Math.min(1, shipX / MW));
-      const aimAngle = (t - 0.5) * 2 * MAX_ANGLE;
-
-      // Auto-fire bullet from ship nose
-      moveShootTimer -= 1;
-      if (moveShootTimer <= 0) {
-        const adx = Math.sin(aimAngle), ady = -Math.cos(aimAngle);
-        const spd = 4;
-        moveBullets.push({ x: shipX + adx*10, y: shipY + ady*10, vx: adx*spd, vy: ady*spd, life: 1 });
-        moveShootTimer = 18;
-      }
-
-      // Draw & update bullets
-      moveBullets = moveBullets.filter(b => {
-        b.x += b.vx; b.y += b.vy;
-        if (b.x < 0 || b.x > MW || b.y < 0 || b.y > MH) return false;
-        mctx.save();
-        mctx.shadowColor = '#00f5ff'; mctx.shadowBlur = 6;
-        mctx.strokeStyle = '#00f5ff'; mctx.lineWidth = 2;
-        mctx.beginPath();
-        mctx.moveTo(b.x, b.y); mctx.lineTo(b.x - b.vx*3, b.y - b.vy*3);
-        mctx.stroke(); mctx.restore();
-        return true;
-      });
-
-      drawDemoShip(mctx, shipX, shipY, aimAngle);
-
-      moveRAF = requestAnimationFrame(tick);
-    }
-    tick();
+  // ── Mine ──
+  // Lifted exactly from script.js drawMines(). r:11 matches spawn default.
+  function drawMine(m) {
+    ctx.save(); ctx.translate(m.x, m.y);
+    ctx.shadowColor = '#ff0000'; ctx.shadowBlur = 18;
+    ctx.beginPath(); ctx.arc(0,0,m.r,0,Math.PI*2);
+    ctx.fillStyle = '#000'; ctx.fill();
+    ctx.strokeStyle = '#ff2020'; ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.arc(0,0,m.r,0,Math.PI*2); ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(-m.r,0); ctx.lineTo(m.r,0);
+    ctx.moveTo(0,-m.r); ctx.lineTo(0,m.r);
+    ctx.stroke();
+    const s = m.r*0.55;
+    ctx.beginPath();
+    ctx.moveTo(-s,-s); ctx.lineTo(s,s);
+    ctx.moveTo(s,-s); ctx.lineTo(-s,s);
+    ctx.strokeStyle = 'rgba(255,30,30,0.5)'; ctx.stroke();
+    ctx.restore();
   }
 
-  // ──────────────────────────────────
-  // SLIDE 2: HUD bar 
-  // ──────────────────────────────────
-  let hudT=0, hudRAF=null;
-  function startHudAnimate(){
-    if(hudRAF) return;
-    function tick(){
-      hudT+=0.01;
-      const sw = 40+30*Math.sin(hudT*0.7);
-      const aw = 20+25*Math.sin(hudT*0.5+1);
-      document.getElementById('mock-shield-bar').style.width=sw+'%';
-      document.getElementById('mock-ammo-bar').style.width=aw+'%';
-      hudRAF=requestAnimationFrame(tick);
-    }
-    tick();
+  // ── Scout ──
+  // draw() lifted exactly from ENEMY_TYPES scout entry.
+  // angle: Math.PI points nose downward (toward player), matching chase behaviour.
+  function drawScout(e) {
+    ctx.save(); ctx.translate(e.x, e.y); ctx.rotate(e.angle);
+    ctx.beginPath();
+    ctx.moveTo(0, e.r);
+    ctx.lineTo(-e.r * 0.85, -e.r);
+    ctx.lineTo( e.r * 0.85, -e.r);
+    ctx.closePath();
+    ctx.strokeStyle = e.color; ctx.lineWidth = 1.5;
+    ctx.shadowColor = e.color; ctx.shadowBlur = 8;
+    ctx.stroke(); ctx.restore();
   }
 
-  // ──────────────────────────────────
-  // SLIDE 3: Combat animation
-  // ──────────────────────────────────
-  const combatScene = document.getElementById('combat-scene');
-  let combatRAF=null, combatSeq=0, combatT=0;
-
-  function buildCombatScene(){
-    combatScene.innerHTML='';
-    // Stars
-    for(let i=0;i<20;i++){
-      const s=document.createElement('div');
-      s.className='star';
-      const sz=Math.random()*1.2+0.4;
-      s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;opacity:${0.1+Math.random()*0.4}`;
-      combatScene.appendChild(s);
-    }
-    // Ship
-    const shipCv=document.createElement('canvas');
-    shipCv.id='cs-ship';
-    shipCv.width=48; shipCv.height=48;
-    shipCv.style.cssText='position:absolute;left:50%;top:65%;transform:translate(-50%,-50%)';
-    combatScene.appendChild(shipCv);
-    (function(){
-      const sc=shipCv.getContext('2d');
-      sc.save(); sc.translate(24,24); sc.rotate(0);
-      sc.shadowColor='#00f5ff'; sc.shadowBlur=16;
-      sc.beginPath();
-      sc.moveTo(0,-18); sc.lineTo(-12,8); sc.lineTo(-5,4);
-      sc.lineTo(0,10); sc.lineTo(5,4); sc.lineTo(12,8);
-      sc.closePath();
-      sc.strokeStyle='#00f5ff'; sc.lineWidth=1.5; sc.stroke();
-      sc.beginPath();
-      sc.moveTo(-12,8); sc.lineTo(-18,2); sc.lineTo(-10,-2);
-      sc.strokeStyle='#a855f7'; sc.lineWidth=1; sc.stroke();
-      sc.beginPath();
-      sc.moveTo(12,8); sc.lineTo(18,2); sc.lineTo(10,-2);
-      sc.stroke();
-      sc.beginPath(); sc.arc(0,10,3,0,Math.PI*2);
-      sc.fillStyle='#ff2d78'; sc.fill();
-      sc.restore();
-    })();
-    // Enemy — scout triangle
-    const enemy=document.createElementNS('http://www.w3.org/2000/svg','svg');
-    enemy.id='cs-enemy';
-    enemy.setAttribute('width','24'); enemy.setAttribute('height','24');
-    enemy.setAttribute('viewBox','-12 -12 24 24');
-    enemy.style.cssText='position:absolute;left:55%;top:20%;transform:translate(-50%,-50%);filter:drop-shadow(0 0 6px #ff6b35);overflow:visible';
-    const epoly=document.createElementNS('http://www.w3.org/2000/svg','polygon');
-    epoly.setAttribute('points','0,12 -10.2,-12 10.2,-12');
-    epoly.setAttribute('fill','none'); epoly.setAttribute('stroke','#ff6b35');
-    epoly.setAttribute('stroke-width','1.5'); epoly.setAttribute('stroke-linejoin','round');
-    enemy.appendChild(epoly);
-    combatScene.appendChild(enemy);
-    // Mine
-    const mine=document.createElementNS('http://www.w3.org/2000/svg','svg');
-    mine.id='cs-mine';
-    mine.setAttribute('width','22'); mine.setAttribute('height','22');
-    mine.setAttribute('viewBox','-11 -11 22 22');
-    mine.style.cssText='position:absolute;left:20%;top:55%;transform:translate(-50%,-50%);filter:drop-shadow(0 0 8px #ff2020);overflow:visible';
-    mine.innerHTML=`
-      <circle cx="0" cy="0" r="9" fill="#000"/>
-      <circle cx="0" cy="0" r="9" fill="none" stroke="#ff2020" stroke-width="1.2"/>
-      <line x1="-9" y1="0" x2="9" y2="0" stroke="#ff2020" stroke-width="1.2"/>
-      <line x1="0" y1="-9" x2="0" y2="9" stroke="#ff2020" stroke-width="1.2"/>
-      <line x1="-5" y1="-5" x2="5" y2="5" stroke="rgba(255,30,30,0.5)" stroke-width="1.2"/>
-      <line x1="5" y1="-5" x2="-5" y2="5" stroke="rgba(255,30,30,0.5)" stroke-width="1.2"/>
-    `;
-    combatScene.appendChild(mine);
-    // Bullet
-    const bullet=document.createElement('div');
-    bullet.id='cs-bullet';
-    bullet.className='bullet';
-    bullet.style.cssText='left:50%;top:55%;transform:translateX(-50%);opacity:0';
-    combatScene.appendChild(bullet);
-    // Explode ring
-    const ring=document.createElement('div');
-    ring.id='cs-ring';
-    ring.className='explode-ring';
-    ring.style.cssText='left:55%;top:20%;width:20px;height:20px;transform:translate(-50%,-50%) scale(0)';
-    combatScene.appendChild(ring);
-    // Mine X warning
-    const mineX=document.createElement('div');
-    mineX.id='cs-minex';
-    mineX.className='mine-x';
-    mineX.textContent='✕';
-    mineX.style.cssText='left:18%;top:49%;';
-    combatScene.appendChild(mineX);
-    // Enemy label
-    const el=document.createElement('div');
-    el.style.cssText='position:absolute;left:62%;top:18%;font-size:8px;letter-spacing:0.12em;color:rgba(255,45,120,0.6)';
-    el.textContent='ENEMY';
-    combatScene.appendChild(el);
-    // Mine label
-    const ml=document.createElement('div');
-    ml.style.cssText='position:absolute;left:22%;top:57%;font-size:8px;letter-spacing:0.12em;color:rgba(255,215,0,0.6)';
-    ml.textContent='MINE';
-    combatScene.appendChild(ml);
+  // ── Drone ──
+  // draw() lifted exactly from ENEMY_TYPES drone entry.
+  // angle: Math.PI/4 gives a natural tilted-diamond look mid-rotation.
+  function drawDrone(e) {
+    ctx.save(); ctx.translate(e.x, e.y); ctx.rotate(e.angle);
+    ctx.beginPath();
+    ctx.moveTo(0, -e.r); ctx.lineTo(e.r, 0);
+    ctx.lineTo(0, e.r); ctx.lineTo(-e.r, 0);
+    ctx.closePath();
+    ctx.strokeStyle = e.color; ctx.lineWidth = 1.5;
+    ctx.shadowColor = e.color; ctx.shadowBlur = 10;
+    ctx.stroke();
+    const s = e.r * 0.45;
+    ctx.beginPath();
+    ctx.moveTo(0,-s); ctx.lineTo(s,0); ctx.lineTo(0,s); ctx.lineTo(-s,0); ctx.closePath();
+    ctx.strokeStyle = e.color; ctx.lineWidth = 0.8; ctx.stroke();
+    ctx.restore();
   }
 
-  function startCombat(){
-    buildCombatScene();
-    if(combatRAF) cancelAnimationFrame(combatRAF);
-    combatT=0; combatSeq=0;
-    let phase='idle', phaseT=0;
-    function tick(){
-      combatT+=1;
-      phaseT+=1;
-
-      const bullet=document.getElementById('cs-bullet');
-      const ring=document.getElementById('cs-ring');
-      const enemy=document.getElementById('cs-enemy');
-      const minex=document.getElementById('cs-minex');
-      const ship=document.getElementById('cs-ship');
-      if(!bullet){combatRAF=requestAnimationFrame(tick);return;}
-
-      if(phase==='idle' && phaseT>40){
-        phase='shoot'; phaseT=0;
-        bullet.style.opacity='1';
-        bullet.style.transition='none';
-        bullet.style.top='55%';
-      }
-      else if(phase==='shoot'){
-        const pct=phaseT/30;
-        const ty=55-pct*38;
-        bullet.style.top=ty+'%';
-        if(pct>=1){
-          bullet.style.opacity='0';
-          ring.style.transition='none';
-          ring.style.transform='translate(-50%,-50%) scale(0)';
-          ring.style.opacity='0.9';
-          void ring.offsetWidth;
-          ring.style.transition='transform 0.5s ease-out, opacity 0.5s ease-out';
-          ring.style.transform='translate(-50%,-50%) scale(2.5)';
-          ring.style.opacity='0';
-          enemy.style.display='none';
-          phase='wait'; phaseT=0;
-        }
-      }
-      else if(phase==='wait' && phaseT>50){
-        // reset enemy
-        enemy.style.display='block';
-        enemy.style.left='55%'; enemy.style.top='20%';
-        // mine warning
-        minex.style.animation='none'; void minex.offsetWidth;
-        minex.style.opacity='0';
-        phase='minewarn'; phaseT=0;
-      }
-      else if(phase==='minewarn' && phaseT>10){
-        minex.style.animation='flashMineWarn 1.2s ease';
-        phase='minedone'; phaseT=0;
-      }
-      else if(phase==='minedone' && phaseT>80){
-        phase='idle'; phaseT=0;
-      }
-
-      combatRAF=requestAnimationFrame(tick);
+  // ── Pod ──
+  // Lifted exactly from script.js drawPods(). pulse frozen at mid-value (sin=0 → 0.6).
+  // puKey 'TITANE' → sym 'Θ', matching STRINGS.powerups.TITANE.
+  function drawPod(pod) {
+    ctx.save();
+    ctx.translate(pod.x, pod.y);
+    const pulse = 0.6; // frozen: 0.6 + 0.4 * Math.sin(pod.t * 3) at t=0
+    ctx.shadowColor = '#00f5ff'; ctx.shadowBlur = 18 * pulse;
+    ctx.strokeStyle = `rgba(0,245,255,${0.6 + 0.4 * pulse})`;
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 6) * Math.PI * 2;
+      const px = Math.cos(a) * pod.r, py = Math.sin(a) * pod.r;
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
     }
-    tick();
+    ctx.closePath(); ctx.stroke();
+    // Inner hex (smaller, rotated 30°)
+    ctx.strokeStyle = `rgba(0,245,255,0.3)`;
+    ctx.lineWidth = 0.8;
+    ctx.beginPath();
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 6) * Math.PI * 2 + Math.PI / 6;
+      const px = Math.cos(a) * pod.r * 0.55, py = Math.sin(a) * pod.r * 0.55;
+      i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+    }
+    ctx.closePath(); ctx.stroke();
+    // Titane symbol
+    ctx.font = 'bold 13px Nova Square, monospace';
+    ctx.fillStyle = `rgba(0,245,255,${0.8 + 0.2 * pulse})`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.shadowColor = '#00f5ff'; ctx.shadowBlur = 8;
+    ctx.fillText('Θ', 0, 0);
+    ctx.restore();
   }
 
-  // ──────────────────────────────────
-  // SLIDE 4: Powerup drag demo
-  // ──────────────────────────────────
-  let puRAF=null, puT=0;
-  function startPUDemo(){
-    if(puRAF) return;
-    const ghost = document.getElementById('pu-ghost');
-    let phase='wait', phaseT=0;
-    function tick(){
-      puT+=1; phaseT+=1;
-      if(phase==='wait' && phaseT>60){
-        phase='appear'; phaseT=0;
-        ghost.style.opacity='0.85';
-        ghost.style.transition='none';
-        ghost.style.top='30px'; ghost.style.left='50%';
-        ghost.style.transform='translateX(-50%)';
-      }
-      else if(phase==='appear' && phaseT>10){
-        phase='drag'; phaseT=0;
-      }
-      else if(phase==='drag'){
-        const pct=phaseT/50;
-        const ty=30+pct*70;
-        ghost.style.top=ty+'px';
-        if(pct>=1){
-          phase='drop'; phaseT=0;
-        }
-      }
-      else if(phase==='drop' && phaseT>10){
-        ghost.style.opacity='0';
-        ghost.style.transition='opacity 0.3s';
-        phase='wait'; phaseT=0;
-      }
-      puRAF=requestAnimationFrame(tick);
-    }
-    tick();
+  const fakePod = { x: W * 0.78, y: H * 0.50, r: 16 };
+  const fakeMine  = { x: W * 0.22, y: H * 0.38, r: 11 };
+  const fakeScout = { x: W * 0.65, y: H * 0.28, r: 12, color: '#e8600a', angle: Math.PI };
+  const fakeDrone = { x: W * 0.50, y: H * 0.18, r: 14, color: '#a855f7', angle: Math.PI / 4 };
+
+  // Fill background then draw scene
+  ctx.fillStyle = '#050510';
+  ctx.fillRect(0, 0, W, H);
+  drawSynthwaveScene();
+  drawMine(fakeMine);
+  drawScout(fakeScout);
+  drawDrone(fakeDrone);
+  drawPod(fakePod);
+  drawShip();
+
+  // ══════════════════════════════════════
+  // TUTORIAL TOAST SYSTEM
+  // ══════════════════════════════════════
+  const TOAST_CONTENT = {
+    score:    { title: 'SCORE',           body: 'Placeholder — score info goes here.' },
+    combo:    { title: 'COMBO MULTIPLIER',body: 'Placeholder — combo info goes here.' },
+    level:    { title: 'LEVEL',           body: 'Placeholder — level info goes here.' },
+    bars:     { title: 'SHIELD & AMMO',   body: 'Placeholder — shield and ammo info goes here.' },
+    enemies:  { title: 'ENEMIES',         body: 'Placeholder — enemy info goes here.' },
+    mine:     { title: 'MINE',            body: 'Placeholder — mine info goes here.' },
+    ship:     { title: 'YOUR SHIP',       body: 'Placeholder — ship info goes here.' },
+    log:      { title: 'PICKUP LOG',      body: 'Placeholder — pickup log info goes here.' },
+    reserves: { title: 'RESERVES BAR',    body: 'Placeholder — reserves info goes here.' },
+    stash:    { title: 'STASH',           body: 'Placeholder — stash info goes here.' },
+    radio:    { title: 'RADIO',           body: 'Placeholder — radio info goes here.' },
+  };
+
+  const toast      = document.getElementById('tut-toast');
+  const toastTitle = document.getElementById('tut-toast-title');
+  const toastBody  = document.getElementById('tut-toast-body');
+  let toastTimer   = null;
+
+  function showToast(key) {
+    const c = TOAST_CONTENT[key];
+    if (!c) return;
+    toastTitle.textContent = c.title;
+    toastBody.textContent  = c.body;
+    toast.classList.add('visible');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toast.classList.remove('visible'), 3200);
   }
 
-})();
+  // ── DOM element listeners ──
+  // Score block (label wraps value + combo so one tap covers both)
+  document.getElementById('tap-score').addEventListener('pointerdown', e => { e.stopPropagation(); showToast('score'); });
+
+  // Level
+  document.getElementById('tap-level').addEventListener('pointerdown', e => { e.stopPropagation(); showToast('level'); });
+
+  // Shield + Ammo bars
+  document.getElementById('tap-bars').addEventListener('pointerdown', e => { e.stopPropagation(); showToast('bars'); });
+
+  // Data-tut DOM shorthand for radio, reserves slots, stash, log
+  document.querySelectorAll('[data-tut]').forEach(el => {
+    el.addEventListener('pointerdown', e => { e.stopPropagation(); showToast(el.dataset.tut); });
+  });
+
+  // ── Canvas hit-testing ──
+  // Objects: ship (circle r≈22), mine, scout, drone — all use canvas-space coords.
+  // Also catches combo separately via a small region near the score label.
+  const CANVAS_TARGETS = [
+    { key: 'ship',    hitR: 22, get x() { return ship.x; },       get y() { return ship.y; } },
+    { key: 'mine',    hitR: 18, get x() { return fakeMine.x; },   get y() { return fakeMine.y; } },
+    { key: 'enemies', hitR: 20, get x() { return fakeScout.x; },  get y() { return fakeScout.y; } },
+    { key: 'enemies', hitR: 22, get x() { return fakeDrone.x; },  get y() { return fakeDrone.y; } },
+  ];
+
+  canvas.addEventListener('pointerdown', e => {
+    e.stopPropagation();
+    // Convert to canvas logical coords (accounting for left margin)
+    const rect = canvas.getBoundingClientRect();
+    const cx = e.clientX - rect.left;
+    const cy = e.clientY - rect.top;
+
+    for (const t of CANVAS_TARGETS) {
+      const dx = cx - t.x, dy = cy - t.y;
+      if (dx*dx + dy*dy <= t.hitR * t.hitR) {
+        showToast(t.key);
+        return;
+      }
+    }
+  });
 </script>
 </body>
 </html>
