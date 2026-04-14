@@ -653,7 +653,7 @@
       Ver 25.04-A0V<br>
       Calibration: Zero-Magnitude Standard<br>
       Vehicle Class: Eagle026<br>
-      Disclaimer: Distribution to unauthorized parties outside of the Castor Moving Group is strictly prohibited. If found, please return.
+      Disclaimer: Distribution to unauthorized parties outside of the Castor Moving Group is strictly prohibited. If found, please return to ALAD.
     </div>
     <div class="tut-hint">SWIPE →</div>
   </div>
@@ -968,8 +968,6 @@
   }
 
   // ── Pod ──
-  // Lifted exactly from script.js drawPods(). pulse frozen at mid-value (sin=0 → 0.6).
-  // puKey 'TITANE' → sym 'Θ', matching STRINGS.powerups.TITANE.
   function drawPod(pod) {
     ctx.save();
     ctx.translate(pod.x, pod.y);
@@ -1076,7 +1074,7 @@ function drawScene() {
   const TOAST_CONTENT = {
     score:     { title: 'SCORE & COMBO',  body: 'Current Score & Combo Multiplier. Combo resets on taking Shield Damage.' },
     level:     { title: 'LEVEL',          body: 'Current Sector Level and Progress Gauge. Fill the gauge by clearing Enemies.' },
-    bars:      { title: 'SHIELD & AMMO',  body: 'Shield and Ammo Readouts. Regular Ammo Reloads are based on your stats. Use Compounds to restore shields, completely reload, negate ammo cost, or increase reload amounts.' },
+    bars:      { title: 'SHIELD & AMMO',  body: 'Shield and Ammo Readouts. Regular Ammo Reloads are based on your stats. Use Compounds to restore.' },
     enemies:   { title: 'ENEMIES',        body: 'Enemies have different behaviors and attack patterns. Shoot them to clear the level and aquire Elements.' },
     mine:      { title: 'MINE',           body: 'Obstacles found throughout the corridor. Mines are not targetable without crafting special Alloys.' },
     ship:      { title: 'YOUR SHIP',      body: 'Standard Issue Alpha Lyrae Aerospace Division Eagle026 Spacecraft.' },
@@ -1104,30 +1102,57 @@ function drawScene() {
     toastTimer = setTimeout(() => toast.classList.remove('visible'), 3200);
   }
 
+ // ── Dismiss helper ──
+  function dismissToast() {
+    clearTimeout(toastTimer);
+    toast.classList.remove('visible');
+  }
+
   // ── DOM element listeners ──
-  // Score block (label wraps value + combo so one tap covers both)
   document.getElementById('tap-score').addEventListener('pointerdown', e => { e.stopPropagation(); showToast('score'); });
-
-  // Level
   document.getElementById('tap-level').addEventListener('pointerdown', e => { e.stopPropagation(); showToast('level'); });
-
-  // Shield + Ammo bars
   document.getElementById('tap-bars').addEventListener('pointerdown', e => { e.stopPropagation(); showToast('bars'); });
 
-  // Data-tut DOM shorthand for radio, reserves slots, stash, log
   document.querySelectorAll('[data-tut]').forEach(el => {
     el.addEventListener('pointerdown', e => { e.stopPropagation(); showToast(el.dataset.tut); });
   });
 
   // ── Canvas hit-testing ──
+  canvas.addEventListener('pointerdown', e => {
+    e.stopPropagation();
+    const rect = canvas.getBoundingClientRect();
+    const cx = e.clientX - rect.left;
+    const cy = e.clientY - rect.top;
+
+    for (const t of CANVAS_TARGETS) {
+      const dx = cx - t.x, dy = cy - t.y;
+      if (dx*dx + dy*dy <= t.hitR * t.hitR) {
+        showToast(t.key);
+        return;
+      }
+    }
+
+    // No target hit — dismiss
+    dismissToast();
+  });
+
+  // ── Document fallback ──
+  document.addEventListener('pointerdown', e => {
+    if (e.target.closest('button')) return;
+    if (e.target.closest('.tut-tap')) return;
+    if (e.pointerType !== 'touch') goto(cur + 1);
+    dismissToast();
+  });
+	
+  // ── Canvas hit-testing ──
   // Objects: ship (circle r≈22), mine, scout, drone — all use canvas-space coords.
   // Also catches combo separately via a small region near the score label.
   const CANVAS_TARGETS = [
-    { key: 'ship',    hitR: 22, get x() { return ship.x; },       get y() { return ship.y; } },
-    { key: 'mine',    hitR: 18, get x() { return fakeMine.x; },   get y() { return fakeMine.y; } },
-    { key: 'enemies', hitR: 20, get x() { return fakeScout.x; },  get y() { return fakeScout.y; } },
-    { key: 'enemies', hitR: 22, get x() { return fakeDrone.x; },  get y() { return fakeDrone.y; } },
-	{ key: 'pod', hitR: 20, get x() { return fakePod.x; }, get y() { return fakePod.y; } },
+    { key: 'ship',      hitR: 22, get x() { return ship.x; },       get y() { return ship.y; } },
+    { key: 'mine',      hitR: 18, get x() { return fakeMine.x; },   get y() { return fakeMine.y; } },
+    { key: 'enemies',   hitR: 20, get x() { return fakeScout.x; },  get y() { return fakeScout.y; } },
+    { key: 'enemies',   hitR: 22, get x() { return fakeDrone.x; },  get y() { return fakeDrone.y; } },
+	{ key: 'pod',       hitR: 20, get x() { return fakePod.x; }, get y() { return fakePod.y; } },
 	{ key: 'enemydrop', hitR: 16, get x() { return fakeEnemyDrop.x; }, get y() { return fakeEnemyDrop.y; } },
     { key: 'poddrop',   hitR: 18, get x() { return fakePodDrop.x; },   get y() { return fakePodDrop.y; } },
   ];
