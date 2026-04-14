@@ -835,6 +835,10 @@
       }
     }
   });
+  
+  // Expose resetTutorial for parent window to call when opening tutorial
+  window.resetTutorial = function() { goto(0); };
+  
 </script>
 </body>
 </html>
