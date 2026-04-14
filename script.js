@@ -2807,10 +2807,8 @@ function showItemInfo(key, tier) {
   // tier: 'element' | 'compound' | 'alloy' | 'powerup'
   const panel = document.getElementById('shop-info-panel');
   if (!panel) return;
-
-  let sym, name, effect, power, recipeLines, desc, price;
+  let sym, name, effect, power, desc, price;
   const symClass = tier === 'compound' ? 'compound' : tier === 'alloy' ? 'alloy' : '';
-
   if (tier === 'element') {
     const item = STRINGS.items[key];
     if (!item) return;
@@ -2820,45 +2818,19 @@ function showItemInfo(key, tier) {
     const pu = STRINGS.powerups[key];
     if (!pu) return;
     sym = pu.sym; name = pu.name; effect = pu.effect; power = pu.power; desc = pu.desc;
-
     if (tier === 'compound') {
-      // Pull all variants from COMPOUND_VARIANTS and render each as a line
-      const variants = COMPOUND_VARIANTS[key];
-      if (variants) {
-        recipeLines = variants.map(v =>
-          v.map(k => { const el = STRINGS.items[k]; return el ? `${el.sym} ${el.name}` : k; }).join(' + ')
-        );
-      }
       price = 'BUY 150¢ · SELL 90¢';
     } else if (tier === 'alloy') {
-      // Pull all variants from ALLOY_VARIANTS and render each as a line
-      const variants = ALLOY_VARIANTS[key];
-      if (variants) {
-        recipeLines = variants.map(v =>
-          v.map(r => {
-            const p = STRINGS.powerups[r.key];
-            return p ? `${p.sym} ${p.name}` : r.key;
-          }).join(' + ')
-        );
-      }
       price = key === 'OMEGITE' ? 'SELL 250¢' : 'SELL 200¢';
     } else {
       price = 'BUY 150¢';
     }
   }
-
-  const recipeHTML = recipeLines && recipeLines.length
-    ? recipeLines.map((line, i) =>
-        `<div class="shop-info-recipe">${i === 0 ? 'RECIPE: ' : '    or: '}${line}</div>`
-      ).join('')
-    : '';
-
   panel.innerHTML =
     `<div class="shop-info-sym ${symClass}">${sym}</div>` +
     `<div class="shop-info-name">${name}</div>` +
     (effect ? `<div class="shop-info-effect">EXPEND: ${effect}</div>` : '') +
-	(power  ? `<div class="shop-info-power">TRIGGER: ${power}</div>` : '') +
-    recipeHTML +
+    (power  ? `<div class="shop-info-power">TRIGGER: ${power}</div>` : '') +
     (desc   ? `<div class="shop-info-desc">${desc}</div>` : '') +
     (price  ? `<div class="shop-info-price">${price}</div>` : '');
 }
