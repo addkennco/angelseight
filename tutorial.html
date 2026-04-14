@@ -949,8 +949,6 @@
   }
 
   // ── Drone ──
-  // draw() lifted exactly from ENEMY_TYPES drone entry.
-  // angle: Math.PI/4 gives a natural tilted-diamond look mid-rotation.
   function drawDrone(e) {
     ctx.save(); ctx.translate(e.x, e.y); ctx.rotate(e.angle);
     ctx.beginPath();
@@ -960,7 +958,7 @@
     ctx.strokeStyle = e.color; ctx.lineWidth = 1.5;
     ctx.shadowColor = e.color; ctx.shadowBlur = 10;
     ctx.stroke();
-    const s = e.r * 0.45;
+    const s = e.r * 0.25;
     ctx.beginPath();
     ctx.moveTo(0,-s); ctx.lineTo(s,0); ctx.lineTo(0,s); ctx.lineTo(-s,0); ctx.closePath();
     ctx.strokeStyle = e.color; ctx.lineWidth = 0.8; ctx.stroke();
@@ -1044,8 +1042,8 @@ const fakePodDrop   = {};
 function drawScene() {
     // lets try assigning fresh coordinates each draw
 	Object.assign(ship, { x: W / 2, y: H - 130 }); // you silly thing, you go here, I said
-    Object.assign(fakePod,   { x: W * 0.78, y: H * 0.40, r: 16 });
-    Object.assign(fakeMine,  { x: W * 0.22, y: H * 0.38, r: 11 });
+    Object.assign(fakePod,   { x: W * 0.88, y: H * 0.40, r: 16 });
+    Object.assign(fakeMine,  { x: W * 0.12, y: H * 0.38, r: 11 });
     Object.assign(fakeScout, { x: W * 0.65, y: H * 0.58, r: 12, color: '#e8600a', angle: Math.PI });
     Object.assign(fakeDrone, { x: W * 0.50, y: H * 0.18, r: 14, color: '#a855f7', angle: Math.PI / 4 });
 	Object.assign(fakeEnemyDrop, { x: W * 0.35, y: H * 0.62, r: 10 });
