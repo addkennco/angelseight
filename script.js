@@ -3180,7 +3180,7 @@ function renderShopBody() {
 
     // ── CRAFT — compound target cards (progress lights) ───────────
     const labelCraft = document.createElement('div');
-    labelCraft.className = 'shop-section-label'; labelCraft.style.marginTop = '14px'; labelCraft.textContent = 'CRAFT';
+    labelCraft.className = 'shop-section-label'; labelCraft.style.marginTop = '4px'; labelCraft.textContent = 'CRAFT';
     body.appendChild(labelCraft);
     const gridCraft = document.createElement('div'); gridCraft.className = 'shop-grid';
 
@@ -3213,7 +3213,7 @@ function renderShopBody() {
     // ── ALLOYS — crafted from compounds (progress lights) ─────────
     const labelAlloy = document.createElement('div');
     labelAlloy.className = 'shop-section-label';
-    labelAlloy.style.marginTop = '14px';
+    labelAlloy.style.marginTop = '4px';
     labelAlloy.textContent = 'ALLOYS';
     body.appendChild(labelAlloy);
 
