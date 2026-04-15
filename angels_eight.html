@@ -981,15 +981,15 @@
 }
   #btn-tutorial-close {
     position: absolute;
-    top: 1px;     
+    top: 90%; left: 5%;     
     right: 0;  
-    font-family: 'Noto Emoji'; font-size: 20px;
+    font-family: var(--mono); font-size: 14px;
     background: transparent; border: 0;
-    color: var(--purple); cursor: pointer;
+    color: #1CC74C;
     z-index: 1001; line-height: 1;
     transition: color 0.15s;
   }
-  #btn-tutorial-close:active { color: var(--cyan); }
+  #btn-tutorial-close:active { color: #acfa70; }
 
 </style>
 </head>
@@ -1286,7 +1286,7 @@
 ══════════════════════════════════════ -->
 <div id="tutorial-overlay">
   <div id="tutorial-wrapper">  
-    <button id="btn-tutorial-close">❎</button>
+    <button id="btn-tutorial-close">END SIMULATION</button>
     <iframe id="tutorial-frame" src="tutorial.html" scrolling="no"></iframe>
   </div>
 </div>
