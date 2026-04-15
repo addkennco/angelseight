@@ -11,8 +11,8 @@
      CSS CUSTOM PROPERTIES
   ══════════════════════════════════════ */
   :root {
-    --bg:       #050510;
-    --bg2:      #0a0a20;
+    --bg:       #061005;
+    --bg2:      #0D1C18;
     --green:    #1CC74C;
     --light:    #acfa70;
     --dark:     #147c1b;
@@ -30,7 +30,7 @@
   html, body {
     width:100%; height:100%;
     background: var(--bg);
-    color: #fff;
+    color: #1CC74C;
     font-family: var(--mono);
     overflow: hidden;
     touch-action: none;
@@ -70,7 +70,7 @@
      SLIDE 0: TITLE COVER
   ══════════════════════════════════════ */
   #slide-0 {
-    background: radial-gradient(ellipse at 50% 30%, #008000 0%, #013220 70%);
+    background: radial-gradient(ellipse at 50% 30%, #013220 0%, #008000 70%);
   }
   .tut-eyebrow {
     font-size: 9px; letter-spacing: 0.45em;
@@ -579,7 +579,7 @@
   .shop-reserves { border:1px solid var(--dim); position:relative; padding:10px 8px 8px; }
   .shop-reserves::before {
     content:'RESERVES'; position:absolute; top:-7px; left:8px;
-    background:#0a0a20; padding:0 5px;
+    background:#0c200a; padding:0 5px;
     font-size:7px; letter-spacing:0.3em; color:var(--dark); opacity:0.6;
   }
   .shop-reserve-slots { display:flex; flex-wrap:wrap; gap:5px; }
@@ -1089,7 +1089,7 @@
     ctx.translate(pod.x, pod.y);
     const pulse = 0.6; // frozen: 0.6 + 0.4 * Math.sin(pod.t * 3) at t=0
     ctx.shadowColor = '#64db09'; ctx.shadowBlur = 18 * pulse;
-    ctx.strokeStyle = `rgba(29,199,76,0.5${0.6 + 0.4 * pulse})`;
+    ctx.strokeStyle = `rgba(100,220,10,0.5${0.6 + 0.4 * pulse})`;
     ctx.lineWidth = 1.8;
     ctx.beginPath();
     for (let i = 0; i < 6; i++) {
@@ -1099,7 +1099,7 @@
     }
     ctx.closePath(); ctx.stroke();
     // Inner hex (smaller, rotated 30°)
-    ctx.strokeStyle = `rgba(29,199,76,0.5)`;
+    ctx.strokeStyle = `rgba(100,220,10,0.5)`;
     ctx.lineWidth = 0.8;
     ctx.beginPath();
     for (let i = 0; i < 6; i++) {
