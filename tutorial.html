@@ -472,7 +472,7 @@
   .shop-info::before {
     content: 'INFO'; position: absolute; top: -7px; left: 8px;
     background: var(--bg); padding: 0 5px;
-    font-size: 7px; letter-spacing: 0.3em; color: var(--green); opacity: 0.6;
+    font-size: 7px; letter-spacing: 0.3em; color: var(--green); opacity: 0.6; }
   .shop-info-empty { font-size:8px; letter-spacing:0.15em; color:rgba(28,199,76,0.15); text-align:center; margin:auto; }
   .shop-info-sym { font-family:var(--display); font-size:18px; font-weight:700; color:var(--green); line-height:1; }
   .shop-info-sym.compound { color: var(--dark); }
@@ -536,7 +536,7 @@
     font-size:7px; letter-spacing:0.3em; color:var(--green); opacity:0.6;
   }
   .shop-stat-row {
-    display:flex; justify-content:space-between; align-items:baseline;
+    display:flex; justify-content:space-between; align-items:center;
     padding:6px 8px; border-bottom:1px solid rgba(28,199,76,0.04);
   }
   .shop-stat-row:last-child { border-bottom:none; }
@@ -643,6 +643,29 @@
   .btn-secondary:active { color: var(--green); border-color: var(--green); }
 
   /* ══════════════════════════════════════
+     NAV ARROWS
+  ══════════════════════════════════════ */
+  .tut-nav-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 200;
+    background: transparent;
+    border: none;
+    padding: 16px 10px;
+    cursor: pointer;
+    color: rgba(28,199,76,0.35);
+    font-size: 28px;
+    line-height: 1;
+    transition: color 0.2s;
+    pointer-events: all;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .tut-nav-arrow:active { color: var(--green); }
+  .tut-nav-arrow.left  { left: 0; }
+  .tut-nav-arrow.right { right: 0; }
+
+  /* ══════════════════════════════════════
      SLIDE 2: SHOP CRAFT TAB
   ══════════════════════════════════════ */
   #slide-2 {
@@ -686,11 +709,14 @@
       Vehicle Class: Eagle026<br>
       Disclaimer: Distribution to unauthorized parties outside of the Castor Moving Group is strictly prohibited. If found, please return to ALAD.
     </div>
-    <div class="tut-hint">SWIPE →</div>
+    <div class="tut-hint">TAP ▶</div>
+    <button class="tut-nav-arrow right" onclick="goto(1)">▶</button>
   </div>
 
   <!-- ════ SLIDE 1: GAME SCREEN ════ -->
   <div class="slide" id="slide-1">
+  <button class="tut-nav-arrow left" onclick="goto(0)">◀</button>
+  <button class="tut-nav-arrow right" onclick="goto(2)">▶</button>
   <div class="screen-content">
     <!-- Canvas -->
     <canvas id="game-canvas"></canvas>
@@ -765,6 +791,7 @@
 
   <!-- ════ SLIDE 2: SHOP — CRAFT TAB ════ -->
   <div class="slide" id="slide-2">
+  <button class="tut-nav-arrow left" onclick="goto(1)">◀</button>
 
     <!-- Grid background -->
     <div class="shop-grid-bg"></div>
@@ -780,7 +807,6 @@
       <!-- Header -->
       <div class="shop-header">
         <div>
-          <!-- Powerup decoration — orbiting star animation -->
           <canvas id="shop-powerup-deco" width="60" height="60"
             class="tut-tap" data-tut="shopdeco"
             style="position:absolute; top:0px; left:0px; cursor:pointer;"></canvas>
@@ -800,6 +826,239 @@
         <div class="sg-main"></div>
         <div class="sg-dark"></div>
       </div>
+
+      <!-- Two-column body -->
+      <div class="shop-layout">
+
+        <!-- LEFT — tabs + scroll -->
+        <div class="shop-left">
+          <div class="shop-tabs">
+            <button class="shop-tab-btn">BUY</button>
+            <button class="shop-tab-btn">SELL</button>
+            <button class="shop-tab-btn active">CRAFT</button>
+            <button class="shop-tab-btn">STASH</button>
+          </div>
+          <div class="shop-scroll">
+
+            <!-- ELEMENTS collapsible label (open) -->
+            <div class="shop-section-label collapsible">ELEMENTS ▾</div>
+            <div class="shop-grid">
+              <!-- Magnesium — owned, highlighted, qty 1 -->
+              <div class="shop-card obj stash-has recipe-ingredient--owned tut-tap" data-tut="craft-ingredient">
+                <div class="shop-card-sym">μ</div>
+                <div class="shop-card-name">Magnesium</div>
+                <div class="shop-card-corner"><span class="stash-count">1</span></div>
+              </div>
+              <!-- Lithium — not owned, highlighted as ingredient needed -->
+              <div class="shop-card obj stash-empty recipe-ingredient tut-tap" data-tut="craft-ingredient">
+                <div class="shop-card-sym">λ</div>
+                <div class="shop-card-name">Lithium</div>
+                <div class="shop-card-corner"><span class="stash-count">0</span></div>
+              </div>
+              <!-- Potassium — not owned, highlighted as ingredient needed -->
+              <div class="shop-card obj stash-empty recipe-ingredient tut-tap" data-tut="craft-ingredient">
+                <div class="shop-card-sym">κ</div>
+                <div class="shop-card-name">Potassium</div>
+                <div class="shop-card-corner"><span class="stash-count">0</span></div>
+              </div>
+              <!-- Beryllium — not in stock, plain -->
+              <div class="shop-card obj stash-empty">
+                <div class="shop-card-sym">β</div>
+                <div class="shop-card-name">Beryllium</div>
+                <div class="shop-card-corner"><span class="stash-count">0</span></div>
+              </div>
+              <!-- Titanium — not in stock, plain -->
+              <div class="shop-card obj stash-empty">
+                <div class="shop-card-sym">τ</div>
+                <div class="shop-card-name">Titanium</div>
+                <div class="shop-card-corner"><span class="stash-count">0</span></div>
+              </div>
+              <!-- Nitrogen — not in stock, plain -->
+              <div class="shop-card obj stash-empty">
+                <div class="shop-card-sym">𝜈</div>
+                <div class="shop-card-name">Nitrogen</div>
+                <div class="shop-card-corner"><span class="stash-count">0</span></div>
+              </div>
+              <!-- Silicon — not in stock, plain -->
+              <div class="shop-card obj stash-empty">
+                <div class="shop-card-sym">Σ</div>
+                <div class="shop-card-name">Silicon</div>
+                <div class="shop-card-corner"><span class="stash-count">0</span></div>
+              </div>
+              <!-- Carbon — not in stock, plain -->
+              <div class="shop-card obj stash-empty">
+                <div class="shop-card-sym">ζ</div>
+                <div class="shop-card-name">Carbon</div>
+                <div class="shop-card-corner"><span class="stash-count">0</span></div>
+              </div>
+            </div>
+
+            <!-- COMPOUNDS — collapsed, label only -->
+            <div class="shop-section-label collapsible" style="margin-top:4px">COMPOUNDS ▸</div>
+
+            <!-- CRAFT section label -->
+            <div class="shop-section-label" style="margin-top:4px">CRAFT</div>
+            <div class="shop-grid">
+              <!-- Magnium craft card — selected, 1 light on, 0 in inventory -->
+              <div class="shop-card obj selected tut-tap" data-tut="craft-card">
+                <div class="shop-card-sym">Μ</div>
+                <div class="shop-card-name">Magnium</div>
+                <div class="shop-card-progress">
+                  <span class="craft-inv-count">0</span>
+                  <div class="craft-lights">
+                    <span class="craft-light on"></span>
+                    <span class="craft-light off"></span>
+                  </div>
+                </div>
+              </div>
+              <!-- Lithebryl craft card — unselected, no lights -->
+              <div class="shop-card obj stash-empty">
+                <div class="shop-card-sym">Β</div>
+                <div class="shop-card-name">Lithebryl</div>
+                <div class="shop-card-progress">
+                  <span class="craft-inv-count">0</span>
+                  <div class="craft-lights">
+                    <span class="craft-light off"></span>
+                    <span class="craft-light off"></span>
+                  </div>
+                </div>
+              </div>
+              <!-- Nitrokalium craft card -->
+              <div class="shop-card obj stash-empty">
+                <div class="shop-card-sym">Π</div>
+                <div class="shop-card-name">Nitrokalium</div>
+                <div class="shop-card-progress">
+                  <span class="craft-inv-count">0</span>
+                  <div class="craft-lights">
+                    <span class="craft-light off"></span>
+                    <span class="craft-light off"></span>
+                  </div>
+                </div>
+              </div>
+              <!-- Carbosilicium craft card -->
+              <div class="shop-card obj stash-empty">
+                <div class="shop-card-sym">Ξ</div>
+                <div class="shop-card-name">Carbosilicium</div>
+                <div class="shop-card-progress">
+                  <span class="craft-inv-count">0</span>
+                  <div class="craft-lights">
+                    <span class="craft-light off"></span>
+                    <span class="craft-light off"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /.shop-scroll -->
+        </div><!-- /.shop-left -->
+
+        <!-- RIGHT — stats, info, staging, reserves, launch -->
+        <div class="shop-right">
+
+          <!-- Stats block -->
+          <div class="shop-stats">
+            <div class="shop-stat-row">
+              <div>
+                <div class="shop-stat-label">AMMO REFILL</div>
+                <div class="shop-stat-bar"><div class="shop-stat-bar-fill" style="width:10%"></div></div>
+              </div>
+              <div style="text-align:right">
+                <span class="shop-stat-val">1</span>
+                <span class="shop-stat-max">/10</span>
+              </div>
+            </div>
+            <div class="shop-stat-row">
+              <div>
+                <div class="shop-stat-label">AMMO MAX</div>
+                <div class="shop-stat-bar"><div class="shop-stat-bar-fill" style="width:17%"></div></div>
+              </div>
+              <div style="text-align:right">
+                <span class="shop-stat-val">50</span>
+                <span class="shop-stat-max">/300</span>
+              </div>
+            </div>
+            <div class="shop-stat-row">
+              <div>
+                <div class="shop-stat-label">SHIELD MAX</div>
+                <div class="shop-stat-bar"><div class="shop-stat-bar-fill" style="width:10%"></div></div>
+              </div>
+              <div style="text-align:right">
+                <span class="shop-stat-val">10</span>
+                <span class="shop-stat-max">/100</span>
+              </div>
+            </div>
+            <div class="shop-stat-row">
+              <div>
+                <div class="shop-stat-label">RESERVES</div>
+                <div class="shop-stat-bar"><div class="shop-stat-bar-fill" style="width:37%"></div></div>
+              </div>
+              <div style="text-align:right">
+                <span class="shop-stat-val">3</span>
+                <span class="shop-stat-max">/8</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Info panel — Magnium -->
+          <div class="shop-info" id="shop-info-panel">
+            <div class="shop-info-sym">Μ</div>
+            <div class="shop-info-name">Magnium</div>
+            <div class="shop-info-effect">EXPEND: Reserve +2, Ammo Refill +1</div>
+            <div class="shop-info-power">TRIGGER: Bomb</div>
+            <div class="shop-info-desc">A Magnesium-based unstable isotope that is highly volatile when impacted.</div>
+            <div class="shop-info-price">BUY 150¢</div>
+          </div>
+
+          <!-- Staging area — 1 Magnium in queue -->
+          <div class="shop-staging">
+            <div class="staging-droprow">
+              <div class="shop-action-box craft-box"></div>
+              <button class="btn-secondary staging-confirm">CRAFT ALL</button>
+            </div>
+            <div class="staging-list">
+              <div class="staging-row">
+                <span class="staging-row-sym">Μ</span>
+                <span class="staging-row-name">Magnium</span>
+                <span class="staging-row-qty">
+                  <button class="staging-qty-btn">−</button>
+                  <span class="staging-qty-val">1</span>
+                  <button class="staging-qty-btn">+</button>
+                </span>
+                <button class="staging-row-remove">✕</button>
+              </div>
+            </div>
+            <div class="staging-total">TOTAL: 0¢</div>
+          </div>
+
+          <!-- Reserves -->
+          <div class="shop-reserves">
+            <div class="shop-reserve-slots">
+              <div class="shop-reserve-slot filled">
+                <span class="shop-reserve-sym">Θ</span>
+                <span class="shop-reserve-name">TITANE</span>
+              </div>
+              <div class="shop-reserve-slot filled">
+                <span class="shop-reserve-sym">Μ</span>
+                <span class="shop-reserve-name">MAGNIUM</span>
+              </div>
+              <div class="shop-reserve-slot filled">
+                <span class="shop-reserve-sym">Π</span>
+                <span class="shop-reserve-name">NITROKALIUM</span>
+              </div>
+              <div class="shop-reserve-slot"></div>
+              <div class="shop-reserve-slot"></div>
+              <div class="shop-reserve-slot"></div>
+              <div class="shop-reserve-slot"></div>
+              <div class="shop-reserve-slot"></div>
+            </div>
+          </div>
+
+          <!-- Launch -->
+          <button class="btn-sweep">LAUNCH</button>
+
+        </div><!-- /.shop-right -->
+
+      </div><!-- /.shop-layout -->
 
     </div><!-- /.screen-content -->
   </div><!-- /#slide-2 -->
@@ -821,29 +1080,7 @@
     SLIDES[cur].classList.add('active');
   }
 
-  // Swipe gesture detection
-  let touchStartX = 0, touchStartY = 0, touchEndX = 0, touchEndY = 0;
-  const minSwipeDistance = 50;
-
-  function handleGesture() {
-    const deltaX = touchEndX - touchStartX;
-    const deltaY = touchEndY - touchStartY;
-    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minSwipeDistance) {
-      deltaX > 0 ? goto(cur - 1) : goto(cur + 1);
-    }
-  }
-
-  document.addEventListener('touchstart', e => {
-    touchStartX = e.changedTouches[0].screenX;
-    touchStartY = e.changedTouches[0].screenY;
-  });
-  document.addEventListener('touchend', e => {
-    touchEndX = e.changedTouches[0].screenX;
-    touchEndY = e.changedTouches[0].screenY;
-    handleGesture();
-  });
-
-  // Tap to advance — handled by document fallback listener below (near canvas hit-testing).
+  // Navigation handled by triangle buttons on each slide.
 
   // ══════════════════════════════════════
   // CANVAS + DRAWING
@@ -1203,7 +1440,7 @@ function drawScene() {
   document.addEventListener('pointerdown', e => {
     if (e.target.closest('button')) return;
     if (e.target.closest('.tut-tap')) return;
-    if (e.pointerType !== 'touch') goto(cur + 1);
+    if (e.target.closest('.tut-nav-arrow')) return;
     dismissToast();
   });
 	
