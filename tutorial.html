@@ -1025,10 +1025,10 @@
     ctx.moveTo(12, 8); ctx.lineTo(18, 2); ctx.lineTo(10, -2);
     ctx.stroke();
 
-    // Engine glow (frozen — no Date.now() pulse)
+    // Engine glow
     ctx.beginPath();
     ctx.arc(0, 10, 3, 0, Math.PI*2);
-    ctx.fillStyle = '#d42b6a'; ctx.fill();
+    ctx.fillStyle = '#1cc74c'; ctx.fill();
 
     ctx.restore();
   }
@@ -1036,7 +1036,7 @@
   // ── Mine ──
   function drawMine(m) {
     ctx.save(); ctx.translate(m.x, m.y);
-    ctx.shadowColor = '#ff0000'; ctx.shadowBlur = 18;
+    ctx.shadowColor = '#64db09'; ctx.shadowBlur = 18;
     ctx.beginPath(); ctx.arc(0,0,m.r,0,Math.PI*2);
     ctx.fillStyle = '#000'; ctx.fill();
     ctx.strokeStyle = '#1cc74c'; ctx.lineWidth = 1.2;
@@ -1110,7 +1110,7 @@
     ctx.closePath(); ctx.stroke();
     // Titane symbol
     ctx.font = 'bold 13px Nova Square, monospace';
-    ctx.fillStyle = `rgba(0,245,255,${0.8 + 0.2 * pulse})`;
+    ctx.fillStyle = `'#1cc74c')`;
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.shadowColor = '#64db09'; ctx.shadowBlur = 8;
     ctx.fillText('Θ', 0, 0);
@@ -1125,7 +1125,7 @@ ctx.shadowColor = '#64db09'; ctx.shadowBlur = 10;
 ctx.beginPath(); ctx.arc(0, 0, fakeEnemyDrop.r, 0, Math.PI * 2);
 ctx.strokeStyle = '#1cc74c'; ctx.lineWidth = 1; ctx.stroke();
 ctx.font = 'bold 9px Nova Square, monospace';
-ctx.fillStyle = '#00f5ff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+ctx.fillStyle = '#1cc74c'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
 ctx.fillText('Σ', 0, 0);
 ctx.restore();
 }
@@ -1144,7 +1144,7 @@ for (let i = 0; i < 6; i++) {
 }
 ctx.closePath(); ctx.stroke();
 ctx.font = 'bold 11px Nova Square, monospace';
-ctx.fillStyle = 'rgba(168,85,247,0.9)';
+ctx.fillStyle = '#1cc74c';
 ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
 ctx.fillText('Θ', 0, 0);
 ctx.restore();
