@@ -30,7 +30,7 @@
   html, body {
     width:100%; height:100%;
     background: var(--bg);
-    color: #1CC74C;
+    color: var(--green);
     font-family: var(--mono);
     overflow: hidden;
     touch-action: none;
@@ -87,14 +87,14 @@
     font-weight: 900; line-height: 0.9; letter-spacing: -0.02em;
     background: linear-gradient(135deg, var(--light) 0%, var(--dark) 50%, var(--green) 100%);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-    filter: drop-shadow(0 0 30px rgba(168,85,247,0.4));
+    filter: drop-shadow(0 0 30px rgba(28,199,76,0.4));
     padding: 12px 16px; margin-bottom: 0; text-align: center;
   }
   .tut-cursive {
     font-family: var(--cursive);
     font-size: clamp(30px, 7vw, 56px);
     color: var(--green);
-    text-shadow: 0 0 20px rgba(172,150,112,0.7), 0 0 50px rgba(0,0,0,0.4);
+    text-shadow: 0 0 20px rgba(28,199,76,0.7), 0 0 50px rgba(0,0,0,0.4);
     line-height: 1; position: absolute; z-index: 2;
     pointer-events: none; white-space: nowrap;
   }
@@ -105,7 +105,7 @@
   }
   .tut-hint {
     font-size: 9px; letter-spacing: 0.3em;
-    color: rgba(255,255,255,0.2);
+    color: var(--dim);
     animation: hintPulse 2.5s ease-in-out infinite;
   }
   @keyframes hintPulse {
@@ -157,7 +157,7 @@
 
   .hud-label {
     font-size: 8px; letter-spacing: 0.2em;
-    color: rgba(255,255,255,0.3); text-transform:uppercase;
+    color: var(--dim); text-transform:uppercase;
   }
   .hud-value {
     font-family: var(--display);
@@ -167,12 +167,11 @@
 	align-content: center;
   }
   .hud-value.green { color: var(--green); }
-  .hud-value.green { color: var(--green); }
 
   .hud-bar-wrap { width: 90px; }
   .hud-bar {
     height: 4px;
-    background: rgba(255,255,255,0.1);
+    background: var(--dim);
     border-radius: 2px;
     overflow: hidden;
     margin-top: 3px;
@@ -213,7 +212,7 @@
     border-radius: 50%;
     display: flex; align-items:center; justify-content:center;
     position: relative;
-    background: rgba(0,245,255,0.04);
+    background: rgba(28,199,76,0.04);
   }
   .radio-needle {
     position:absolute;
@@ -238,17 +237,17 @@
     border: 1px solid var(--dark);
     display: flex; align-items:center; justify-content:center;
     font-size: 8px; letter-spacing:0.05em;
-    color: rgba(255,255,255,0.5);
+    color: rgba(28,199,76,0.5);
     clip-path: polygon(5px 0%, 100% 0%, calc(100% - 5px) 100%, 0% 100%);
-    background: rgba(255,255,255,0.03);
+    background: rgba(28,199,76,0.04);
     cursor: pointer;
     flex-direction: column;
     gap: 1px;
   }
   .pu-slot.filled {
     border-color: rgba(28,199,76,0.7);
-    background: rgba(168,85,247,0.1);
-    color: #fff;
+    background: rgba(28,199,76,0.1);
+    color: var(--light);
   }
   .pu-slot-sym { font-family: var(--display); font-size:11px; font-weight:700; color: var(--dark); }
   .pu-slot-name { font-size: 5px; letter-spacing:0.05em; color:rgba(28,199,76,0.7); text-align:center; line-height:1.2; }
@@ -274,7 +273,7 @@
     line-height: 28px;
     position: relative;
     border: 1.5px solid var(--dark);
-    background: rgba(168,85,247,0.05);
+    background: rgba(28,199,76,0.05);
     clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
     user-select: none;
   }
@@ -320,56 +319,29 @@
   /* ══════════════════════════════════════
      TUTORIAL TOAST
   ══════════════════════════════════════ */
-  #tut-toast {
+  .tut-toast {
     position: absolute;
     bottom: 50%; left: 50%; transform: translate(-50%, -50%);
     background: var(--bg2);
     border: 1px solid var(--green);
-    box-shadow: 0 0 24px rgba(100,220,10,0.2);
+    box-shadow: 0 0 24px rgba(28,199,76,0.2);
     padding: 10px 18px;
     font-family: var(--mono);
     font-size: 11px;
     line-height: 1.6;
     letter-spacing: 0.08em;
-    color: #1CC74C;
-    text-align: center;
-    max-width: 260px;
-    width: max-content;
-    pointer-events: none;
-    z-index: 100;
-    opacity: 0;
-    transition: opacity 0.15s;
-  }
-  #tut-toast.visible { opacity: 1; }
-  #tut-toast-2 {
-    position: absolute;
-    bottom: 50%; left: 50%; transform: translate(-50%, -50%);
-    background: var(--bg2);
-    border: 1px solid var(--green);
-    box-shadow: 0 0 24px rgba(100,220,10,0.2);
-    padding: 10px 18px;
-    font-family: var(--mono);
-    font-size: 11px;
-    line-height: 1.6;
-    letter-spacing: 0.08em;
-    color: #fff;
-    text-align: center;
-    max-width: 260px;
-    width: max-content;
-    pointer-events: none;
-    z-index: 100;
-    opacity: 0;
-    transition: opacity 0.15s;
-  }
-  #tut-toast-2.visible { opacity: 1; }
-  #tut-toast-2-title {
-    font-family: var(--display);
-    font-size: 10px;
     color: var(--green);
-    letter-spacing: 0.18em;
-    margin-bottom: 5px;
+    text-align: center;
+    max-width: 260px;
+    width: max-content;
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0;
+    transition: opacity 0.15s;
   }
-  #tut-toast-title {
+  .tut-toast.visible { opacity: 1; }
+  #tut-toast-2 { color: #fff; }
+  .tut-toast-title {
     font-family: var(--display);
     font-size: 10px;
     color: var(--green);
@@ -388,8 +360,8 @@
   .shop-grid-bg {
     position: absolute; inset: 0;
     background:
-      linear-gradient(rgba(100,220,10,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(100,220,10,0.04) 1px, transparent 1px);
+      linear-gradient(rgba(28,199,76,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(28,199,76,0.04) 1px, transparent 1px);
     background-size: 40px 40px;
     opacity: 1;
     pointer-events: none;
@@ -406,7 +378,7 @@
   }
   .shop-title { font-family:var(--display); font-size:14px; font-weight:700; color:var(--dark); letter-spacing:0.1em; text-indent:40px; }
   .shop-credits { font-family:var(--display); font-size:13px; color:var(--green); }
-  .shop-level-badge { font-size:8px; letter-spacing:0.2em; color:rgba(100,220,10,0.3); text-indent:40px; }
+  .shop-level-badge { font-size:8px; letter-spacing:0.2em; color:rgba(28,199,76,0.3); text-indent:40px; }
 
   /* ── 70s Supergraphic ── */
   .supergraphic {
@@ -440,7 +412,7 @@
   .shop-tab-btn {
     flex:1; padding:9px 0;
     font-family:var(--mono); font-size:8px; letter-spacing:0.18em;
-    color:rgba(255,255,255,0.35);
+    color:rgba(28,199,76,0.35);
     background:transparent; border:none; cursor:pointer;
     text-transform:uppercase; transition:color 0.15s;
   }
@@ -452,7 +424,7 @@
   }
 
   .shop-section-label {
-    font-size:7px; letter-spacing:0.35em; color:rgba(255,255,255,0.3);
+    font-size:7px; letter-spacing:0.35em; color:rgba(28,199,76,0.3);
     text-transform:uppercase; margin-bottom:2px;
   }
   .shop-section-label.collapsible { cursor:pointer; user-select:none; }
@@ -460,17 +432,17 @@
 
   .shop-grid { display:grid; grid-template-columns: repeat(2,1fr); gap:6px; }
   .shop-card {
-    border: 1px solid rgba(100,220,10,0.1);
+    border: 1px solid rgba(28,199,76,0.1);
     padding: 8px 6px;
     display:flex; flex-direction:column; gap:3px;
     cursor:pointer;
-    background: rgba(255,255,255,0.02);
+    background: rgba(28,199,76,0.02);
     transition: border-color 0.15s, background 0.15s;
     position:relative;
   }
-  .shop-card:active { border-color: var(--light); background: rgba(168,85,247,0.08); }
+  .shop-card:active { border-color: var(--light); background: rgba(28,199,76,0.08); }
   .shop-card-sym { font-family:var(--display); font-size:15px; font-weight:700; color:var(--green); }
-  .shop-card-name { font-size:8px; font-weight:700; color:#fff; letter-spacing:0.04em; }
+  .shop-card-name { font-size:8px; font-weight:700; color:var(--light); letter-spacing:0.04em; }
   .shop-card-effect { font-size:7px; color:var(--light); line-height:1.4; }
   .shop-card-count { font-size:7px; color:var(--light); }
   .shop-card-price { font-family:var(--display); font-size:9px; color:var(--light); margin-top:2px; }
@@ -481,14 +453,14 @@
 
   .craft-lights { display:flex; flex-direction:row; gap:3px; align-items:center; }
   .craft-light { width:6px; height:6px; border-radius:50%; flex-shrink:0; transition: background 0.2s, box-shadow 0.2s; }
-  .craft-light.off { background:rgba(255,255,255,0.08); box-shadow:none; border: 1px solid rgba(255,255,255,0.12); }
-  .craft-light.on  { background:var(--green); border:none; box-shadow: 0 0 5px 1px rgba(0,245,255,0.7), 0 0 10px 2px rgba(0,245,255,0.3); }
-  .craft-light.complete { background:var(--green); border:none; box-shadow: 0 0 5px 1px rgba(255,215,0,0.8), 0 0 12px 3px rgba(255,215,0,0.4); }
-  .shop-card.craft-ready { border-color: rgba(255,215,0,0.5); background: rgba(255,215,0,0.04); }
+  .craft-light.off { background:rgba(28,199,76,0.08); box-shadow:none; border: 1px solid rgba(28,199,76,0.12); }
+  .craft-light.on  { background:var(--green); border:none; box-shadow: 0 0 5px 1px rgba(28,199,76,0.7), 0 0 10px 2px rgba(28,199,76,0.3); }
+  .craft-light.complete { background:var(--green); border:none; box-shadow: 0 0 5px 1px rgba(28,199,76,0.8), 0 0 12px 3px rgba(28,199,76,0.4); }
+  .shop-card.craft-ready { border-color: rgba(28,199,76,0.5); background: rgba(28,199,76,0.04); }
   .shop-card.craft-ready .shop-card-sym { color: var(--green); }
 
-  .shop-card.recipe-ingredient { border-color: rgba(168,85,247,0.45); box-shadow: 0 0 6px rgba(168,85,247,0.2); }
-  .shop-card.recipe-ingredient--owned { border-color: rgba(0,245,255,0.65); box-shadow: 0 0 8px rgba(0,245,255,0.3); }
+  .shop-card.recipe-ingredient { border-color: rgba(28,199,76,0.25); box-shadow: 0 0 6px rgba(28,199,76,0.1); }
+  .shop-card.recipe-ingredient--owned { border-color: rgba(28,199,76,0.65); box-shadow: 0 0 8px rgba(28,199,76,0.3); }
   .shop-card.recipe-ingredient--owned .shop-card-sym { color: var(--green); }
 
   /* ── Info panel ── */
@@ -499,56 +471,55 @@
   }
   .shop-info::before {
     content: 'INFO'; position: absolute; top: -7px; left: 8px;
-    background: #0a0a20; padding: 0 5px;
+    background: var(--bg); padding: 0 5px;
     font-size: 7px; letter-spacing: 0.3em; color: var(--green); opacity: 0.6;
-  }
-  .shop-info-empty { font-size:8px; letter-spacing:0.15em; color:rgba(255,255,255,0.15); text-align:center; margin:auto; }
+  .shop-info-empty { font-size:8px; letter-spacing:0.15em; color:rgba(28,199,76,0.15); text-align:center; margin:auto; }
   .shop-info-sym { font-family:var(--display); font-size:18px; font-weight:700; color:var(--green); line-height:1; }
   .shop-info-sym.compound { color: var(--dark); }
   .shop-info-sym.alloy    { color: var(--green); }
-  .shop-info-name { font-size:9px; font-weight:700; color:#fff; letter-spacing:0.06em; }
+  .shop-info-name { font-size:9px; font-weight:700; color:var(--light); letter-spacing:0.06em; }
   .shop-info-effect { font-size:10px; color:var(--green); letter-spacing:0.04em; line-height:1.0; }
   .shop-info-power { font-size:10px; color:var(--green); letter-spacing:0.04em; line-height:1.0; }
-  .shop-info-recipe { font-size:10px; color:rgba(255,255,255,0.75); letter-spacing:0.04em; line-height:1.0; }
-  .shop-info-desc { font-size:8px; color:rgba(255,255,255,0.75); line-height:1.5; font-style:italic; border-top:1px solid rgba(255,255,255,0.06); padding-top:4px; margin-top:2px; }
+  .shop-info-recipe { font-size:10px; color:rgba(28,199,76,0.75); letter-spacing:0.04em; line-height:1.0; }
+  .shop-info-desc { font-size:8px; color:rgba(28,199,76,0.75); line-height:1.5; font-style:italic; border-top:1px solid rgba(28,199,76,0.06); padding-top:4px; margin-top:2px; }
   .shop-info-price { font-family:var(--display); font-size:8px; color:var(--green); margin-top:auto; }
 
   /* ── Action box ── */
   .shop-action-box {
-    --shadow-color: rgb(255,255,255);
+    --shadow-color: rgba(28,199,76,0.3);
     width:70%; max-width:250px; height:38px;
     border:2px solid var(--shadow-color);
-    background:rgba(255,255,255,0.03);
+    background:rgba(28,199,76,0.03);
     clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
   }
-  .shop-action-box.buy-box   { --shadow-color: rgba(0,245,255,0.3); }
-  .shop-action-box.sell-box  { --shadow-color: rgba(255,45,120,0.3); }
-  .shop-action-box.craft-box { --shadow-color: rgba(168,85,247,0.3); }
-  .shop-action-box.drag-over { --shadow-color: rgba(255,215,0,0.3); }
+  .shop-action-box.buy-box   { --shadow-color: rgba(28,199,76,0.3); }
+  .shop-action-box.sell-box  { --shadow-color: rgba(20,124,27,0.3); }
+  .shop-action-box.craft-box { --shadow-color: rgba(172,250,112,0.3); }
+  .shop-action-box.drag-over { --shadow-color: rgba(28,199,76,0.5); }
 
   /* Stash states */
-  .shop-card.stash-empty { background:rgba(255,255,255,0.008); border-color:rgba(255,255,255,0.05); cursor:default; }
-  .shop-card.stash-empty .shop-card-sym  { color:rgba(255,255,255,0.15); }
-  .shop-card.stash-empty .shop-card-name { color:rgba(255,255,255,0.18); }
-  .shop-card.stash-empty .shop-card-effect { color:rgba(255,255,255,0.1); }
-  .shop-card.stash-empty .stash-count   { color:rgba(255,255,255,0.18); }
+  .shop-card.stash-empty { background:rgba(28,199,76,0.008); border-color:rgba(28,199,76,0.05); cursor:default; }
+  .shop-card.stash-empty .shop-card-sym  { color:rgba(28,199,76,0.15); }
+  .shop-card.stash-empty .shop-card-name { color:rgba(28,199,76,0.18); }
+  .shop-card.stash-empty .shop-card-effect { color:rgba(28,199,76,0.1); }
+  .shop-card.stash-empty .stash-count   { color:rgba(28,199,76,0.18); }
   .shop-card.stash-has .stash-count { font-family:var(--display); font-size:13px; font-weight:700; color:var(--green); }
   .shop-card.stash-has.pu-card .stash-count { color:var(--dark); }
   .stash-count { position:absolute; top:5px; right:5px; font-size:7px; letter-spacing:0.05em; }
 
   /* Drag states */
   .shop-card.drag-source { opacity:0.45; border-color:var(--dark); }
-  .shop-reserve-slot.drag-over { border-color:var(--green); background:rgba(0,245,255,0.12); }
-  .shop-reserve-slot.drag-over-full { border-color:var(--green); background:rgba(255,45,120,0.08); }
+  .shop-reserve-slot.drag-over { border-color:var(--green); background:rgba(28,199,76,0.12); }
+  .shop-reserve-slot.drag-over-full { border-color:var(--dark); background:rgba(20,124,27,0.08); }
   #shop-drag-ghost {
     position:fixed; pointer-events:none; z-index:9999;
     opacity:0.85; transform:translate(-50%,-50%) scale(1.08);
-    border:1px solid var(--green); background:rgba(0,245,255,0.12);
+    border:1px solid var(--green); background:rgba(28,199,76,0.12);
     padding:8px 6px; width:80px;
     display:flex; flex-direction:column; gap:3px; font-family:var(--mono);
   }
   #shop-drag-ghost .ghost-sym  { font-family:var(--display); font-size:14px; font-weight:700; color:var(--dark); }
-  #shop-drag-ghost .ghost-name { font-size:7px; color:rgba(255,255,255,0.7); letter-spacing:0.04em; }
+  #shop-drag-ghost .ghost-name { font-size:7px; color:rgba(28,199,76,0.7); letter-spacing:0.04em; }
 
   /* RIGHT column */
   .shop-right {
@@ -561,18 +532,18 @@
   .shop-stats { border:1px solid var(--dim); position:relative; }
   .shop-stats::before {
     content:'STATS'; position:absolute; top:-7px; left:8px;
-    background:#0a0a20; padding:0 5px;
+    background:var(--bg); padding:0 5px;
     font-size:7px; letter-spacing:0.3em; color:var(--green); opacity:0.6;
   }
   .shop-stat-row {
     display:flex; justify-content:space-between; align-items:baseline;
-    padding:6px 8px; border-bottom:1px solid rgba(255,255,255,0.04);
+    padding:6px 8px; border-bottom:1px solid rgba(28,199,76,0.04);
   }
   .shop-stat-row:last-child { border-bottom:none; }
-  .shop-stat-label { font-size:7px; letter-spacing:0.15em; color:rgba(255,255,255,0.4); text-transform:uppercase; line-height:1.3; }
+  .shop-stat-label { font-size:7px; letter-spacing:0.15em; color:rgba(28,199,76,0.4); text-transform:uppercase; line-height:1.3; }
   .shop-stat-val { font-family:var(--display); font-size:13px; font-weight:700; color:var(--green); }
-  .shop-stat-max { font-size:6px; color:rgba(255,255,255,0.2); margin-left:3px; }
-  .shop-stat-bar { width:100%; height:2px; background:rgba(255,255,255,0.08); border-radius:1px; margin-top:3px; overflow:hidden; }
+  .shop-stat-max { font-size:6px; color:rgba(28,199,76,0.2); margin-left:3px; }
+  .shop-stat-bar { width:100%; height:2px; background:rgba(28,199,76,0.08); border-radius:1px; margin-top:3px; overflow:hidden; }
   .shop-stat-bar-fill { height:100%; border-radius:1px; background:linear-gradient(90deg,var(--green),var(--dark)); }
 
   /* Reserves block */
@@ -585,22 +556,22 @@
   .shop-reserve-slots { display:flex; flex-wrap:wrap; gap:5px; }
   .shop-reserve-slot {
     width:32px; height:32px;
-    border:1px solid rgba(168,85,247,0.25);
+    border:1px solid rgba(28,199,76,0.25);
     display:flex; align-items:center; justify-content:center;
     clip-path: polygon(4px 0%,100% 0%,calc(100% - 4px) 100%,0% 100%);
-    background:rgba(168,85,247,0.04);
-    font-size:7px; color:rgba(168,85,247,0.4);
+    background:rgba(28,199,76,0.04);
+    font-size:7px; color:rgba(28,199,76,0.4);
     flex-direction:column; gap:1px;
   }
-  .shop-reserve-slot.filled { border-color:rgba(168,85,247,0.7); background:rgba(168,85,247,0.12); }
+  .shop-reserve-slot.filled { border-color:rgba(28,199,76,0.7); background:rgba(28,199,76,0.12); }
   .shop-reserve-sym { font-family:var(--display); font-size:12px; font-weight:700; color:var(--dark); }
-  .shop-reserve-name { font-size:5px; letter-spacing:0.04em; color:rgba(255,255,255,0.35); text-align:center; }
+  .shop-reserve-name { font-size:5px; letter-spacing:0.04em; color:rgba(28,199,76,0.35); text-align:center; }
 
   /* Stash button */
   .shop-stash-btn {
     font-family:var(--mono); font-size:8px; letter-spacing:0.2em;
-    color:rgba(255,255,255,0.4); background:transparent;
-    border:1px solid rgba(255,255,255,0.12); padding:9px 0;
+    color:rgba(28,199,76,0.4); background:transparent;
+    border:1px solid rgba(28,199,76,0.12); padding:9px 0;
     cursor:pointer; transition:color 0.2s, border-color 0.2s;
   }
   .shop-stash-btn:active { color:var(--dark); border-color:var(--dark); }
@@ -611,14 +582,14 @@
   .staging-droprow .shop-action-box { flex:1; height:40px; }
   .staging-droprow .btn-secondary { flex-shrink:0; font-size:8px; padding:8px 10px; white-space:nowrap; letter-spacing:0.15em; }
   .staging-list { display:flex; flex-direction:column; gap:4px; }
-  .staging-row { display:flex; align-items:center; gap:4px; padding:4px 6px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.02); font-size:8px; letter-spacing:0.06em; }
+  .staging-row { display:flex; align-items:center; gap:4px; padding:4px 6px; border:1px solid rgba(28,199,76,0.08); background:rgba(28,199,76,0.02); font-size:8px; letter-spacing:0.06em; }
   .staging-row-sym { font-family:var(--display); font-size:12px; font-weight:700; color:var(--dark); min-width:16px; text-align:center; }
-  .staging-row-name { flex:1; color:rgba(255,255,255,0.75); font-size:7px; letter-spacing:0.06em; }
+  .staging-row-name { flex:1; color:rgba(28,199,76,0.75); font-size:7px; letter-spacing:0.06em; }
   .staging-row-qty { display:flex; align-items:center; gap:3px; }
   .staging-qty-btn { font-family:var(--display); font-size:11px; font-weight:700; color:var(--green); background:transparent; border:none; cursor:pointer; padding:0 3px; line-height:1; opacity:0.7; transition:opacity 0.15s; }
   .staging-qty-btn:active { opacity:1; }
   .staging-qty-val { font-family:var(--display); font-size:11px; color:var(--green); min-width:14px; text-align:center; }
-  .staging-row-remove { font-size:9px; color:rgba(255,45,120,0.5); background:transparent; border:none; cursor:pointer; padding:0 2px; line-height:1; transition:color 0.15s; }
+  .staging-row-remove { font-size:9px; color:rgba(28,199,76,0.3); background:transparent; border:none; cursor:pointer; padding:0 2px; line-height:1; transition:color 0.15s; }
   .staging-row-remove:active { color:var(--green); }
   .staging-total { font-family:var(--display); font-size:9px; color:var(--green); text-align:center; letter-spacing:0.1em; min-height:12px; }
 
@@ -626,7 +597,7 @@
   .shop-card.obj { padding:6px 6px; gap:1px; }
   .shop-card.obj .shop-card-sym { font-size:13px; }
   .shop-card.obj .shop-card-name { font-size:7px; }
-  .shop-card.obj.selected { border-color:var(--green); background:rgba(0,245,255,0.06); }
+  .shop-card.obj.selected { border-color:var(--green); background:rgba(28,199,76,0.06); }
   .shop-card.obj.selected .shop-card-sym { color:var(--green); }
 
   /* Shop toast */
@@ -637,7 +608,7 @@
     letter-spacing:0.15em; line-height:1.5; text-align:center;
     color:var(--green); background:var(--bg2);
     border:1px solid var(--dark);
-    box-shadow:0 0 32px rgba(168,85,247,0.25),0 0 0 1px rgba(168,85,247,0.1);
+    box-shadow:0 0 32px rgba(28,199,76,0.25),0 0 0 1px rgba(28,199,76,0.1);
     opacity:0; pointer-events:none; transition:opacity 0.2s;
   }
   #shop-toast.visible { opacity:1; }
@@ -683,18 +654,6 @@
     overflow: hidden;
   }
 
-  .shop-grid-bg {
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(rgba(0,245,255,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,245,255,0.04) 1px, transparent 1px);
-    background-size: 40px 40px;
-    opacity: 1;
-    pointer-events: none;
-    z-index: 0;
-  }
-
   #slide-2 .screen-content {
     display: flex;
     flex-direction: column;
@@ -707,18 +666,6 @@
     z-index: 1;
     overflow: hidden;
   }
-
-  .shop-header {
-    position: relative;
-    width: 100%; padding: 12px 14px 10px;
-    display: flex; align-items: center; justify-content: space-between;
-    border-bottom: 1px solid var(--dim);
-    flex-shrink: 0;
-  }
-  .shop-title { font-family: var(--display); font-size: 14px; font-weight: 700; color: var(--dark); letter-spacing: 0.1em; text-indent: 40px; }
-  .shop-credits { font-family: var(--display); font-size: 13px; color: var(--green); }
-  .shop-level-badge { font-size: 8px; letter-spacing: 0.2em; color: rgba(255,255,255,0.3); text-indent: 40px; }
-
 
 </style>
 </head>
@@ -808,8 +755,8 @@
     </div>
 
     <!-- Tutorial toast -->
-    <div id="tut-toast">
-      <div id="tut-toast-title"></div>
+    <div id="tut-toast" class="tut-toast">
+      <div id="tut-toast-title" class="tut-toast-title"></div>
       <div id="tut-toast-body"></div>
     </div>
 
@@ -825,8 +772,8 @@
     <div class="screen-content">
 
       <!-- Tutorial toast -->
-      <div id="tut-toast-2">
-        <div id="tut-toast-2-title"></div>
+      <div id="tut-toast-2" class="tut-toast">
+        <div id="tut-toast-2-title" class="tut-toast-title"></div>
         <div id="tut-toast-2-body"></div>
       </div>
 
@@ -841,7 +788,7 @@
           <div class="shop-level-badge">Mode: Stationary</div>
         </div>
         <div style="text-align:right">
-          <div style="font-size:7px;letter-spacing:0.2em;color:rgba(255,255,255,0.3)">CREDITS</div>
+          <div class="shop-level-badge" style="text-indent:0">CREDITS</div>
           <div class="shop-credits tut-tap" data-tut="shopcredits">2504</div>
         </div>
       </div>
@@ -927,16 +874,7 @@
   const waveOffset = 0;
   const waveT      = 0;
 
-  const LEVEL_PALETTES = [ // what if you want to change the color Jen
-    { skyT:'#147c1b', skyB:'#1cc74c', sun:'#1cc74c', sunG:'#1cc74c', grid:'#64e15e', mtn:'#acfa70' }, // 1
-    { skyT:'#0a0025', skyB:'#1e0050', sun:'#ff8c42', sunG:'#ff4500', grid:'#00ccff', mtn:'#0066cc' }, // 2
-    { skyT:'#100015', skyB:'#300030', sun:'#d42b6a', sunG:'#cc0055', grid:'#cc44ff', mtn:'#8800cc' }, // 3
-    { skyT:'#1a0800', skyB:'#3d1200', sun:'#ffd700', sunG:'#ff8c00', grid:'#ff6b35', mtn:'#cc3300' }, // 4
-    { skyT:'#200010', skyB:'#450020', sun:'#ff4500', sunG:'#ff0000', grid:'#d42b6a', mtn:'#cc0044' }, // 5
-    { skyT:'#05001a', skyB:'#150040', sun:'#a855f7', sunG:'#6600cc', grid:'#8800ff', mtn:'#550099' }, // 6
-    { skyT:'#001510', skyB:'#003322', sun:'#00ff9f', sunG:'#00cc66', grid:'#00ffcc', mtn:'#009966' }, // 7
-    { skyT:'#1a0000', skyB:'#400000', sun:'#ffffff', sunG:'#ff0040', grid:'#ff0040', mtn:'#990020' }, // 8
-  ];
+  const pal = { skyT:'#147c1b', skyB:'#1cc74c', sun:'#1cc74c', sunG:'#1cc74c', grid:'#64e15e', mtn:'#acfa70' };
 	
   function hexToRgb(hex) {
     const r = parseInt(hex.slice(1,3),16);
@@ -946,8 +884,7 @@
   }
 
   function drawSynthwaveScene() {
-    const lvl  = 1;
-    const pal  = LEVEL_PALETTES[(lvl - 1) % LEVEL_PALETTES.length];
+
 
     // ── WAVEFORM —
     const rows    = 38;
@@ -959,7 +896,7 @@
     for (let r = 0; r < rows; r++) {
       const baseY = (r * rowSpan + rowSpan * 0.5 + waveOffset) % H;
       const screenPct = baseY / H;
-      const amp   = (4 + screenPct * rows * 1.4 + lvl * 0.8) * (0.4 + screenPct * 0.6);
+      const amp   = (4.8 + screenPct * rows * 1.4) * (0.4 + screenPct * 0.6);
       const freq  = 0.022 + screenPct * rows * 0.001;
       const cycle  = waveOffset / H;
       const localT = cycle < 1 ? cycle : 2 - cycle;
@@ -1004,7 +941,7 @@
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(aimAngle);
-    ctx.shadowColor = '#00f5ff'; ctx.shadowBlur = 16;
+    ctx.shadowColor = '#1cc74c'; ctx.shadowBlur = 16;
 
     // Main body
     ctx.beginPath();
@@ -1166,7 +1103,7 @@ function drawScene() {
     Object.assign(fakeDrone, { x: W * 0.50, y: H * 0.18, r: 14, angle: Math.PI / 4 });
 	Object.assign(fakeEnemyDrop, { x: W * 0.35, y: H * 0.62, r: 10 });
 	Object.assign(fakePodDrop,   { x: W * 0.72, y: H * 0.70, r: 13 });
-    ctx.fillStyle = '#050510';
+    ctx.fillStyle = '#061005';
     ctx.fillRect(0, 0, W, H);
     drawSynthwaveScene();
     drawMine(fakeMine);
@@ -1345,7 +1282,7 @@ function drawScene() {
         if (Math.sin(angle) <= -0.1 && depthAlpha <= 0.3) return;
         decoCtx.save();
         decoCtx.globalAlpha = depthAlpha;
-        decoCtx.shadowColor = 'rgba(255,215,0,0.9)';
+        decoCtx.shadowColor = '#acfa70';
         decoCtx.shadowBlur  = 4 * depthAlpha;
         decoCtx.fillStyle   = '#1cc74c';
         decoCtx.beginPath();
