@@ -1210,7 +1210,7 @@
   // ── Mine ──
   function drawMine(m) {
     ctx.save(); ctx.translate(m.x, m.y);
-    ctx.shadowColor = '#64db09'; ctx.shadowBlur = 18;
+    ctx.shadowColor = '#64db09'; ctx.shadowBlur = 8;
     ctx.beginPath(); ctx.arc(0,0,m.r,0,Math.PI*2);
     ctx.fillStyle = '#000'; ctx.fill();
     ctx.strokeStyle = '#1cc74c'; ctx.lineWidth = 1.2;
