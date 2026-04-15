@@ -804,7 +804,7 @@
             class="tut-tap" data-tut="shopdeco"
             style="position:absolute; top:0px; left:0px; cursor:pointer;"></canvas>
           <div class="shop-title">FUSION SHOP</div>
-          <div class="shop-level-badge">Mode: Stationary</div>
+          <div class="shop-level-badge tut-tap" data-tut="shoplevel">Mode: Stationary</div>
         </div>
         <div style="text-align:right">
           <div class="shop-level-badge" style="text-indent:0">CREDITS</div>
@@ -825,7 +825,7 @@
 
         <!-- LEFT — tabs + scroll -->
         <div class="shop-left">
-          <div class="shop-tabs">
+          <div class="shop-tabs tut-tap" data-tut="shoptabs">
             <button class="shop-tab-btn">BUY</button>
             <button class="shop-tab-btn">SELL</button>
             <button class="shop-tab-btn active">CRAFT</button>
@@ -835,21 +835,21 @@
 
             <!-- ELEMENTS collapsible label (open) -->
             <div class="shop-section-label collapsible">ELEMENTS ▾</div>
-            <div class="shop-grid">
+            <div class="shop-grid tut-tap" data-tut="shopelem">
               <!-- Magnesium — owned, highlighted, qty 1 -->
-              <div class="shop-card obj recipe-ingredient--owned tut-tap" data-tut="craft-ingredient">
+              <div class="shop-card obj recipe-ingredient--owned">
                 <div class="shop-card-sym">μ</div>
                 <div class="shop-card-name">Magnesium</div>
                 <div class="shop-card-corner"><span class="stash-count">1</span></div>
               </div>
               <!-- Lithium — not owned, highlighted as ingredient needed -->
-              <div class="shop-card obj recipe-ingredient tut-tap" data-tut="craft-ingredient">
+              <div class="shop-card obj recipe-ingredient">
                 <div class="shop-card-sym">λ</div>
                 <div class="shop-card-name">Lithium</div>
                 <div class="shop-card-corner"><span class="stash-count">0</span></div>
               </div>
               <!-- Potassium — not owned, highlighted as ingredient needed -->
-              <div class="shop-card obj recipe-ingredient tut-tap" data-tut="craft-ingredient">
+              <div class="shop-card obj recipe-ingredient">
                 <div class="shop-card-sym">κ</div>
                 <div class="shop-card-name">Potassium</div>
                 <div class="shop-card-corner"><span class="stash-count">0</span></div>
@@ -891,9 +891,9 @@
 
             <!-- CRAFT section label -->
             <div class="shop-section-label" style="margin-top:4px">CRAFT</div>
-            <div class="shop-grid">
+            <div class="shop-grid tut-tap" data-tut="shopcomp">
               <!-- Magnium craft card — selected, 1 light on, 0 in inventory -->
-              <div class="shop-card obj selected tut-tap" data-tut="craft-card">
+              <div class="shop-card obj selected">
                 <div class="shop-card-sym">Μ</div>
                 <div class="shop-card-name">Magnium</div>
                 <div class="shop-card-progress">
@@ -949,7 +949,7 @@
         <div class="shop-right">
 
           <!-- Stats block -->
-          <div class="shop-stats">
+          <div class="shop-stats tut-tap" data-tut="shopstats">
             <div class="shop-stat-row">
               <div>
                 <div class="shop-stat-label">AMMO REFILL</div>
@@ -993,7 +993,7 @@
           </div>
 
           <!-- Info panel — Magnium -->
-          <div class="shop-info" id="shop-info-panel">
+          <div class="shop-info tut-tap" id="shopinfo">
             <div class="shop-info-sym">Μ</div>
             <div class="shop-info-name">Magnium</div>
             <div class="shop-info-effect">EXPEND: Reserve +2, Ammo Refill +1</div>
@@ -1002,10 +1002,10 @@
           </div>
 
           <!-- Staging area — 1 Magnium in queue -->
-          <div class="shop-staging">
+          <div class="shop-staging tut-tap" data-tut="shopstaging">
             <div class="staging-droprow">
               <div class="shop-action-box craft-box"></div>
-              <button class="btn-secondary staging-confirm">CRAFT ALL</button>
+              <button class="btn-secondary staging-confirm tut-tap" data-tut="shopbutton">CRAFT ALL</button>
             </div>
             <div class="staging-list">
               <div class="staging-row">
@@ -1022,7 +1022,7 @@
           </div>
 
           <!-- Reserves -->
-          <div class="shop-reserves">
+          <div class="shop-reserves tut-tap" data-tut="shopreserves">
             <div class="shop-reserve-slots">
               <div class="shop-reserve-slot filled">
                 <span class="shop-reserve-sym">Θ</span>
@@ -1034,7 +1034,7 @@
           </div>
 
           <!-- Launch -->
-          <button class="btn-sweep">LAUNCH</button>
+          <button class="btn-sweep tut-tap" data-tut="shoplaunch">LAUNCH</button>
 
         </div><!-- /.shop-right -->
 
@@ -1379,14 +1379,14 @@ function drawScene() {
     const c = TOAST_CONTENT[key];
     if (!c) return;
     // Drive whichever toast is on the active slide
-    const activeToast = (cur === 2) ? toast2 : toast;
-    const activeTitle = (cur === 2) ? toast2Title : toastTitle;
-    const activeBody  = (cur === 2) ? toast2Body  : toastBody;
+    const activeToast = toast;
+	const activeTitle = toastTitle;
+	const activeBody  = toastBody;
     activeTitle.textContent = c.title;
     activeBody.textContent  = c.body;
     activeToast.classList.add('visible');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => activeToast.classList.remove('visible'), 3200);
+    toastTimer = setTimeout(() => activeToast.classList.remove('visible'), 4000);
   }
 
   // ── Dismiss helper ──
