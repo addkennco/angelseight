@@ -450,7 +450,7 @@
   .shop-card.craft-ready { border-color: rgba(28,199,76,0.5); background: rgba(28,199,76,0.04); }
   .shop-card.craft-ready .shop-card-sym { color: var(--green); }
 
-  .shop-card.recipe-ingredient { border-color: rgba(28,199,76,0.25); box-shadow: 0 0 6px rgba(28,199,76,0.1); }
+  .shop-card.recipe-ingredient { border-color: rgba(28,199,76,0.45); box-shadow: 0 0 6px rgba(28,199,76,0.2); }
   .shop-card.recipe-ingredient--owned { border-color: rgba(28,199,76,0.65); box-shadow: 0 0 8px rgba(28,199,76,0.3); }
   .shop-card.recipe-ingredient--owned .shop-card-sym { color: var(--green); }
 
@@ -613,25 +613,15 @@
     color: var(--green); border: 2px solid var(--green);
     padding: 10px 48px; cursor: pointer;
     background: transparent; position: relative;
-    transition: 0.2s; overflow: hidden; margin-bottom: 10px;
+    overflow: hidden; margin-bottom: 10px;
   }
-  .btn-sweep.sweeping { color: var(--bg); }
-  .btn-sweep::before {
-    content: ""; position: absolute;
-    height: 100%; width: 0%; top: 0; left: -40px;
-    transform: skewX(45deg); background-color: var(--green);
-    z-index: -1; transition: 0.2s;
-  }
-  .btn-sweep.sweeping::before { width: 160%; }
-  .btn-sweep:active { transform: scale(0.97); }
 
   .btn-secondary {
     font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em;
     color: var(--dark); background: transparent;
     border: 1px double var(--dark); padding: 10px 28px; margin-bottom: 10px;
-    cursor: pointer; transition: color 0.2s, border-color 0.2s;
+    cursor: pointer;
   }
-  .btn-secondary:active { color: var(--green); border-color: var(--green); }
 
   /* ══════════════════════════════════════
      NAV ARROWS
@@ -645,15 +635,14 @@
     border: none;
     padding: 16px 10px;
     cursor: pointer;
-    color: rgba(28,199,76,0.35);
+    color: var(--green);
     font-size: 28px;
     line-height: 1;
     transition: color 0.2s;
     pointer-events: all;
-    -webkit-tap-highlight-color: transparent;
 	animation: hintPulse 2.5s ease-in-out infinite;
   }
-  .tut-nav-arrow:active { color: var(--green); }
+  .tut-nav-arrow:active { color: var(--light); }
   .tut-nav-arrow.left  { left: 0; }
   .tut-nav-arrow.right { right: 0; }
 
@@ -1002,7 +991,6 @@
             <div class="shop-info-effect">EXPEND: Reserve +2, Ammo Refill +1</div>
             <div class="shop-info-power">TRIGGER: Bomb</div>
             <div class="shop-info-desc">A Magnesium-based unstable isotope that is highly volatile when impacted.</div>
-            <div class="shop-info-price">BUY 150¢</div>
           </div>
 
           <!-- Staging area — 1 Magnium in queue -->
@@ -1023,7 +1011,6 @@
                 <button class="staging-row-remove">✕</button>
               </div>
             </div>
-            <div class="staging-total">TOTAL: 0¢</div>
           </div>
 
           <!-- Reserves -->
@@ -1033,17 +1020,6 @@
                 <span class="shop-reserve-sym">Θ</span>
                 <span class="shop-reserve-name">TITANE</span>
               </div>
-              <div class="shop-reserve-slot filled">
-                <span class="shop-reserve-sym">Μ</span>
-                <span class="shop-reserve-name">MAGNIUM</span>
-              </div>
-              <div class="shop-reserve-slot filled">
-                <span class="shop-reserve-sym">Π</span>
-                <span class="shop-reserve-name">NITROKALIUM</span>
-              </div>
-              <div class="shop-reserve-slot"></div>
-              <div class="shop-reserve-slot"></div>
-              <div class="shop-reserve-slot"></div>
               <div class="shop-reserve-slot"></div>
               <div class="shop-reserve-slot"></div>
             </div>
@@ -1358,21 +1334,31 @@ function drawScene() {
   // TUTORIAL TOAST SYSTEM
   // ══════════════════════════════════════
   const TOAST_CONTENT = {
-    score:     { title: 'SCORE & COMBO',  body: 'Current Score & Combo Multiplier. Combo resets on taking Shield Damage.' },
-    level:     { title: 'LEVEL',          body: 'Current Sector Level and Progress Gauge. Fill the gauge by clearing Enemies.' },
-    bars:      { title: 'SHIELD & AMMO',  body: 'Shield and Ammo Readouts. Regular Ammo Reloads are based on your stats. Use Compounds to restore.' },
-    enemies:   { title: 'ENEMIES',        body: 'Enemies have different behaviors and attack patterns. Shoot them to clear the level and aquire Elements.' },
-    mine:      { title: 'MINE',           body: 'Obstacles found throughout the corridor. Mines are not targetable without crafting special Alloys.' },
-    ship:      { title: 'YOUR SHIP',      body: 'Standard Issue Alpha Lyrae Aerospace Division Eagle026 Spacecraft.' },
-    log:       { title: 'PICKUP LOG',     body: 'Personal Log. Displays Pickups and Deployments.' },
-    reserves:  { title: 'RESERVES',       body: 'Active Loadout for deploying Compounds and Alloys.' },
-    stash:     { title: 'STASH',          body: 'Direct line to inventory. Drag Pickups here to sell or craft with later.' },
-    radio:     { title: 'RADIO',          body: 'Radio tuner. Find your favorite station.' },
-	pod:       { title: 'COMPOUND POD',   body: 'Resources from Alpha Lyrae Areospace Divison. Shoot to release Compound.' },
-	enemydrop: { title: 'ELEMENT',        body: 'Resources from downed Enemies. Magentic pickup enabled.' },
-    poddrop:   { title: 'COMPOUND',       body: 'Resources from Alpha Lyrae Areospace Divison. Magnetic pickup enabled.' },
-    shopdeco:  { title: 'SHOP DECO',        body: 'Placeholder — author to fill.' },
-    shopcredits: { title: 'CREDITS',        body: 'Placeholder — author to fill.' },
+    score:        { title: 'SCORE & COMBO',  body: 'Current Score & Combo Multiplier. Combo resets on taking Shield Damage.' },
+    level:        { title: 'SECTOR LEVEL',   body: 'Current Sector Level and Progress Gauge. Fill the gauge by clearing Enemies.' },
+    bars:         { title: 'SHIELD & AMMO',  body: 'Shield and Ammo Readouts. Regular Ammo Reloads are based on your stats. Use Compounds to restore.' },
+    enemies:      { title: 'ENEMIES',        body: 'Enemies have different behaviors and attack patterns. Shoot them to clear the level and aquire Elements.' },
+    mine:         { title: 'MINE',           body: 'Obstacles found throughout the corridor. Mines are not targetable without crafting special Alloys.' },
+    ship:         { title: 'YOUR SHIP',      body: 'Standard Issue Alpha Lyrae Aerospace Division Eagle026 Spacecraft.' },
+    log:          { title: 'PICKUP LOG',     body: 'Personal Log. Displays Pickups and Deployments.' },
+    reserves:     { title: 'RESERVES',       body: 'Active Loadout for deploying Compounds and Alloys.' },
+    stash:        { title: 'STASH',          body: 'Direct line to inventory. Drag Pickups here to sell or craft with later.' },
+    radio:        { title: 'RADIO',          body: 'Radio tuner. Find your favorite station.' },
+	pod:          { title: 'COMPOUND POD',   body: 'Resources from Alpha Lyrae Areospace Divison. Shoot to release Compound.' },
+	enemydrop:    { title: 'ELEMENT',        body: 'Resources from downed Enemies. Magentic pickup enabled.' },
+    poddrop:      { title: 'COMPOUND',       body: 'Resources from Alpha Lyrae Areospace Divison. Magnetic pickup enabled.' },
+    shopdeco:     { title: 'SHOP DECO',      body: 'Just decoration. We think it is neat.' },
+    shopcredits:  { title: 'CREDITS',        body: 'Earn your Paycheck by clearing Sectors. Buy and Sell Elements and Compounds in the Fusion Shop.' },
+	shoptabs:     { title: 'SHOP MODES',      body: 'Switch the Fusion Shop to Buy, Sell, or Craft Mode. Visit your Stash to Expend Materials on the Ship or Equip for use in Combat.' },
+	shopstats:    { title: 'SHIP SPECS',     body: 'In Stash Mode, Drag Materials here to bolster Offense and Defense.' },
+    shopinfo:     { title: 'INFO PANEL',     body: 'Click Any Material for Information on Expending or Triggering in Combat' },
+	shopaction:   { title: 'LOADING PANEL',  body: 'Drag Material Cards to the Panel to add them to the Queue. Works for Buying, Selling, and Crafting.' },
+    shopbutton:   { title: 'ACTIVATION',     body: 'After Queueing Materials to Buy, Sell, or Craft, Click here to Begin the Process' },
+	shopelem:     { title: 'INGREDIENTS',    body: 'Elements can be used to craft Compounds. Compounds can be used to craft Alloys. Drag an ingredient onto a Craft Card and drag Activated Craft Cards to the Panel to add them to the Queue. Highlighted Ingredient Cards will display owned and missing ingredients.' },
+    shopcomp:     { title: 'CRAFT CARDS',    body: 'Drag Ingredients to Craft Cards to Activate them. When fully Activated, Drag Cards to the Panel to add them to the Queue. Compounds and Alloys have multiple recipes. Double Click to return Ingredients.' },
+	shopstaging:  { title: 'FUSION QUEUE',   body: 'Add Cards to the Queue before Processing. Use the Plus and Minus Buttons to Buy, Sell, or Craft Multiple Compounds or Alloys at one time.' },
+    shopreserves: { title: 'RESERVES',       body: 'Materials to be Triggered in Combat. Visit the Stash to organize your Loadout.' },
+	shoplaunch:   { title: 'LAUNCH',         body: 'Leave the Fusion Shop and Launch Mission to the Next Sector.' },
   };
 
   const toast       = document.getElementById('tut-toast');
