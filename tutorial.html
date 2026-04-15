@@ -70,7 +70,7 @@
      SLIDE 0: TITLE COVER
   ══════════════════════════════════════ */
   #slide-0 {
-    background: radial-gradient(ellipse at 50% 30%, #013220 0%, #008000 70%);
+    background: radial-gradient(ellipse at 50% 30%, #004d00 0%, #008000 70%);
   }
   .tut-eyebrow {
     font-size: 9px; letter-spacing: 0.45em;
@@ -1384,6 +1384,52 @@ function drawScene() {
     }
   })();
 
+</script>
+<!-- Scan bar overlay — sits above all slides -->
+<canvas id="scan-overlay" style="position:fixed;inset:0;pointer-events:none;z-index:998;"></canvas>
+
+<script>
+(function() {
+  const canvas = document.getElementById('scan-overlay');
+  const ctx = canvas.getContext('2d');
+  let startTime = null;
+
+  function resize() {
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width  = window.innerWidth  * dpr;
+    canvas.height = window.innerHeight * dpr;
+    canvas.style.width  = window.innerWidth  + 'px';
+    canvas.style.height = window.innerHeight + 'px';
+    ctx.setTransform(1,0,0,1,0,0);
+    ctx.scale(dpr, dpr);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function render(ts) {
+    if (!startTime) startTime = ts;
+    const t = (ts - startTime) / 1000;
+    const W = window.innerWidth, H = window.innerHeight;
+
+    ctx.clearRect(0, 0, W, H);
+
+    const barY = ((t * 0.4) % 1) * H;  // 0.4 = speed, tune freely
+
+    const grad = ctx.createLinearGradient(0, barY - 40, 0, barY + 40);
+    grad.addColorStop(0,    'rgba(28,199,76,0)');
+    grad.addColorStop(0.45, 'rgba(28,199,76,0.04)');
+    grad.addColorStop(0.5,  'rgba(172,250,112,0.10)');  // bright peak: --light
+    grad.addColorStop(0.55, 'rgba(28,199,76,0.04)');
+    grad.addColorStop(1,    'rgba(28,199,76,0)');
+
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, barY - 40, W, 80);
+
+    requestAnimationFrame(render);
+  }
+
+  requestAnimationFrame(render);
+})();
 </script>
 </body>
 </html>
