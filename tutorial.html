@@ -450,7 +450,7 @@
   .shop-card.craft-ready .shop-card-sym { color: var(--green); }
 
   .shop-card.recipe-ingredient { border-color: rgba(28,199,76,0.25); box-shadow: 0 0 6px rgba(28,199,76,0.05); }
-  .shop-card.recipe-ingredient--owned { border-color: rgba(28,199,76,0.65); box-shadow: 0 0 8px rgba(28,199,76,0.3); }
+  .shop-card.recipe-ingredient--owned { border-color: rgba(28,199,76,0.85); box-shadow: 0 0 8px rgba(28,199,76,0.65); }
   .shop-card.recipe-ingredient--owned .shop-card-sym { color: var(--green); }
 
   /* ── Info panel ── */
@@ -645,18 +645,15 @@
 
   .tut-nav-hint {
     position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
     z-index: 200;
     background: transparent;
     border: none;
     padding: 16px 10px;
     cursor: pointer;
     color: var(--green);
-    font-size: 28px;
-    line-height: 1;
-    transition: color 0.2s;
-    pointer-events: all;
+    font-size: 10px;
 	animation: hintPulse 2.5s ease-in-out infinite;
   }
 	
