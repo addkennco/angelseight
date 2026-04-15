@@ -988,10 +988,16 @@
 	box-shadow: 0 0 40px rgba(255,249,91,0.3);
 	padding: 4px;
     z-index: 1001; line-height: 1;
+	animation: hintPulse 2.5s ease-in-out infinite;
     transition: color 0.15s;
   }
   #btn-tutorial-close:active { color: #acfa70; }
 
+	@keyframes hintPulse {
+    0%,100% { opacity: 0.4; }
+    50%      { opacity: 1; }
+  }
+	
 </style>
 </head>
 <body>
