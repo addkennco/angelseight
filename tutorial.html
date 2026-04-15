@@ -331,7 +331,6 @@
     transition: opacity 0.15s;
   }
   .tut-toast.visible { opacity: 1; }
-  #tut-toast-2 { color: #fff; }
   .tut-toast-title {
     font-family: var(--display);
     font-size: 10px;
@@ -450,7 +449,7 @@
   .shop-card.craft-ready { border-color: rgba(28,199,76,0.5); background: rgba(28,199,76,0.04); }
   .shop-card.craft-ready .shop-card-sym { color: var(--green); }
 
-  .shop-card.recipe-ingredient { border-color: rgba(28,199,76,0.45); box-shadow: 0 0 6px rgba(28,199,76,0.2); }
+  .shop-card.recipe-ingredient { border-color: rgba(28,199,76,0.25); box-shadow: 0 0 6px rgba(28,199,76,0.05); }
   .shop-card.recipe-ingredient--owned { border-color: rgba(28,199,76,0.65); box-shadow: 0 0 8px rgba(28,199,76,0.3); }
   .shop-card.recipe-ingredient--owned .shop-card-sym { color: var(--green); }
 
@@ -800,12 +799,6 @@
     <div class="shop-grid-bg"></div>
 
     <div class="screen-content">
-
-      <!-- Tutorial toast -->
-      <div id="tut-toast-2" class="tut-toast">
-        <div id="tut-toast-2-title" class="tut-toast-title"></div>
-        <div id="tut-toast-2-body"></div>
-      </div>
 
       <!-- Header -->
       <div class="shop-header">
@@ -1383,9 +1376,6 @@ function drawScene() {
   const toast       = document.getElementById('tut-toast');
   const toastTitle  = document.getElementById('tut-toast-title');
   const toastBody   = document.getElementById('tut-toast-body');
-  const toast2      = document.getElementById('tut-toast-2');
-  const toast2Title = document.getElementById('tut-toast-2-title');
-  const toast2Body  = document.getElementById('tut-toast-2-body');
   let toastTimer    = null;
 
   function showToast(key) {
