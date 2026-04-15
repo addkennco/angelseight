@@ -94,13 +94,13 @@
     font-family: var(--cursive);
     font-size: clamp(30px, 7vw, 56px);
     color: var(--green);
-    text-shadow: 0 0 20px rgba(255,45,120,0.7), 0 0 50px rgba(168,85,247,0.4);
+    text-shadow: 0 0 20px rgba(172,150,112,0.7), 0 0 50px rgba(0,0,0,0.4);
     line-height: 1; position: absolute; z-index: 2;
     pointer-events: none; white-space: nowrap;
   }
   .tut-intro {
     font-size: 12px; line-height: 1.8;
-    color: rgba(255,255,255,0.55);
+    color: rgba(28,199,76,0.7);
     text-align: left; max-width: 300px; margin-bottom: 32px;
   }
   .tut-hint {
@@ -206,10 +206,10 @@
     display: flex; flex-direction:column; align-items:center; gap:4px;
     touch-action: none;
   }
-  .radio-label { font-size:7px; letter-spacing:0.25em; color:rgba(255,255,255,0.3); }
+  .radio-label { font-size:7px; letter-spacing:0.25em; color:rgba(28,199,76,0.7); }
   .radio-dial {
     width: 44px; height: 44px;
-    border: 1px solid rgba(0,245,255,0.3);
+    border: 1px solid rgba(28,199,76,0.7);
     border-radius: 50%;
     display: flex; align-items:center; justify-content:center;
     position: relative;
@@ -235,7 +235,7 @@
   ══════════════════════════════════════ */
   .pu-slot {
     width: 36px; height: 36px;
-    border: 1px solid rgba(255,255,255,0.15);
+    border: 1px solid var(--dark);
     display: flex; align-items:center; justify-content:center;
     font-size: 8px; letter-spacing:0.05em;
     color: rgba(255,255,255,0.5);
@@ -246,12 +246,12 @@
     gap: 1px;
   }
   .pu-slot.filled {
-    border-color: rgba(168,85,247,0.6);
+    border-color: rgba(28,199,76,0.7);
     background: rgba(168,85,247,0.1);
     color: #fff;
   }
   .pu-slot-sym { font-family: var(--display); font-size:11px; font-weight:700; color: var(--dark); }
-  .pu-slot-name { font-size: 5px; letter-spacing:0.05em; color:rgba(255,255,255,0.4); text-align:center; line-height:1.2; }
+  .pu-slot-name { font-size: 5px; letter-spacing:0.05em; color:rgba(28,199,76,0.7); text-align:center; line-height:1.2; }
 
   /* Powerup bar wrapper */
   #powerup-bar {
@@ -325,7 +325,7 @@
     bottom: 50%; left: 50%; transform: translate(-50%, -50%);
     background: var(--bg2);
     border: 1px solid var(--green);
-    box-shadow: 0 0 24px rgba(0,245,255,0.2);
+    box-shadow: 0 0 24px rgba(100,220,10,0.2);
     padding: 10px 18px;
     font-family: var(--mono);
     font-size: 11px;
@@ -346,7 +346,7 @@
     bottom: 50%; left: 50%; transform: translate(-50%, -50%);
     background: var(--bg2);
     border: 1px solid var(--green);
-    box-shadow: 0 0 24px rgba(0,245,255,0.2);
+    box-shadow: 0 0 24px rgba(100,220,10,0.2);
     padding: 10px 18px;
     font-family: var(--mono);
     font-size: 11px;
@@ -388,8 +388,8 @@
   .shop-grid-bg {
     position: absolute; inset: 0;
     background:
-      linear-gradient(rgba(0,245,255,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,245,255,0.04) 1px, transparent 1px);
+      linear-gradient(rgba(100,220,10,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(100,220,10,0.04) 1px, transparent 1px);
     background-size: 40px 40px;
     opacity: 1;
     pointer-events: none;
@@ -406,7 +406,7 @@
   }
   .shop-title { font-family:var(--display); font-size:14px; font-weight:700; color:var(--dark); letter-spacing:0.1em; text-indent:40px; }
   .shop-credits { font-family:var(--display); font-size:13px; color:var(--green); }
-  .shop-level-badge { font-size:8px; letter-spacing:0.2em; color:rgba(255,255,255,0.3); text-indent:40px; }
+  .shop-level-badge { font-size:8px; letter-spacing:0.2em; color:rgba(100,220,10,0.3); text-indent:40px; }
 
   /* ── 70s Supergraphic ── */
   .supergraphic {
@@ -415,7 +415,7 @@
     gap: 0; line-height: 0; font-size: 0;
   }
   .sg-light     { background: #acfa70; height: 5px; } 
-  .sg-mid       { background: ##64e15e; height: 7px; }
+  .sg-mid       { background: #64e15e; height: 7px; }
   .sg-main      { background: #1cc74c; height: 10px; }
   .sg-dark      { background: #147c1b; height: 15px; }
 
@@ -460,7 +460,7 @@
 
   .shop-grid { display:grid; grid-template-columns: repeat(2,1fr); gap:6px; }
   .shop-card {
-    border: 1px solid rgba(255,255,255,0.1);
+    border: 1px solid rgba(100,220,10,0.1);
     padding: 8px 6px;
     display:flex; flex-direction:column; gap:3px;
     cursor:pointer;
@@ -928,7 +928,7 @@
   const waveT      = 0;
 
   const LEVEL_PALETTES = [ // what if you want to change the color Jen
-    { skyT:'#0d0020', skyB:'#1a0040', sun:'#ff6ec7', sunG:'#d42b6a', grid:'#2255ff', mtn:'#1133cc' }, // 1
+    { skyT:'#147c1b', skyB:'#1cc74c', sun:'#1cc74c', sunG:'#1cc74c', grid:'#64e15e', mtn:'#acfa70' }, // 1
     { skyT:'#0a0025', skyB:'#1e0050', sun:'#ff8c42', sunG:'#ff4500', grid:'#00ccff', mtn:'#0066cc' }, // 2
     { skyT:'#100015', skyB:'#300030', sun:'#d42b6a', sunG:'#cc0055', grid:'#cc44ff', mtn:'#8800cc' }, // 3
     { skyT:'#1a0800', skyB:'#3d1200', sun:'#ffd700', sunG:'#ff8c00', grid:'#ff6b35', mtn:'#cc3300' }, // 4
@@ -937,7 +937,7 @@
     { skyT:'#001510', skyB:'#003322', sun:'#00ff9f', sunG:'#00cc66', grid:'#00ffcc', mtn:'#009966' }, // 7
     { skyT:'#1a0000', skyB:'#400000', sun:'#ffffff', sunG:'#ff0040', grid:'#ff0040', mtn:'#990020' }, // 8
   ];
-
+	
   function hexToRgb(hex) {
     const r = parseInt(hex.slice(1,3),16);
     const g = parseInt(hex.slice(3,5),16);
@@ -1015,12 +1015,12 @@
     ctx.lineTo(5, 4);
     ctx.lineTo(12, 8);
     ctx.closePath();
-    ctx.strokeStyle = '#00f5ff'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.strokeStyle = '#1cc74c'; ctx.lineWidth = 1.5; ctx.stroke();
 
     // Wing accents
     ctx.beginPath();
     ctx.moveTo(-12, 8); ctx.lineTo(-18, 2); ctx.lineTo(-10, -2);
-    ctx.strokeStyle = '#a855f7'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.strokeStyle = '#1cc74c'; ctx.lineWidth = 1; ctx.stroke();
     ctx.beginPath();
     ctx.moveTo(12, 8); ctx.lineTo(18, 2); ctx.lineTo(10, -2);
     ctx.stroke();
@@ -1039,7 +1039,7 @@
     ctx.shadowColor = '#ff0000'; ctx.shadowBlur = 18;
     ctx.beginPath(); ctx.arc(0,0,m.r,0,Math.PI*2);
     ctx.fillStyle = '#000'; ctx.fill();
-    ctx.strokeStyle = '#ff2020'; ctx.lineWidth = 1.2;
+    ctx.strokeStyle = '#1cc74c'; ctx.lineWidth = 1.2;
     ctx.beginPath(); ctx.arc(0,0,m.r,0,Math.PI*2); ctx.stroke();
     ctx.beginPath();
     ctx.moveTo(-m.r,0); ctx.lineTo(m.r,0);
@@ -1049,13 +1049,11 @@
     ctx.beginPath();
     ctx.moveTo(-s,-s); ctx.lineTo(s,s);
     ctx.moveTo(s,-s); ctx.lineTo(-s,s);
-    ctx.strokeStyle = 'rgba(255,30,30,0.5)'; ctx.stroke();
+    ctx.strokeStyle = 'rgba(29,199,76,0.5)'; ctx.stroke();
     ctx.restore();
   }
 
   // ── Scout ──
-  // draw() lifted exactly from ENEMY_TYPES scout entry.
-  // angle: Math.PI points nose downward (toward player), matching chase behaviour.
   function drawScout(e) {
     ctx.save(); ctx.translate(e.x, e.y); ctx.rotate(e.angle);
     ctx.beginPath();
@@ -1063,8 +1061,8 @@
     ctx.lineTo(-e.r * 0.85, -e.r);
     ctx.lineTo( e.r * 0.85, -e.r);
     ctx.closePath();
-    ctx.strokeStyle = e.color; ctx.lineWidth = 1.5;
-    ctx.shadowColor = e.color; ctx.shadowBlur = 8;
+    ctx.strokeStyle = #1cc74c; ctx.lineWidth = 1.5;
+    ctx.shadowColor = #64db09; ctx.shadowBlur = 8;
     ctx.stroke(); ctx.restore();
   }
 
@@ -1075,8 +1073,8 @@
     ctx.moveTo(0, -e.r); ctx.lineTo(e.r, 0);
     ctx.lineTo(0, e.r); ctx.lineTo(-e.r, 0);
     ctx.closePath();
-    ctx.strokeStyle = e.color; ctx.lineWidth = 1.5;
-    ctx.shadowColor = e.color; ctx.shadowBlur = 10;
+    ctx.strokeStyle = #1cc74c; ctx.lineWidth = 1.5;
+    ctx.shadowColor = #64db09; ctx.shadowBlur = 10;
     ctx.stroke();
     const s = e.r * 0.45;
     ctx.beginPath();
@@ -1090,8 +1088,8 @@
     ctx.save();
     ctx.translate(pod.x, pod.y);
     const pulse = 0.6; // frozen: 0.6 + 0.4 * Math.sin(pod.t * 3) at t=0
-    ctx.shadowColor = '#00f5ff'; ctx.shadowBlur = 18 * pulse;
-    ctx.strokeStyle = `rgba(0,245,255,${0.6 + 0.4 * pulse})`;
+    ctx.shadowColor = '#64db09'; ctx.shadowBlur = 18 * pulse;
+    ctx.strokeStyle = `rgba(29,199,76,0.5${0.6 + 0.4 * pulse})`;
     ctx.lineWidth = 1.8;
     ctx.beginPath();
     for (let i = 0; i < 6; i++) {
@@ -1101,7 +1099,7 @@
     }
     ctx.closePath(); ctx.stroke();
     // Inner hex (smaller, rotated 30°)
-    ctx.strokeStyle = `rgba(0,245,255,0.3)`;
+    ctx.strokeStyle = `rgba(29,199,76,0.5)`;
     ctx.lineWidth = 0.8;
     ctx.beginPath();
     for (let i = 0; i < 6; i++) {
@@ -1114,7 +1112,7 @@
     ctx.font = 'bold 13px Nova Square, monospace';
     ctx.fillStyle = `rgba(0,245,255,${0.8 + 0.2 * pulse})`;
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.shadowColor = '#00f5ff'; ctx.shadowBlur = 8;
+    ctx.shadowColor = '#64db09'; ctx.shadowBlur = 8;
     ctx.fillText('Θ', 0, 0);
     ctx.restore();
   }
@@ -1123,9 +1121,9 @@
 function drawDrop() {
 ctx.save();
 ctx.translate(fakeEnemyDrop.x, fakeEnemyDrop.y);
-ctx.shadowColor = '#00f5ff'; ctx.shadowBlur = 10;
+ctx.shadowColor = '#64db09'; ctx.shadowBlur = 10;
 ctx.beginPath(); ctx.arc(0, 0, fakeEnemyDrop.r, 0, Math.PI * 2);
-ctx.strokeStyle = '#00f5ff'; ctx.lineWidth = 1; ctx.stroke();
+ctx.strokeStyle = '#1cc74c'; ctx.lineWidth = 1; ctx.stroke();
 ctx.font = 'bold 9px Nova Square, monospace';
 ctx.fillStyle = '#00f5ff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
 ctx.fillText('Σ', 0, 0);
@@ -1135,8 +1133,8 @@ ctx.restore();
 function drawPodDrop() {	
 ctx.save();
 ctx.translate(fakePodDrop.x, fakePodDrop.y);
-ctx.shadowColor = '#a855f7'; ctx.shadowBlur = 14;
-ctx.strokeStyle = 'rgba(168,85,247,0.9)';
+ctx.shadowColor = '#64db09'; ctx.shadowBlur = 14;
+ctx.strokeStyle = 'rgba(29,199,76,0.5)';
 ctx.lineWidth = 1.5;
 ctx.beginPath();
 for (let i = 0; i < 6; i++) {
@@ -1349,7 +1347,7 @@ function drawScene() {
         decoCtx.globalAlpha = depthAlpha;
         decoCtx.shadowColor = 'rgba(255,215,0,0.9)';
         decoCtx.shadowBlur  = 4 * depthAlpha;
-        decoCtx.fillStyle   = 'rgba(255,215,0,0.9)';
+        decoCtx.fillStyle   = '#1cc74c';
         decoCtx.beginPath();
         decoCtx.arc(ox, oy, SMALL_R, 0, Math.PI * 2);
         decoCtx.fill();
@@ -1358,9 +1356,9 @@ function drawScene() {
 
       function drawMainStar() {
         decoCtx.save();
-        decoCtx.shadowColor = 'white';
+        decoCtx.shadowColor = '#acfa70';
         decoCtx.shadowBlur  = 8;
-        decoCtx.strokeStyle = 'rgba(255,215,0,0.9)';
+        decoCtx.strokeStyle = '#1cc74c';
         decoCtx.lineWidth   = 1;
         decoCtx.beginPath();
         decoCtx.arc(CX, CY, BODY_R, 0, Math.PI * 2);
@@ -1371,7 +1369,7 @@ function drawScene() {
         const rippleR      = BODY_R + pingProgress * 18;
         const rippleAlpha  = (1 - pingProgress) * 0.3;
         decoCtx.save();
-        decoCtx.strokeStyle = `rgba(255,215,0,${rippleAlpha})`;
+        decoCtx.strokeStyle = `rgba(100,220,20,${rippleAlpha})`;
         decoCtx.lineWidth   = 1.5;
         decoCtx.beginPath();
         decoCtx.arc(CX, CY, rippleR, 0, Math.PI * 2);
