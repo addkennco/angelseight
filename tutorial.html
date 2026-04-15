@@ -494,8 +494,6 @@
   .shop-card.stash-empty .shop-card-name { color:rgba(28,199,76,0.18); }
   .shop-card.stash-empty .shop-card-effect { color:rgba(28,199,76,0.1); }
   .shop-card.stash-empty .stash-count   { color:rgba(28,199,76,0.18); }
-  .shop-card.stash-has .stash-count { font-family:var(--display); font-size:13px; font-weight:700; color:var(--green); }
-  .shop-card.stash-has.pu-card .stash-count { color:var(--dark); }
   .stash-count { position:absolute; top:5px; right:5px; font-size:7px; letter-spacing:0.05em; }
 
   /* Drag states */
@@ -829,19 +827,19 @@
             <div class="shop-section-label collapsible">ELEMENTS ▾</div>
             <div class="shop-grid">
               <!-- Magnesium — owned, highlighted, qty 1 -->
-              <div class="shop-card obj stash-has recipe-ingredient--owned tut-tap" data-tut="craft-ingredient">
+              <div class="shop-card obj recipe-ingredient--owned tut-tap" data-tut="craft-ingredient">
                 <div class="shop-card-sym">μ</div>
                 <div class="shop-card-name">Magnesium</div>
                 <div class="shop-card-corner"><span class="stash-count">1</span></div>
               </div>
               <!-- Lithium — not owned, highlighted as ingredient needed -->
-              <div class="shop-card obj stash-empty recipe-ingredient tut-tap" data-tut="craft-ingredient">
+              <div class="shop-card obj recipe-ingredient tut-tap" data-tut="craft-ingredient">
                 <div class="shop-card-sym">λ</div>
                 <div class="shop-card-name">Lithium</div>
                 <div class="shop-card-corner"><span class="stash-count">0</span></div>
               </div>
               <!-- Potassium — not owned, highlighted as ingredient needed -->
-              <div class="shop-card obj stash-empty recipe-ingredient tut-tap" data-tut="craft-ingredient">
+              <div class="shop-card obj recipe-ingredient tut-tap" data-tut="craft-ingredient">
                 <div class="shop-card-sym">κ</div>
                 <div class="shop-card-name">Potassium</div>
                 <div class="shop-card-corner"><span class="stash-count">0</span></div>
