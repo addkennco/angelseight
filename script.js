@@ -192,7 +192,7 @@ function openTutorial() {
     setTimeout(() => {
       loader.style.opacity = '0';
       loader.style.pointerEvents = 'none';
-    }, 800);
+    }, 3000);
   } else {
     // First load — wait for iframe, then fade out loader
     iframe.addEventListener('load', function onLoad() {
@@ -204,7 +204,7 @@ function openTutorial() {
       setTimeout(() => {
         loader.style.opacity = '0';
         loader.style.pointerEvents = 'none';
-      }, 1050);
+      }, 800);
     });
   }
 }
