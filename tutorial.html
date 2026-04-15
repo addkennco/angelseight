@@ -644,11 +644,29 @@
   .tut-nav-arrow.left  { left: 0; }
   .tut-nav-arrow.right { right: 0; }
 
+  .tut-nav-hint {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 200;
+    background: transparent;
+    border: none;
+    padding: 16px 10px;
+    cursor: pointer;
+    color: var(--green);
+    font-size: 28px;
+    line-height: 1;
+    transition: color 0.2s;
+    pointer-events: all;
+	animation: hintPulse 2.5s ease-in-out infinite;
+  }
+	
 	@keyframes hintPulse {
     0%,100% { opacity: 0.4; }
     50%      { opacity: 1; }
   }
 
+	
   /* ══════════════════════════════════════
      SLIDE 2: SHOP CRAFT TAB
   ══════════════════════════════════════ */
@@ -736,6 +754,8 @@
       </div>
     </div>
 
+	  <div class="tut-nav-hint">CLICK TO EXAMINE</div>
+	  
     <!-- Radio -->
     <div id="radio-tuner" class="tut-tap" data-tut="radio">
       <div class="radio-label">RADIO</div>
