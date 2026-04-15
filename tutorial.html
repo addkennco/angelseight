@@ -1088,8 +1088,8 @@
     ctx.save();
     ctx.translate(pod.x, pod.y);
     const pulse = 0.6; // frozen: 0.6 + 0.4 * Math.sin(pod.t * 3) at t=0
-    ctx.shadowColor = '#64db09'; ctx.shadowBlur = 18 * pulse;
-    ctx.strokeStyle = `rgba(100,220,10,0.5${0.6 + 0.4 * pulse})`;
+    ctx.shadowColor = '#1cc74c'; ctx.shadowBlur = 18 * pulse;
+    ctx.strokeStyle = `rgba(28,199,76,0.7)`;
     ctx.lineWidth = 1.8;
     ctx.beginPath();
     for (let i = 0; i < 6; i++) {
@@ -1099,7 +1099,7 @@
     }
     ctx.closePath(); ctx.stroke();
     // Inner hex (smaller, rotated 30°)
-    ctx.strokeStyle = `rgba(100,220,10,0.5)`;
+    ctx.strokeStyle = `rgba(28,199,76,0.7)`;
     ctx.lineWidth = 0.8;
     ctx.beginPath();
     for (let i = 0; i < 6; i++) {
