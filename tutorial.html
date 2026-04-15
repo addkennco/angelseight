@@ -334,6 +334,34 @@
     transition: opacity 0.15s;
   }
   #tut-toast.visible { opacity: 1; }
+  #tut-toast-2 {
+    position: absolute;
+    bottom: 50%; left: 50%; transform: translate(-50%, -50%);
+    background: var(--bg2);
+    border: 1px solid var(--cyan);
+    box-shadow: 0 0 24px rgba(0,245,255,0.2);
+    padding: 10px 18px;
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.6;
+    letter-spacing: 0.08em;
+    color: #fff;
+    text-align: center;
+    max-width: 260px;
+    width: max-content;
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  #tut-toast-2.visible { opacity: 1; }
+  #tut-toast-2-title {
+    font-family: var(--display);
+    font-size: 10px;
+    color: var(--cyan);
+    letter-spacing: 0.18em;
+    margin-bottom: 5px;
+  }
   #tut-toast-title {
     font-family: var(--display);
     font-size: 10px;
@@ -636,6 +664,55 @@
   }
   .btn-secondary:active { color: var(--cyan); border-color: var(--cyan); }
 
+  /* ══════════════════════════════════════
+     SLIDE 2: SHOP CRAFT TAB
+  ══════════════════════════════════════ */
+  #slide-2 {
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    overflow: hidden;
+  }
+
+  .shop-grid-bg {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(rgba(0,245,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,245,255,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 1;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  #slide-2 .screen-content {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    flex: 1;
+    width: 100%;
+    min-height: 0;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  .shop-header {
+    position: relative;
+    width: 100%; padding: 12px 14px 10px;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--dim);
+    flex-shrink: 0;
+  }
+  .shop-title { font-family: var(--display); font-size: 14px; font-weight: 700; color: var(--purple); letter-spacing: 0.1em; text-indent: 40px; }
+  .shop-credits { font-family: var(--display); font-size: 13px; color: var(--gold); }
+  .shop-level-badge { font-size: 8px; letter-spacing: 0.2em; color: rgba(255,255,255,0.3); text-indent: 40px; }
+
+
 </style>
 </head>
 <body>
@@ -732,6 +809,47 @@
   </div><!-- /.screen-content -->
   </div><!-- /#slide-1 -->
 
+  <!-- ════ SLIDE 2: SHOP — CRAFT TAB ════ -->
+  <div class="slide" id="slide-2">
+
+    <!-- Grid background -->
+    <div class="shop-grid-bg"></div>
+
+    <div class="screen-content">
+
+      <!-- Tutorial toast -->
+      <div id="tut-toast-2">
+        <div id="tut-toast-2-title"></div>
+        <div id="tut-toast-2-body"></div>
+      </div>
+
+      <!-- Header -->
+      <div class="shop-header">
+        <div>
+          <!-- Powerup decoration — orbiting star animation -->
+          <canvas id="shop-powerup-deco" width="60" height="60"
+            class="tut-tap" data-tut="shopdeco"
+            style="position:absolute; top:0px; left:0px; cursor:pointer;"></canvas>
+          <div class="shop-title">FUSION SHOP</div>
+          <div class="shop-level-badge">Mode: Stationary</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:7px;letter-spacing:0.2em;color:rgba(255,255,255,0.3)">CREDITS</div>
+          <div class="shop-credits tut-tap" data-tut="shopcredits">2504</div>
+        </div>
+      </div>
+
+      <!-- 70s Supergraphic -->
+      <div class="supergraphic">
+        <div class="sg-orange"></div>
+        <div class="sg-pink"></div>
+        <div class="sg-purple"></div>
+        <div class="sg-darkpurple"></div>
+      </div>
+
+    </div><!-- /.screen-content -->
+  </div><!-- /#slide-2 -->
+
 </div><!-- /#tut-wrap -->
 
 <script>
@@ -771,12 +889,7 @@
     handleGesture();
   });
 
-  // Tap to advance for devtesting. Canvas & tut-tap elements stop propagation.
-  document.addEventListener('pointerdown', e => {
-    if (e.target.closest('button')) return;
-    if (e.target.closest('.tut-tap')) return;
-    if (e.pointerType !== 'touch') goto(cur + 1);
-  });
+  // Tap to advance — handled by document fallback listener below (near canvas hit-testing).
 
   // ══════════════════════════════════════
   // CANVAS + DRAWING
@@ -1083,27 +1196,37 @@ function drawScene() {
 	pod:       { title: 'COMPOUND POD',   body: 'Resources from Alpha Lyrae Areospace Divison. Shoot to release Compound.' },
 	enemydrop: { title: 'ELEMENT',        body: 'Resources from downed Enemies. Magentic pickup enabled.' },
     poddrop:   { title: 'COMPOUND',       body: 'Resources from Alpha Lyrae Areospace Divison. Magnetic pickup enabled.' },
+    shopdeco:  { title: 'SHOP DECO',        body: 'Placeholder — author to fill.' },
+    shopcredits: { title: 'CREDITS',        body: 'Placeholder — author to fill.' },
   };
 
-  const toast      = document.getElementById('tut-toast');
-  const toastTitle = document.getElementById('tut-toast-title');
-  const toastBody  = document.getElementById('tut-toast-body');
-  let toastTimer   = null;
+  const toast       = document.getElementById('tut-toast');
+  const toastTitle  = document.getElementById('tut-toast-title');
+  const toastBody   = document.getElementById('tut-toast-body');
+  const toast2      = document.getElementById('tut-toast-2');
+  const toast2Title = document.getElementById('tut-toast-2-title');
+  const toast2Body  = document.getElementById('tut-toast-2-body');
+  let toastTimer    = null;
 
   function showToast(key) {
     const c = TOAST_CONTENT[key];
     if (!c) return;
-    toastTitle.textContent = c.title;
-    toastBody.textContent  = c.body;
-    toast.classList.add('visible');
+    // Drive whichever toast is on the active slide
+    const activeToast = (cur === 2) ? toast2 : toast;
+    const activeTitle = (cur === 2) ? toast2Title : toastTitle;
+    const activeBody  = (cur === 2) ? toast2Body  : toastBody;
+    activeTitle.textContent = c.title;
+    activeBody.textContent  = c.body;
+    activeToast.classList.add('visible');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toast.classList.remove('visible'), 3200);
+    toastTimer = setTimeout(() => activeToast.classList.remove('visible'), 3200);
   }
 
- // ── Dismiss helper ──
+  // ── Dismiss helper ──
   function dismissToast() {
     clearTimeout(toastTimer);
     toast.classList.remove('visible');
+    toast2.classList.remove('visible');
   }
 
   // ── DOM element listeners ──
@@ -1173,7 +1296,89 @@ function drawScene() {
   
 	// Expose resetTutorial for parent window to call when opening tutorial
 	window.resetTutorial = function() { goto(0); };
-	
+
+  // ══════════════════════════════════════
+  // SHOP DECO — orbiting star animation
+  // Runs always on slide-2; no start/stop needed for tutorial.
+  // ══════════════════════════════════════
+  (function() {
+    const DECO_SIZE   = 60;
+    const CX          = 30;
+    const CY          = 30;
+    const BODY_R      = 6;
+    const ORBIT_R_X   = 10;
+    const ORBIT_R_Y   = 6;
+    const SMALL_R     = 2;
+    const ORBIT_SPEED = 0.04;
+
+    let angle   = 0;
+    let decoCtx = null;
+
+    const cv = document.getElementById('shop-powerup-deco');
+    if (cv) {
+      const dpr = window.devicePixelRatio || 1;
+      cv.width  = DECO_SIZE * dpr;
+      cv.height = DECO_SIZE * dpr;
+      cv.style.width  = DECO_SIZE + 'px';
+      cv.style.height = DECO_SIZE + 'px';
+      decoCtx = cv.getContext('2d');
+      decoCtx.scale(dpr, dpr);
+      requestAnimationFrame(render);
+    }
+
+    function render() {
+      if (!decoCtx) return;
+      decoCtx.clearRect(0, 0, DECO_SIZE, DECO_SIZE);
+
+      angle += ORBIT_SPEED;
+      const inBack     = Math.sin(angle + ORBIT_SPEED) < 0;
+      const ox         = CX + Math.cos(angle) * ORBIT_R_X;
+      const oy         = CY + Math.sin(angle) * ORBIT_R_Y;
+      const depthAlpha = (Math.sin(angle) + 1) * 0.4 + 0.2;
+
+      function drawSmallStar() {
+        if (Math.sin(angle) <= -0.1 && depthAlpha <= 0.3) return;
+        decoCtx.save();
+        decoCtx.globalAlpha = depthAlpha;
+        decoCtx.shadowColor = 'rgba(255,215,0,0.9)';
+        decoCtx.shadowBlur  = 4 * depthAlpha;
+        decoCtx.fillStyle   = 'rgba(255,215,0,0.9)';
+        decoCtx.beginPath();
+        decoCtx.arc(ox, oy, SMALL_R, 0, Math.PI * 2);
+        decoCtx.fill();
+        decoCtx.restore();
+      }
+
+      function drawMainStar() {
+        decoCtx.save();
+        decoCtx.shadowColor = 'white';
+        decoCtx.shadowBlur  = 8;
+        decoCtx.strokeStyle = 'rgba(255,215,0,0.9)';
+        decoCtx.lineWidth   = 1;
+        decoCtx.beginPath();
+        decoCtx.arc(CX, CY, BODY_R, 0, Math.PI * 2);
+        decoCtx.stroke();
+        decoCtx.restore();
+
+        const pingProgress = (Date.now() % 1200) / 1200;
+        const rippleR      = BODY_R + pingProgress * 18;
+        const rippleAlpha  = (1 - pingProgress) * 0.3;
+        decoCtx.save();
+        decoCtx.strokeStyle = `rgba(255,215,0,${rippleAlpha})`;
+        decoCtx.lineWidth   = 1.5;
+        decoCtx.beginPath();
+        decoCtx.arc(CX, CY, rippleR, 0, Math.PI * 2);
+        decoCtx.stroke();
+        decoCtx.restore();
+      }
+
+      if (inBack) { drawSmallStar(); drawMainStar(); }
+      else        { drawMainStar();  drawSmallStar(); }
+
+      requestAnimationFrame(render);
+    }
+  })();
+
 </script>
 </body>
 </html>
