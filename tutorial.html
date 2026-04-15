@@ -13,11 +13,10 @@
   :root {
     --bg:       #050510;
     --bg2:      #0a0a20;
-    --pink:     #d42b6a;
-    --cyan:     #00f5ff;
-    --purple:   #a855f7;
-    --gold:     #ffd700;
-    --dim:      #ffffff22;
+    --green:    #1CC74C;
+    --light:    #acfa70;
+    --dark:     #147c1b;
+    --dim:      #1CC74C22;
     --mono:     'Nova Square', monospace;
     --display:  'Monoton', sans-serif;
     --cursive:  'Carattere', cursive;
@@ -36,6 +35,14 @@
     overflow: hidden;
     touch-action: none;
   }
+
+  /* ══════════════════════════════════════
+     SCANLINE OVERLAY
+  ══════════════════════════════════════ */
+  body::after {
+    content:''; position:fixed; inset:0; pointer-events:none; z-index:999;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.08) 2px, rgba(0,0,0,0.08) 4px);
+  }	
 
   /* ══════════════════════════════════════
      SLIDE SYSTEM
@@ -67,7 +74,7 @@
   }
   .tut-eyebrow {
     font-size: 9px; letter-spacing: 0.45em;
-    color: var(--cyan); opacity: 0.65; margin-bottom: 14px;
+    color: var(--green); opacity: 0.65; margin-bottom: 14px;
   }
   .tut-title-wrap {
     position: relative;
@@ -78,7 +85,7 @@
     font-family: var(--display);
     font-size: clamp(30px, 10vw, 64px);
     font-weight: 900; line-height: 0.9; letter-spacing: -0.02em;
-    background: linear-gradient(135deg, var(--cyan) 0%, var(--purple) 50%, var(--pink) 100%);
+    background: linear-gradient(135deg, var(--light) 0%, var(--dark) 50%, var(--green) 100%);
     -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     filter: drop-shadow(0 0 30px rgba(168,85,247,0.4));
     padding: 12px 16px; margin-bottom: 0; text-align: center;
@@ -86,7 +93,7 @@
   .tut-cursive {
     font-family: var(--cursive);
     font-size: clamp(30px, 7vw, 56px);
-    color: var(--gold);
+    color: var(--green);
     text-shadow: 0 0 20px rgba(255,45,120,0.7), 0 0 50px rgba(168,85,247,0.4);
     line-height: 1; position: absolute; z-index: 2;
     pointer-events: none; white-space: nowrap;
@@ -155,12 +162,12 @@
   .hud-value {
     font-family: var(--display);
     font-size: 18px; font-weight:700;
-    color: var(--cyan);
+    color: var(--green);
     line-height:1;
 	align-content: center;
   }
-  .hud-value.gold { color: var(--gold); }
-  .hud-value.pink { color: var(--pink); }
+  .hud-value.green { color: var(--green); }
+  .hud-value.green { color: var(--green); }
 
   .hud-bar-wrap { width: 90px; }
   .hud-bar {
@@ -174,14 +181,14 @@
     height:100%; border-radius:2px;
     transition: width 0.15s;
   }
-  .shield-fill { background: linear-gradient(90deg, var(--cyan), var(--purple)); }
-  .ammo-fill   { background: linear-gradient(90deg, var(--pink), var(--gold)); }
+  .shield-fill { background: linear-gradient(90deg, var(--dark), var(--light)); }
+  .ammo-fill   { background: linear-gradient(90deg, var(--light), var(--dark)); }
 
   /* Combo */
   .hud-combo {
     font-family: var(--display);
     font-size: 11px; font-weight:700;
-    color: var(--gold);
+    color: var(--green);
     letter-spacing: 0.1em;
     opacity: 0;
     transition: opacity 0.3s;
@@ -211,14 +218,14 @@
   .radio-needle {
     position:absolute;
     width:2px; height:14px;
-    background: var(--cyan);
+    background: var(--green);
     top: 5px; left: 50%; transform-origin: bottom center;
     transform: translateX(-50%) rotate(0deg);
     transition: transform 0.2s;
     border-radius: 1px;
   }
   .radio-track-name {
-    font-size: 8px; color: var(--cyan); opacity:0.7;
+    font-size: 8px; color: var(--green); opacity:0.7;
     letter-spacing:0.1em; max-width:60px; text-align:center;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
@@ -243,7 +250,7 @@
     background: rgba(168,85,247,0.1);
     color: #fff;
   }
-  .pu-slot-sym { font-family: var(--display); font-size:11px; font-weight:700; color: var(--purple); }
+  .pu-slot-sym { font-family: var(--display); font-size:11px; font-weight:700; color: var(--dark); }
   .pu-slot-name { font-size: 5px; letter-spacing:0.05em; color:rgba(255,255,255,0.4); text-align:center; line-height:1.2; }
 
   /* Powerup bar wrapper */
@@ -262,11 +269,11 @@
     width: 122px; height: 28px;
     font-family: var(--mono);
     font-size: 10px;
-    color: var(--purple);
+    color: var(--dark);
     text-align: center;
     line-height: 28px;
     position: relative;
-    border: 1.5px solid var(--purple);
+    border: 1.5px solid var(--dark);
     background: rgba(168,85,247,0.05);
     clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
     user-select: none;
@@ -283,7 +290,7 @@
   }
   .pickup-entry {
     font-size: 9px; letter-spacing:0.1em;
-    color: var(--cyan);
+    color: var(--green);
   }
 
   /* ══════════════════════════════════════
@@ -300,7 +307,7 @@
   #btn-pause {
     font-family: Noto Emoji;
     font-size: 14px; letter-spacing: 0.25em;
-    color: var(--purple);
+    color: var(--dark);
     background: transparent;
     border: 0px;
     padding: 4px 8px; cursor: pointer;
@@ -308,7 +315,7 @@
     z-index: 20;
     transition: color 0.15s;
   }
-  #btn-pause:active { color: var(--cyan); }
+  #btn-pause:active { color: var(--green); }
 
   /* ══════════════════════════════════════
      TUTORIAL TOAST
@@ -317,7 +324,7 @@
     position: absolute;
     bottom: 50%; left: 50%; transform: translate(-50%, -50%);
     background: var(--bg2);
-    border: 1px solid var(--cyan);
+    border: 1px solid var(--green);
     box-shadow: 0 0 24px rgba(0,245,255,0.2);
     padding: 10px 18px;
     font-family: var(--mono);
@@ -338,7 +345,7 @@
     position: absolute;
     bottom: 50%; left: 50%; transform: translate(-50%, -50%);
     background: var(--bg2);
-    border: 1px solid var(--cyan);
+    border: 1px solid var(--green);
     box-shadow: 0 0 24px rgba(0,245,255,0.2);
     padding: 10px 18px;
     font-family: var(--mono);
@@ -358,14 +365,14 @@
   #tut-toast-2-title {
     font-family: var(--display);
     font-size: 10px;
-    color: var(--cyan);
+    color: var(--green);
     letter-spacing: 0.18em;
     margin-bottom: 5px;
   }
   #tut-toast-title {
     font-family: var(--display);
     font-size: 10px;
-    color: var(--cyan);
+    color: var(--green);
     letter-spacing: 0.18em;
     margin-bottom: 5px;
   }
@@ -397,8 +404,8 @@
     border-bottom: 1px solid var(--dim);
     flex-shrink:0;
   }
-  .shop-title { font-family:var(--display); font-size:14px; font-weight:700; color:var(--purple); letter-spacing:0.1em; text-indent:40px; }
-  .shop-credits { font-family:var(--display); font-size:13px; color:var(--gold); }
+  .shop-title { font-family:var(--display); font-size:14px; font-weight:700; color:var(--dark); letter-spacing:0.1em; text-indent:40px; }
+  .shop-credits { font-family:var(--display); font-size:13px; color:var(--green); }
   .shop-level-badge { font-size:8px; letter-spacing:0.2em; color:rgba(255,255,255,0.3); text-indent:40px; }
 
   /* ── 70s Supergraphic ── */
@@ -407,10 +414,10 @@
     display: flex; flex-direction: column; flex-shrink: 0;
     gap: 0; line-height: 0; font-size: 0;
   }
-  .sg-orange     { background: #e8600a; height: 5px; }
-  .sg-pink       { background: #d42b6a; height: 7px; }
-  .sg-purple     { background: #a855f7; height: 10px; }
-  .sg-darkpurple { background: #0e0b12; height: 15px; }
+  .sg-light     { background: #acfa70; height: 5px; } 
+  .sg-mid       { background: ##64e15e; height: 7px; }
+  .sg-main      { background: #1cc74c; height: 10px; }
+  .sg-dark      { background: #147c1b; height: 15px; }
 
   /* ── two-column body ── */
   .shop-layout {
@@ -437,7 +444,7 @@
     background:transparent; border:none; cursor:pointer;
     text-transform:uppercase; transition:color 0.15s;
   }
-  .shop-tab-btn.active { color:var(--cyan); border-bottom:2px solid var(--cyan); margin-bottom:-1px; }
+  .shop-tab-btn.active { color:var(--green); border-bottom:2px solid var(--green); margin-bottom:-1px; }
   .shop-scroll {
     flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;
     padding: 10px 10px 16px;
@@ -461,28 +468,28 @@
     transition: border-color 0.15s, background 0.15s;
     position:relative;
   }
-  .shop-card:active { border-color: var(--purple); background: rgba(168,85,247,0.08); }
-  .shop-card-sym { font-family:var(--display); font-size:15px; font-weight:700; color:var(--cyan); }
+  .shop-card:active { border-color: var(--light); background: rgba(168,85,247,0.08); }
+  .shop-card-sym { font-family:var(--display); font-size:15px; font-weight:700; color:var(--green); }
   .shop-card-name { font-size:8px; font-weight:700; color:#fff; letter-spacing:0.04em; }
-  .shop-card-effect { font-size:7px; color:rgba(255,255,255,0.4); line-height:1.4; }
-  .shop-card-count { font-size:7px; color:rgba(255,255,255,0.3); }
-  .shop-card-price { font-family:var(--display); font-size:9px; color:var(--gold); margin-top:2px; }
+  .shop-card-effect { font-size:7px; color:var(--light); line-height:1.4; }
+  .shop-card-count { font-size:7px; color:var(--light); }
+  .shop-card-price { font-family:var(--display); font-size:9px; color:var(--light); margin-top:2px; }
   .shop-card-corner { position:absolute; top:5px; right:5px; display:flex; flex-direction:column; align-items:flex-end; gap:1px; }
   .shop-card-progress { position:absolute; top:5px; right:5px; display:flex; flex-direction:column; align-items:flex-end; gap:3px; }
-  .shop-card-progress .craft-inv-count { font-size:7px; color:rgba(255,255,255,0.3); letter-spacing:0.05em; }
-  .shop-card-progress .craft-inv-count.has { color:var(--cyan); font-family:var(--display); font-size:9px; }
+  .shop-card-progress .craft-inv-count { font-size:7px; color:var(--light); letter-spacing:0.05em; }
+  .shop-card-progress .craft-inv-count.has { color:var(--green); font-family:var(--display); font-size:9px; }
 
   .craft-lights { display:flex; flex-direction:row; gap:3px; align-items:center; }
   .craft-light { width:6px; height:6px; border-radius:50%; flex-shrink:0; transition: background 0.2s, box-shadow 0.2s; }
   .craft-light.off { background:rgba(255,255,255,0.08); box-shadow:none; border: 1px solid rgba(255,255,255,0.12); }
-  .craft-light.on  { background:var(--cyan); border:none; box-shadow: 0 0 5px 1px rgba(0,245,255,0.7), 0 0 10px 2px rgba(0,245,255,0.3); }
-  .craft-light.complete { background:var(--gold); border:none; box-shadow: 0 0 5px 1px rgba(255,215,0,0.8), 0 0 12px 3px rgba(255,215,0,0.4); }
+  .craft-light.on  { background:var(--green); border:none; box-shadow: 0 0 5px 1px rgba(0,245,255,0.7), 0 0 10px 2px rgba(0,245,255,0.3); }
+  .craft-light.complete { background:var(--green); border:none; box-shadow: 0 0 5px 1px rgba(255,215,0,0.8), 0 0 12px 3px rgba(255,215,0,0.4); }
   .shop-card.craft-ready { border-color: rgba(255,215,0,0.5); background: rgba(255,215,0,0.04); }
-  .shop-card.craft-ready .shop-card-sym { color: var(--gold); }
+  .shop-card.craft-ready .shop-card-sym { color: var(--green); }
 
   .shop-card.recipe-ingredient { border-color: rgba(168,85,247,0.45); box-shadow: 0 0 6px rgba(168,85,247,0.2); }
   .shop-card.recipe-ingredient--owned { border-color: rgba(0,245,255,0.65); box-shadow: 0 0 8px rgba(0,245,255,0.3); }
-  .shop-card.recipe-ingredient--owned .shop-card-sym { color: var(--cyan); }
+  .shop-card.recipe-ingredient--owned .shop-card-sym { color: var(--green); }
 
   /* ── Info panel ── */
   .shop-info {
@@ -493,18 +500,18 @@
   .shop-info::before {
     content: 'INFO'; position: absolute; top: -7px; left: 8px;
     background: #0a0a20; padding: 0 5px;
-    font-size: 7px; letter-spacing: 0.3em; color: var(--cyan); opacity: 0.6;
+    font-size: 7px; letter-spacing: 0.3em; color: var(--green); opacity: 0.6;
   }
   .shop-info-empty { font-size:8px; letter-spacing:0.15em; color:rgba(255,255,255,0.15); text-align:center; margin:auto; }
-  .shop-info-sym { font-family:var(--display); font-size:18px; font-weight:700; color:var(--cyan); line-height:1; }
-  .shop-info-sym.compound { color: var(--purple); }
-  .shop-info-sym.alloy    { color: var(--pink); }
+  .shop-info-sym { font-family:var(--display); font-size:18px; font-weight:700; color:var(--green); line-height:1; }
+  .shop-info-sym.compound { color: var(--dark); }
+  .shop-info-sym.alloy    { color: var(--green); }
   .shop-info-name { font-size:9px; font-weight:700; color:#fff; letter-spacing:0.06em; }
-  .shop-info-effect { font-size:10px; color:var(--gold); letter-spacing:0.04em; line-height:1.0; }
-  .shop-info-power { font-size:10px; color:var(--cyan); letter-spacing:0.04em; line-height:1.0; }
+  .shop-info-effect { font-size:10px; color:var(--green); letter-spacing:0.04em; line-height:1.0; }
+  .shop-info-power { font-size:10px; color:var(--green); letter-spacing:0.04em; line-height:1.0; }
   .shop-info-recipe { font-size:10px; color:rgba(255,255,255,0.75); letter-spacing:0.04em; line-height:1.0; }
   .shop-info-desc { font-size:8px; color:rgba(255,255,255,0.75); line-height:1.5; font-style:italic; border-top:1px solid rgba(255,255,255,0.06); padding-top:4px; margin-top:2px; }
-  .shop-info-price { font-family:var(--display); font-size:8px; color:var(--gold); margin-top:auto; }
+  .shop-info-price { font-family:var(--display); font-size:8px; color:var(--green); margin-top:auto; }
 
   /* ── Action box ── */
   .shop-action-box {
@@ -525,22 +532,22 @@
   .shop-card.stash-empty .shop-card-name { color:rgba(255,255,255,0.18); }
   .shop-card.stash-empty .shop-card-effect { color:rgba(255,255,255,0.1); }
   .shop-card.stash-empty .stash-count   { color:rgba(255,255,255,0.18); }
-  .shop-card.stash-has .stash-count { font-family:var(--display); font-size:13px; font-weight:700; color:var(--cyan); }
-  .shop-card.stash-has.pu-card .stash-count { color:var(--purple); }
+  .shop-card.stash-has .stash-count { font-family:var(--display); font-size:13px; font-weight:700; color:var(--green); }
+  .shop-card.stash-has.pu-card .stash-count { color:var(--dark); }
   .stash-count { position:absolute; top:5px; right:5px; font-size:7px; letter-spacing:0.05em; }
 
   /* Drag states */
-  .shop-card.drag-source { opacity:0.45; border-color:var(--purple); }
-  .shop-reserve-slot.drag-over { border-color:var(--cyan); background:rgba(0,245,255,0.12); }
-  .shop-reserve-slot.drag-over-full { border-color:var(--pink); background:rgba(255,45,120,0.08); }
+  .shop-card.drag-source { opacity:0.45; border-color:var(--dark); }
+  .shop-reserve-slot.drag-over { border-color:var(--green); background:rgba(0,245,255,0.12); }
+  .shop-reserve-slot.drag-over-full { border-color:var(--green); background:rgba(255,45,120,0.08); }
   #shop-drag-ghost {
     position:fixed; pointer-events:none; z-index:9999;
     opacity:0.85; transform:translate(-50%,-50%) scale(1.08);
-    border:1px solid var(--cyan); background:rgba(0,245,255,0.12);
+    border:1px solid var(--green); background:rgba(0,245,255,0.12);
     padding:8px 6px; width:80px;
     display:flex; flex-direction:column; gap:3px; font-family:var(--mono);
   }
-  #shop-drag-ghost .ghost-sym  { font-family:var(--display); font-size:14px; font-weight:700; color:var(--purple); }
+  #shop-drag-ghost .ghost-sym  { font-family:var(--display); font-size:14px; font-weight:700; color:var(--dark); }
   #shop-drag-ghost .ghost-name { font-size:7px; color:rgba(255,255,255,0.7); letter-spacing:0.04em; }
 
   /* RIGHT column */
@@ -555,7 +562,7 @@
   .shop-stats::before {
     content:'STATS'; position:absolute; top:-7px; left:8px;
     background:#0a0a20; padding:0 5px;
-    font-size:7px; letter-spacing:0.3em; color:var(--cyan); opacity:0.6;
+    font-size:7px; letter-spacing:0.3em; color:var(--green); opacity:0.6;
   }
   .shop-stat-row {
     display:flex; justify-content:space-between; align-items:baseline;
@@ -563,17 +570,17 @@
   }
   .shop-stat-row:last-child { border-bottom:none; }
   .shop-stat-label { font-size:7px; letter-spacing:0.15em; color:rgba(255,255,255,0.4); text-transform:uppercase; line-height:1.3; }
-  .shop-stat-val { font-family:var(--display); font-size:13px; font-weight:700; color:var(--cyan); }
+  .shop-stat-val { font-family:var(--display); font-size:13px; font-weight:700; color:var(--green); }
   .shop-stat-max { font-size:6px; color:rgba(255,255,255,0.2); margin-left:3px; }
   .shop-stat-bar { width:100%; height:2px; background:rgba(255,255,255,0.08); border-radius:1px; margin-top:3px; overflow:hidden; }
-  .shop-stat-bar-fill { height:100%; border-radius:1px; background:linear-gradient(90deg,var(--cyan),var(--purple)); }
+  .shop-stat-bar-fill { height:100%; border-radius:1px; background:linear-gradient(90deg,var(--green),var(--dark)); }
 
   /* Reserves block */
   .shop-reserves { border:1px solid var(--dim); position:relative; padding:10px 8px 8px; }
   .shop-reserves::before {
     content:'RESERVES'; position:absolute; top:-7px; left:8px;
     background:#0a0a20; padding:0 5px;
-    font-size:7px; letter-spacing:0.3em; color:var(--purple); opacity:0.6;
+    font-size:7px; letter-spacing:0.3em; color:var(--dark); opacity:0.6;
   }
   .shop-reserve-slots { display:flex; flex-wrap:wrap; gap:5px; }
   .shop-reserve-slot {
@@ -586,7 +593,7 @@
     flex-direction:column; gap:1px;
   }
   .shop-reserve-slot.filled { border-color:rgba(168,85,247,0.7); background:rgba(168,85,247,0.12); }
-  .shop-reserve-sym { font-family:var(--display); font-size:12px; font-weight:700; color:var(--purple); }
+  .shop-reserve-sym { font-family:var(--display); font-size:12px; font-weight:700; color:var(--dark); }
   .shop-reserve-name { font-size:5px; letter-spacing:0.04em; color:rgba(255,255,255,0.35); text-align:center; }
 
   /* Stash button */
@@ -596,7 +603,7 @@
     border:1px solid rgba(255,255,255,0.12); padding:9px 0;
     cursor:pointer; transition:color 0.2s, border-color 0.2s;
   }
-  .shop-stash-btn:active { color:var(--purple); border-color:var(--purple); }
+  .shop-stash-btn:active { color:var(--dark); border-color:var(--dark); }
 
   /* Staging area */
   .shop-staging { display:flex; flex-direction:column; gap:6px; }
@@ -605,22 +612,22 @@
   .staging-droprow .btn-secondary { flex-shrink:0; font-size:8px; padding:8px 10px; white-space:nowrap; letter-spacing:0.15em; }
   .staging-list { display:flex; flex-direction:column; gap:4px; }
   .staging-row { display:flex; align-items:center; gap:4px; padding:4px 6px; border:1px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.02); font-size:8px; letter-spacing:0.06em; }
-  .staging-row-sym { font-family:var(--display); font-size:12px; font-weight:700; color:var(--purple); min-width:16px; text-align:center; }
+  .staging-row-sym { font-family:var(--display); font-size:12px; font-weight:700; color:var(--dark); min-width:16px; text-align:center; }
   .staging-row-name { flex:1; color:rgba(255,255,255,0.75); font-size:7px; letter-spacing:0.06em; }
   .staging-row-qty { display:flex; align-items:center; gap:3px; }
-  .staging-qty-btn { font-family:var(--display); font-size:11px; font-weight:700; color:var(--cyan); background:transparent; border:none; cursor:pointer; padding:0 3px; line-height:1; opacity:0.7; transition:opacity 0.15s; }
+  .staging-qty-btn { font-family:var(--display); font-size:11px; font-weight:700; color:var(--green); background:transparent; border:none; cursor:pointer; padding:0 3px; line-height:1; opacity:0.7; transition:opacity 0.15s; }
   .staging-qty-btn:active { opacity:1; }
-  .staging-qty-val { font-family:var(--display); font-size:11px; color:var(--gold); min-width:14px; text-align:center; }
+  .staging-qty-val { font-family:var(--display); font-size:11px; color:var(--green); min-width:14px; text-align:center; }
   .staging-row-remove { font-size:9px; color:rgba(255,45,120,0.5); background:transparent; border:none; cursor:pointer; padding:0 2px; line-height:1; transition:color 0.15s; }
-  .staging-row-remove:active { color:var(--pink); }
-  .staging-total { font-family:var(--display); font-size:9px; color:var(--gold); text-align:center; letter-spacing:0.1em; min-height:12px; }
+  .staging-row-remove:active { color:var(--green); }
+  .staging-total { font-family:var(--display); font-size:9px; color:var(--green); text-align:center; letter-spacing:0.1em; min-height:12px; }
 
   /* Shop card obj variant */
   .shop-card.obj { padding:6px 6px; gap:1px; }
   .shop-card.obj .shop-card-sym { font-size:13px; }
   .shop-card.obj .shop-card-name { font-size:7px; }
-  .shop-card.obj.selected { border-color:var(--cyan); background:rgba(0,245,255,0.06); }
-  .shop-card.obj.selected .shop-card-sym { color:var(--gold); }
+  .shop-card.obj.selected { border-color:var(--green); background:rgba(0,245,255,0.06); }
+  .shop-card.obj.selected .shop-card-sym { color:var(--green); }
 
   /* Shop toast */
   #shop-toast {
@@ -628,8 +635,8 @@
     width:fit-content; max-width:90%; z-index:50;
     padding:10px 16px; font-family:var(--mono); font-size:14px;
     letter-spacing:0.15em; line-height:1.5; text-align:center;
-    color:var(--cyan); background:var(--bg2);
-    border:1px solid var(--purple);
+    color:var(--green); background:var(--bg2);
+    border:1px solid var(--dark);
     box-shadow:0 0 32px rgba(168,85,247,0.25),0 0 0 1px rgba(168,85,247,0.1);
     opacity:0; pointer-events:none; transition:opacity 0.2s;
   }
@@ -641,7 +648,7 @@
   .btn-sweep {
     font-family: var(--display);
     font-size: 14px; font-weight: bold; letter-spacing: 0.2em;
-    color: var(--cyan); border: 2px solid var(--cyan);
+    color: var(--green); border: 2px solid var(--green);
     padding: 10px 48px; cursor: pointer;
     background: transparent; position: relative;
     transition: 0.2s; overflow: hidden; margin-bottom: 10px;
@@ -650,7 +657,7 @@
   .btn-sweep::before {
     content: ""; position: absolute;
     height: 100%; width: 0%; top: 0; left: -40px;
-    transform: skewX(45deg); background-color: var(--cyan);
+    transform: skewX(45deg); background-color: var(--green);
     z-index: -1; transition: 0.2s;
   }
   .btn-sweep.sweeping::before { width: 160%; }
@@ -658,11 +665,11 @@
 
   .btn-secondary {
     font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em;
-    color: var(--purple); background: transparent;
-    border: 1px double var(--purple); padding: 10px 28px; margin-bottom: 10px;
+    color: var(--dark); background: transparent;
+    border: 1px double var(--dark); padding: 10px 28px; margin-bottom: 10px;
     cursor: pointer; transition: color 0.2s, border-color 0.2s;
   }
-  .btn-secondary:active { color: var(--cyan); border-color: var(--cyan); }
+  .btn-secondary:active { color: var(--green); border-color: var(--green); }
 
   /* ══════════════════════════════════════
      SLIDE 2: SHOP CRAFT TAB
@@ -708,8 +715,8 @@
     border-bottom: 1px solid var(--dim);
     flex-shrink: 0;
   }
-  .shop-title { font-family: var(--display); font-size: 14px; font-weight: 700; color: var(--purple); letter-spacing: 0.1em; text-indent: 40px; }
-  .shop-credits { font-family: var(--display); font-size: 13px; color: var(--gold); }
+  .shop-title { font-family: var(--display); font-size: 14px; font-weight: 700; color: var(--dark); letter-spacing: 0.1em; text-indent: 40px; }
+  .shop-credits { font-family: var(--display); font-size: 13px; color: var(--green); }
   .shop-level-badge { font-size: 8px; letter-spacing: 0.2em; color: rgba(255,255,255,0.3); text-indent: 40px; }
 
 
@@ -759,7 +766,7 @@
       </div>
       <div class="hud-right">
         <div class="hud-label">BEST</div>
-        <div class="hud-value gold" id="hud-best">91000</div>
+        <div class="hud-value green" id="hud-best">91000</div>
         <div class="tut-tap" id="tap-bars" style="margin-top:6px">
           <div class="hud-label">SHIELD</div>
           <div class="hud-bar-wrap">
@@ -841,10 +848,10 @@
 
       <!-- 70s Supergraphic -->
       <div class="supergraphic">
-        <div class="sg-orange"></div>
-        <div class="sg-pink"></div>
-        <div class="sg-purple"></div>
-        <div class="sg-darkpurple"></div>
+        <div class="sg-light"></div>
+        <div class="sg-mid"></div>
+        <div class="sg-main"></div>
+        <div class="sg-dark"></div>
       </div>
 
     </div><!-- /.screen-content -->
