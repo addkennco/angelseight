@@ -103,15 +103,6 @@
     color: rgba(28,199,76,0.7);
     text-align: left; max-width: 300px; margin-bottom: 32px;
   }
-  .tut-hint {
-    font-size: 9px; letter-spacing: 0.3em;
-    color: var(--dim);
-    animation: hintPulse 2.5s ease-in-out infinite;
-  }
-  @keyframes hintPulse {
-    0%,100% { opacity: 0.4; }
-    50%      { opacity: 1; }
-  }
 
   /* ══════════════════════════════════════
      SLIDE 1: GAME SCREEN
@@ -660,10 +651,16 @@
     transition: color 0.2s;
     pointer-events: all;
     -webkit-tap-highlight-color: transparent;
+	animation: hintPulse 2.5s ease-in-out infinite;
   }
   .tut-nav-arrow:active { color: var(--green); }
   .tut-nav-arrow.left  { left: 0; }
   .tut-nav-arrow.right { right: 0; }
+
+	@keyframes hintPulse {
+    0%,100% { opacity: 0.4; }
+    50%      { opacity: 1; }
+  }
 
   /* ══════════════════════════════════════
      SLIDE 2: SHOP CRAFT TAB
@@ -709,7 +706,6 @@
       Vehicle Class: Eagle026<br>
       Disclaimer: Distribution to unauthorized parties outside of the Castor Moving Group is strictly prohibited. If found, please return to ALAD.
     </div>
-    <div class="tut-hint">TAP ▶</div>
     <button class="tut-nav-arrow right" onclick="goto(1)">▶</button>
   </div>
 
