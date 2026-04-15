@@ -166,21 +166,49 @@ function showScreen(id) {
 }
 function openTutorial() {
   const iframe = document.getElementById('tutorial-frame');
-  if (!iframe) return;
+  const overlay = document.getElementById('tutorial-overlay');
+  if (!iframe || !overlay) return;
+  
+  // Create loading spinner
+  let loader = overlay.querySelector('.tutorial-loader');
+  if (!loader) {
+    loader = document.createElement('div');
+    loader.className = 'tutorial-loader';
+    loader.innerHTML = `
+      <div class="loader-spinner"></div>
+      <div class="loader-text">LOADING SIMULATION...</div>
+    `;
+    overlay.appendChild(loader);
+  }
+  
+  // Show overlay and loader
+  overlay.classList.add('active');
+  loader.style.opacity = '1';
+  loader.style.pointerEvents = 'auto';
+  
   if (iframe.contentWindow && iframe.contentWindow.resetTutorial) {
+    // Already loaded - hide loader quickly
     iframe.contentWindow.resetTutorial();
-    document.getElementById('tutorial-overlay').classList.add('active');
+    setTimeout(() => {
+      loader.style.opacity = '0';
+      loader.style.pointerEvents = 'none';
+    }, 100);
   } else {
-    // First load — wait for iframe, then show
+    // First load — wait for iframe, then fade out loader
     iframe.addEventListener('load', function onLoad() {
       iframe.removeEventListener('load', onLoad);
       if (iframe.contentWindow && iframe.contentWindow.resetTutorial) {
         iframe.contentWindow.resetTutorial();
       }
-      document.getElementById('tutorial-overlay').classList.add('active');
+      // Fade out loader
+      setTimeout(() => {
+        loader.style.opacity = '0';
+        loader.style.pointerEvents = 'none';
+      }, 150);
     });
   }
 }
+
 function closeTutorial() {
   document.getElementById('tutorial-overlay').classList.remove('active');
 }
