@@ -781,8 +781,8 @@
 
   <!-- Tutorial toast -->
     <div id="tut-toast1" class="tut-toast">
-      <div id="tut-toast-title"></div>
-      <div id="tut-toast-body"></div>
+  <div class="tut-toast-title"></div>
+  <div class="tut-toast-body"></div>
     </div>
 	  
   </div><!-- /.screen-content -->
@@ -1042,9 +1042,9 @@
 		  
   <!-- Tutorial toast -->
     <div id="tut-toast2" class="tut-toast">
-      <div id="tut-toast-title"></div>
-      <div id="tut-toast-body"></div>
-    </div>
+  <div class="tut-toast-title"></div>
+  <div class="tut-toast-body"></div>
+     </div>
 		  
     </div><!-- /.screen-content -->
   </div><!-- /#slide-2 -->
@@ -1383,7 +1383,6 @@ function showToast(key) {
   if (!c) return;
 
   const activeSlide = SLIDES[cur];
-  console.log('cur:', cur, 'slide:', activeSlide.id, 'toast:', activeSlide.querySelector('.tut-toast'), 'title:', activeSlide.querySelector('.tut-toast-title'), 'body:', activeSlide.querySelector('.tut-toast-body'));
   const activeToast = activeSlide.querySelector('.tut-toast');
   const activeTitle = activeSlide.querySelector('.tut-toast-title');
   const activeBody  = activeSlide.querySelector('.tut-toast-body');
