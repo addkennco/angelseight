@@ -2797,7 +2797,7 @@ function shopTab(tab) {
     });
     delete craftProgress[puKey];
   });
-  ['buy','sell','craft','stash'].forEach(t => {
+  ['buy','sell','craft','stash','upgrade'].forEach(t => {
     const el = document.getElementById('tab-' + t);
     if (el) el.classList.toggle('active', t === tab);
   });
@@ -3545,6 +3545,18 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('boss-hud').classList.remove('active');
     showScreen('menu');
     updateMenuUI();
+  };
+
+  document.getElementById('btn-new-run-plus').onclick = () => {
+    document.getElementById('overlay-boss-clear').classList.remove('active');
+    document.getElementById('boss-hud').classList.remove('active');
+    
+    // Enter Shop in Upgrade Mode
+    shopMode = 'upgrade';
+    document.getElementById('shop-level-badge').textContent = 'MODE: STATIONARY';
+    showScreen('shop');
+    initShopDeco();
+    shopTab('upgrade');
   };
 
   document.getElementById('btn-to-story').onclick = () => {
