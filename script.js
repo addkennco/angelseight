@@ -3555,24 +3555,15 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
 document.getElementById('btn-new-run-plus').onclick = () => {
-    document.getElementById('overlay-boss-clear').classList.remove('active');
-    document.getElementById('boss-hud').classList.remove('active');
-    isUpgradeSession = true; 
-    shopMode = 'buy';        
-    document.getElementById('shop-level-badge').textContent = 'MODE: STATIONARY';
-    
-    showScreen('shop');
-    initShopDeco();
-    shopTab('buy'); // Opens the shop in the standard buy tab but keeps the Upgrade slot active
-  };
-    
-    // Enter Shop in Upgrade Mode
-    shopMode = 'upgrade';
-    document.getElementById('shop-level-badge').textContent = 'MODE: STATIONARY';
-    showScreen('shop');
-    initShopDeco();
-    shopTab('upgrade');
-  };
+  document.getElementById('overlay-boss-clear').classList.remove('active');
+  document.getElementById('boss-hud').classList.remove('active');
+  isUpgradeSession = true; 
+  shopMode = 'stash'; 
+  document.getElementById('shop-level-badge').textContent = 'MODE: STATIONARY';
+  showScreen('shop');
+  initShopDeco();
+  shopTab('upgrade'); 
+}; 
 
   document.getElementById('btn-to-story').onclick = () => {
     document.getElementById('overlay-clear').classList.remove('active');
