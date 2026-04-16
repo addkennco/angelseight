@@ -576,7 +576,7 @@ function newRun() {
 	ammoRefillRate: 1 + save.permStats.ammoRefillRate,
     reserveMax: 3,
     powerups: [],
-    inventory: {},
+    inventory:
 	{
     _upgradeSlot: null // NewRun+ upgrade
     },
