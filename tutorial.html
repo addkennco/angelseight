@@ -727,7 +727,7 @@
         </div>
       </div>
       <div class="pause-wrapper">
-        <button id="btn-pause">⏸︎</button>
+        <button id="btn-pause tut-tap" data-tut="pause">☰</button>
       </div>
       <div class="hud-center">
         <div class="hud-label tut-tap" id="tap-level">LEVEL
@@ -736,7 +736,7 @@
       </div>
       <div class="hud-right">
         <div class="hud-label">BEST</div>
-        <div class="hud-value green" id="hud-best">91000</div>
+        <div class="hud-value green tut-tap" data-tut="highscore">91000</div>
         <div class="tut-tap" id="tap-bars" style="margin-top:6px">
           <div class="hud-label">SHIELD</div>
           <div class="hud-bar-wrap">
@@ -1361,6 +1361,8 @@ function drawScene() {
 	pod:          { title: 'COMPOUND POD',   body: 'Resources from Alpha Lyrae Areospace Divison. Shoot to release Compound.' },
 	enemydrop:    { title: 'ELEMENT',        body: 'Resources from downed Enemies. Magentic pickup enabled.' },
     poddrop:      { title: 'COMPOUND',       body: 'Resources from Alpha Lyrae Areospace Divison. Magnetic pickup enabled.' },
+	pause:        { title: 'MENU',           body: 'Access the Menu Mid-Mission.' },
+    highscore:    { title: 'HIGH SCORE',     body: 'Current High Score to Beat.' },
     shopdeco:     { title: 'SHOP DECO',      body: 'Just decoration. We think it is neat.' },
 	shoplevel:    { title: 'MODE & LEVEL',   body: 'A Display that shows Current Mode and Sector Location.' },
     shopcredits:  { title: 'CREDITS',        body: 'Earn your Paycheck by clearing Sectors. Buy and Sell Elements and Compounds in the Fusion Shop.' },
