@@ -780,8 +780,8 @@
     </div>
 
   <!-- Tutorial toast -->
-    <div id="tut-toast" class="tut-toast">
-      <div id="tut-toast-title" class="tut-toast-title"></div>
+    <div id="tut-toast1" class="tut-toast">
+      <div id="tut-toast-title"></div>
       <div id="tut-toast-body"></div>
     </div>
 	  
@@ -1041,8 +1041,8 @@
       </div><!-- /.shop-layout -->
 		  
   <!-- Tutorial toast -->
-    <div id="tut-toast" class="tut-toast">
-      <div id="tut-toast-title" class="tut-toast-title"></div>
+    <div id="tut-toast2" class="tut-toast">
+      <div id="tut-toast-title"></div>
       <div id="tut-toast-body"></div>
     </div>
 		  
@@ -1376,31 +1376,32 @@ function drawScene() {
 	shoplaunch:   { title: 'LAUNCH',         body: 'Leave the Fusion Shop and Launch Mission to the Next Sector.' },
   };
 
-  const toast       = document.getElementById('tut-toast');
-  const toastTitle  = document.getElementById('tut-toast-title');
-  const toastBody   = document.getElementById('tut-toast-body');
   let toastTimer    = null;
 
-  function showToast(key) {
-    const c = TOAST_CONTENT[key];
-    if (!c) return;
-    // Drive whichever toast is on the active slide
-    const activeToast = toast;
-	const activeTitle = toastTitle;
-	const activeBody  = toastBody;
-    activeTitle.textContent = c.title;
-    activeBody.textContent  = c.body;
-    activeToast.classList.add('visible');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => activeToast.classList.remove('visible'), 4000);
-  }
+function showToast(key) {
+  const c = TOAST_CONTENT[key];
+  if (!c) return;
+
+  // Find the toast inside whichever slide is currently active
+  const activeSlide = SLIDES[cur];
+  const activeToast = activeSlide.querySelector('.tut-toast');
+  const activeTitle = activeSlide.querySelector('.tut-toast-title');
+  const activeBody  = activeSlide.querySelector('.tut-toast-body');
+  if (!activeToast) return;
+
+  activeTitle.textContent = c.title;
+  activeBody.textContent  = c.body;
+  activeToast.classList.add('visible');
+
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => activeToast.classList.remove('visible'), 4000);
+}
 
   // ── Dismiss helper ──
-  function dismissToast() {
-    clearTimeout(toastTimer);
-    toast.classList.remove('visible');
-    toast2.classList.remove('visible');
-  }
+function dismissToast() {
+  clearTimeout(toastTimer);
+  document.querySelectorAll('.tut-toast').forEach(t => t.classList.remove('visible'));
+}
 
   // ── DOM element listeners ──
   document.getElementById('tap-score').addEventListener('pointerdown', e => { e.stopPropagation(); showToast('score'); });
