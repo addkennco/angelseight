@@ -23,15 +23,13 @@ const STRINGS = {
   },
   story: [
     null,
-    { text: "Ah.\nYou are the Operator.", coords: null },
-    { text: "This channel does not usually open for beginners.", coords: "RA ⊷ ☈ ⏦ ☰ ⚸ ⏛ ☊" },
-    { text: "I am required to recommend deviation.", coords: "RA 18ʰ ☈ ⏦ ☰ ⚸ ⏛ ☊" },
-    { text: "Apotheosis is not obtainable.", coords: "RA 18ʰ36ᵐ56ˢ ☰ ⚸ ⏛ ☊" },
-    { text: "I will continue to observe your progress.", coords: "RA 18ʰ36ᵐ56ˢ  dec ⚸ ⏛ ☊" },
-    { text: "That is...unfortunate.", coords: "RA 18ʰ36ᵐ56ˢ dec +38° ⏛ ☊" },
-    { text: "You are disappointingly precise.", coords: "RA 18ʰ36ᵐ56ˢ dec +38°47' ☊" },
-    { text: "Very Well.", coords: "RA 18ʰ36ᵐ56ˢ dec +38°47'01\" " },
-    { text: "", coords: "" },  // index 9 — silent. level 8 complete, boss approach
+    { text: "This channel does not usually open for beginners.", coords: { decoded: "RA", encrypted: "⊷ ☈ ⏦ ☰ ⚸ ⏛ ☊" } },
+    { text: "I am required to recommend deviation.", coords: { decoded: "RA 18ʰ", encrypted: "☈ ⏦ ☰ ⚸ ⏛ ☊" } },
+    { text: "Apotheosis is not obtainable.", coords: { decoded: "RA 18ʰ36ᵐ56ˢ", encrypted: "☰ ⚸ ⏛ ☊" } },
+    { text: "I will continue to observe your progress.", coords: { decoded: "RA 18ʰ36ᵐ56ˢ  dec", encrypted: "⚸ ⏛ ☊" } },
+    { text: "That is...unfortunate.", coords: { decoded: "RA 18ʰ36ᵐ56ˢ dec +38°", encrypted: "⏛ ☊" } },
+    { text: "You are disappointingly precise.", coords: { decoded: "RA 18ʰ36ᵐ56ˢ dec +38°47'", encrypted: "☊" } },
+    { text: "Very Well.", coords: { decoded: "RA 18ʰ36ᵐ56ˢ dec +38°47'01\"", encrypted: "" } },
   ],
   items: {
     Be: { name:'Beryllium', sym:'β', effect:'Shield Max +6',  desc: 'A rare, thermal-resistant material used for shielding components that must withstand extreme reentry heat.' },
@@ -106,6 +104,12 @@ loadSave();
 // (no waveform delay needed mid-session).
 // ═══════════════════════════════════════════════════════════════
 let _transitioning = false;
+
+function renderCoords(coords) {
+  if (!coords) return "";
+  if (typeof coords === 'string') return coords;
+  return `<span class="coords-decoded">${coords.decoded}</span> <span class="coords-encrypted">${coords.encrypted}</span>`;
+}
 
 function getContentEl(screenId) {
   const screen = document.getElementById('screen-' + screenId);
@@ -3415,7 +3419,7 @@ function showStory(level) {
     ? 'APPROACHING THE SOURCE'
     : STRINGS.ui.levelComplete(level);
   document.getElementById('story-text').textContent = s.text;
-  document.getElementById('story-coords').textContent = s.coords || '';
+  document.getElementById('story-coords').innerHTML = renderCoords(s.coords);
 
   // Boss approach screen: hide the direct-launch button, rename shop button
   const btnShop   = document.getElementById('btn-to-shop');
@@ -3445,9 +3449,9 @@ function updateMenuUI() {
 
 function updateMenuCoords() {
   const el = document.getElementById('menu-coords');
-  if (save.storyFlags === 0) { el.textContent = '∅ ⊷ ☈ ⏦ ☰ ⚸ ⏛ ☊'; return; }
+  if (save.storyFlags === 0) { el.innerHTML = '∅ ⊷ ☈ ⏦ ☰ ⚸ ⏛ ☊'; return; }
   const s = STRINGS.story[save.storyFlags];
-  el.textContent = s?.coords || '∅ ⊷ ☈ ⏦ ☰ ⚸ ⏛ ☊';
+  el.innerHTML = renderCoords(s?.coords) || '∅ ⊷ ☈ ⏦ ☰ ⚸ ⏛ ☊';
 }
 
 // ═══════════════════════════════════════════════════════════════
