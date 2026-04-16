@@ -559,6 +559,7 @@ function screenCollapse(el, opts = {}) {
 // RUN STATE
 // ═══════════════════════════════════════════════════════════════
 let run = null;
+let isUpgradeSession = false; // Tracks if we are in the Post-Boss "Evolution" Shop
 
 function newRun() {
   return {
@@ -978,6 +979,7 @@ function applyUpgradePassive() {
     boss         = makeBoss();
     boss.x       = W / 2;
     boss.y       = H * 0.28;
+	document.getElementById('powerup-bar').style.pointerEvents = 'all';
 
     // Clear the field — carry over run stats, wipe combat objects
     bullets    = [];
@@ -1000,10 +1002,12 @@ function applyUpgradePassive() {
     // Reset per-level power timers (run stats carry over untouched)
     invincibleTimer   = 0;
     piercingBullets   = false;
+	run.bulletType = 'standard';
     timeDilationTimer = 0;
     noAmmoCostTimer   = 0;
 	shakeIntensity = 0;
     shakeDuration  = 0;
+	applyUpgradePassive();
 
     // Boss HUD — show and reset
     document.getElementById('boss-hud').classList.add('active');
@@ -2788,7 +2792,9 @@ function switchCraftSection(openThis) {
 }
 
 function shopTab(tab) {
-  shopMode = tab;
+  // If we were in 'upgrade' mode but clicked a tab, stay in upgrade session
+  if (tab !== 'upgrade') shopMode = tab; 
+  else shopMode = 'stash'; // Default to stash if 'upgrade' is passed
   selectedCardKey = null;
   // Return any partially-slotted ingredients to inventory and reset lights
   Object.entries(craftProgress).forEach(([puKey, slots]) => {
@@ -2928,24 +2934,25 @@ function updateShopReserves() {
   const el = document.getElementById('shop-reserve-slots');
   if (!el) return;
 
-  if (shopMode === 'upgrade') {
+  // NEW: If in an evolution session, show the large upgrade slot instead of 8 small ones
+  if (isUpgradeSession) {
     const key = run.inventory._upgradeSlot;
     const pu = key ? STRINGS.powerups[key] : null;
-    
     el.innerHTML = `
-      <div style="width: 100%; display: flex; flex-direction: column; gap: 8px;">
-        <div class="shop-section-label">UPGRADE</div>
-        <div class="shop-reserve-slot filled" style="width: 100%; height: 50px; flex-direction: row; gap: 15px; padding: 0 20px;">
-          <span class="shop-reserve-sym" style="font-size: 24px;">${pu ? pu.sym : '∅'}</span>
-          <div style="display: flex; flex-direction: column; align-items: flex-start;">
-            <span class="shop-reserve-name" style="font-size: 12px; color: var(--purple);">${pu ? pu.name : 'EMPTY'}</span>
-            <span style="font-size: 8px; color: rgba(255,255,255,0.4);">${pu ? 'PASSIVE ACTIVE FOR NEXT RUN' : 'DRAG COMPOUND/ALLOY HERE'}</span>
-          </div>
+      <div class="shop-upgrade-container" style="width:100%; padding: 5px 0;">
+        <div class="shop-section-label" style="color:var(--purple); margin-bottom:5px;">PERMANENT UPGRADE SLOT</div>
+        <div class="shop-reserve-slot filled" id="upgrade-drop-zone" style="width:100%; height:44px; flex-direction:row; gap:12px; justify-content:flex-start; padding-left:15px;">
+           <span class="shop-reserve-sym" style="font-size:22px;">${pu ? pu.sym : 'Ω'}</span>
+           <div style="display:flex; flex-direction:column; align-items:flex-start;">
+             <span class="shop-reserve-name" style="color:#fff; font-size:10px;">${pu ? pu.name : 'EMPTY'}</span>
+             <span style="font-size:7px; color:rgba(255,255,255,0.4);">${pu ? 'PASSIVE EFFECT FOR NEXT RUN' : 'DRAG FUSION HERE'}</span>
+           </div>
         </div>
       </div>
     `;
     return;
   }
+
   el.innerHTML = '';
   for (let i = 0; i < run.reserveMax; i++) {
     const slot = document.createElement('div');
@@ -3551,6 +3558,14 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('overlay-boss-clear').classList.remove('active');
     document.getElementById('boss-hud').classList.remove('active');
     
+    isUpgradeSession = true; // Enable the specialized UI
+    shopMode = 'buy';        // Default to the buy tab
+    document.getElementById('shop-level-badge').textContent = 'MODE: STATIONARY';
+    showScreen('shop');
+    initShopDeco();
+    shopTab('buy');          // Open the shop normally
+  };
+    
     // Enter Shop in Upgrade Mode
     shopMode = 'upgrade';
     document.getElementById('shop-level-badge').textContent = 'MODE: STATIONARY';
@@ -3590,7 +3605,8 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   document.getElementById('btn-story-launch').onclick = () => {
-    if (shopMode === 'upgrade') {
+    if (isUpgradeSession) {
+	  isUpgradeSession = false;
       // Persist the choice to the global save
       save.upgrade = run.inventory._upgradeSlot || null;
       writeSave();
@@ -3814,6 +3830,14 @@ function setupShopDrag() {
   }
   function highlightTarget(x, y) {
     clearHighlights();
+    if (isUpgradeSession) {
+       const zone = document.getElementById('upgrade-drop-zone');
+       const r = zone.getBoundingClientRect();
+       if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) {
+         zone.classList.add('drag-over');
+       }
+       return;
+    }
     const slot = reserveSlotAt(x, y);
     if (slot) {
       slot.classList.add(slot.dataset.key ? 'drag-over-full' : 'drag-over');
@@ -4146,10 +4170,9 @@ function applyElementBuff(key) {
       return;
     }
 
-    // ── Stash card → reserve slot ──────────────────────────────
     // ── Stash card → reserve slot / upgrade slot ──────────────────────────────
     if ((dragSource === 'stash' || (dragSource === 'card' && shopMode === 'stash')) && targetSlot) {
-      if (shopMode === 'upgrade') {
+      if (isUpgradeSession) {
         // Only Compounds and Alloys allowed in Upgrade slot
         if (dragTier === 'element') {
           showShopToast("ONLY FUSIONS CAN BE PERMANENT");
