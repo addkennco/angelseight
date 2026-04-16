@@ -1382,12 +1382,11 @@ function showToast(key) {
   const c = TOAST_CONTENT[key];
   if (!c) return;
 
-  // Find the toast inside whichever slide is currently active
   const activeSlide = SLIDES[cur];
   const activeToast = activeSlide.querySelector('.tut-toast');
   const activeTitle = activeSlide.querySelector('.tut-toast-title');
   const activeBody  = activeSlide.querySelector('.tut-toast-body');
-  if (!activeToast) return;
+  if (!activeToast || !activeTitle || !activeBody) return;  // ← guard
 
   activeTitle.textContent = c.title;
   activeBody.textContent  = c.body;
