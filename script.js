@@ -77,7 +77,12 @@ const STRINGS = {
 // SAVE / STATE
 // ═══════════════════════════════════════════════════════════════
 const SAVE_KEY = 'a8_save_v1';
-let save = { highScore: 0, storyFlags: 0, permStats: { shootSpeed:0, ammoMax:0, shieldMax:0, ammoRefillRate:0 } };
+let save = { 
+  highScore: 0, 
+  storyFlags: 0, 
+  permStats: { shootSpeed:0, ammoMax:0, shieldMax:0, ammoRefillRate:0 },
+  upgrade: null // Stores active upgrade key
+};
 function loadSave() {
   try { const d = localStorage.getItem(SAVE_KEY); if(d) save = JSON.parse(atob(d)); } catch(e){}
 }
@@ -557,6 +562,7 @@ let run = null;
 
 function newRun() {
   return {
+    upgrade: save.upgrade, // Pulls the persistent upgrade into the active run
     level: 1,
     score: 0,
     credits: 0,
@@ -905,6 +911,22 @@ const Game = (() => {
   if (run) { ship.x = W / 2; ship.y = H - 130; ship.targetX = ship.x; }
 }
 
+function applyUpgradePassive() {
+    if (!run || !run.upgrade) return;
+    
+    switch (run.upgrade) {
+      case 'AZOLITHION': 
+        run.bulletType = '3spread'; 
+        break;
+      case 'PHIOMEGA': 
+        // Logic for this is defined later in the Sprint doc (Part 4.10)
+        break;
+      case 'GAMMITE':
+        // Gammite's passive is handled in newRun initialization or here
+        break;
+    }
+  }
+	
   function startLevel() {
     state = 'playing';
     bullets   = [];
@@ -935,6 +957,7 @@ const Game = (() => {
     run.bulletType = 'standard';
     maxEnemies = 24 + run.level * 8;          // enemy increase per level
     levelDuration = 45 + run.level * 4;       // time increase per level
+	applyUpgradePassive();                    // for newRun+
     updateHUD();
     document.getElementById('powerup-bar').style.pointerEvents = 'all';
     document.getElementById('overlay-death').classList.remove('active');
@@ -989,7 +1012,8 @@ const Game = (() => {
     document.getElementById('overlay-death').classList.remove('active');
     document.getElementById('overlay-clear').classList.remove('active');
     document.getElementById('overlay-boss-clear').classList.remove('active');
-
+    
+	applyUpgradePassive();
     updateHUD();
     if (animId) cancelAnimationFrame(animId);
     lastTime = performance.now();
