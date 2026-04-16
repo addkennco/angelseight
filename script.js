@@ -3554,16 +3554,16 @@ document.addEventListener('DOMContentLoaded', () => {
     updateMenuUI();
   };
 
-  document.getElementById('btn-new-run-plus').onclick = () => {
+document.getElementById('btn-new-run-plus').onclick = () => {
     document.getElementById('overlay-boss-clear').classList.remove('active');
     document.getElementById('boss-hud').classList.remove('active');
-    
-    isUpgradeSession = true; // Enable the specialized UI
-    shopMode = 'buy';        // Default to the buy tab
+    isUpgradeSession = true; 
+    shopMode = 'buy';        
     document.getElementById('shop-level-badge').textContent = 'MODE: STATIONARY';
+    
     showScreen('shop');
     initShopDeco();
-    shopTab('buy');          // Open the shop normally
+    shopTab('buy'); // Opens the shop in the standard buy tab but keeps the Upgrade slot active
   };
     
     // Enter Shop in Upgrade Mode
