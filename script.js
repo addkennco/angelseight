@@ -577,6 +577,9 @@ function newRun() {
     reserveMax: 3,
     powerups: [],
     inventory: {},
+	{
+    _upgradeSlot: null // NewRun+ upgrade
+    },
     bulletType: 'standard',
   };
 }
@@ -2924,6 +2927,25 @@ function updateShopReserves() {
   if (!run) return;
   const el = document.getElementById('shop-reserve-slots');
   if (!el) return;
+
+  if (shopMode === 'upgrade') {
+    const key = run.inventory._upgradeSlot;
+    const pu = key ? STRINGS.powerups[key] : null;
+    
+    el.innerHTML = `
+      <div style="width: 100%; display: flex; flex-direction: column; gap: 8px;">
+        <div class="shop-section-label">UPGRADE</div>
+        <div class="shop-reserve-slot filled" style="width: 100%; height: 50px; flex-direction: row; gap: 15px; padding: 0 20px;">
+          <span class="shop-reserve-sym" style="font-size: 24px;">${pu ? pu.sym : '∅'}</span>
+          <div style="display: flex; flex-direction: column; align-items: flex-start;">
+            <span class="shop-reserve-name" style="font-size: 12px; color: var(--purple);">${pu ? pu.name : 'EMPTY'}</span>
+            <span style="font-size: 8px; color: rgba(255,255,255,0.4);">${pu ? 'PASSIVE ACTIVE FOR NEXT RUN' : 'DRAG COMPOUND/ALLOY HERE'}</span>
+          </div>
+        </div>
+      </div>
+    `;
+    return;
+  }
   el.innerHTML = '';
   for (let i = 0; i < run.reserveMax; i++) {
     const slot = document.createElement('div');
@@ -3556,6 +3578,17 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   document.getElementById('btn-story-launch').onclick = () => {
+    if (shopMode === 'upgrade') {
+      // Persist the choice to the global save
+      save.upgrade = run.inventory._upgradeSlot || null;
+      writeSave();
+      
+      // Start a fresh run
+      run = newRun();
+      showScreen('game');
+      Game.startLevel();
+      return;
+    }
     shopContinue();
   };
 
@@ -4102,7 +4135,30 @@ function applyElementBuff(key) {
     }
 
     // ── Stash card → reserve slot ──────────────────────────────
+    // ── Stash card → reserve slot / upgrade slot ──────────────────────────────
     if ((dragSource === 'stash' || (dragSource === 'card' && shopMode === 'stash')) && targetSlot) {
+      if (shopMode === 'upgrade') {
+        // Only Compounds and Alloys allowed in Upgrade slot
+        if (dragTier === 'element') {
+          showShopToast("ONLY FUSIONS CAN BE PERMANENT");
+          reset();
+          return;
+        }
+        
+        // Return current upgrade to inventory if replacing
+        const oldKey = run.inventory._upgradeSlot;
+        if (oldKey) {
+          run.inventory[oldKey] = (run.inventory[oldKey] || 0) + 1;
+        }
+        
+        run.inventory._upgradeSlot = dragKey;
+        run.inventory[dragKey] = Math.max(0, (run.inventory[dragKey] || 0) - 1);
+        showShopToast("UPGRADE EQUIPPED");
+        refresh();
+        reset();
+        return;
+      }
+		
       const slotIdx = parseInt(targetSlot.dataset.slot);
       while (run.powerups.length < run.reserveMax) run.powerups.push(null);
       const existingKey = run.powerups[slotIdx] || null;
