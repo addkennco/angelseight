@@ -30,6 +30,8 @@ const STRINGS = {
     { text: "That is...unfortunate.", coords: { decoded: "RA 18ʰ36ᵐ56ˢ dec +38°", encrypted: "⏛ ☊" } },
     { text: "You are disappointingly precise.", coords: { decoded: "RA 18ʰ36ᵐ56ˢ dec +38°47'", encrypted: "☊" } },
     { text: "Very Well.", coords: { decoded: "RA 18ʰ36ᵐ56ˢ dec +38°47'01\"", encrypted: "" } },
+	{ text: "", coords: "" }, 
+	{ text: "", coords: "" }, 
   ],
   items: {
     Be: { name:'Beryllium', sym:'β', effect:'Shield Max +6',  desc: 'A rare, thermal-resistant material used for shielding components that must withstand extreme reentry heat.' },
