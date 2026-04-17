@@ -3600,6 +3600,7 @@ document.getElementById('btn-new-run-plus').onclick = () => {
 	  isUpgradeSession = false;
       // Persist the choice to the global save
       save.upgrade = run.inventory._upgradeSlot || null;
+	  save.storyFlags = 0;
       writeSave();
       
       // Start a fresh run
