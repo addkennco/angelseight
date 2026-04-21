@@ -83,7 +83,7 @@ let save = {
   highScore: 0, 
   storyFlags: 0, 
   permStats: { shootSpeed:0, ammoMax:0, shieldMax:0, ammoRefillRate:0 },
-  upgrade: null // Stores active upgrade key
+  upgrade: null // NewRun+ persistent upgrade key
 };
 function loadSave() {
   try { const d = localStorage.getItem(SAVE_KEY); if(d) save = JSON.parse(atob(d)); } catch(e){}
@@ -558,33 +558,48 @@ function screenCollapse(el, opts = {}) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// RUN STATE
+// RUN STATE & PASSIVES
 // ═══════════════════════════════════════════════════════════════
 let run = null;
-let isUpgradeSession = false; // Tracks if we are in the Post-Boss "Evolution" Shop
-
+let isUpgradeSession = false; 
 function newRun() {
-  return {
-    upgrade: save.upgrade, // Pulls the persistent upgrade into the active run
+  const r = {
+    upgrade: save.upgrade, 
     level: 1,
     score: 0,
     credits: 0,
     combo: 1,
     noHitKills: 0,
+    kills: 0,             // total enemies killed (Part 1.3)
+    totalTime: 0,         // cumulative seconds (Part 1.3)
     shield: 10 + save.permStats.shieldMax,
     shieldMax: 10 + save.permStats.shieldMax,
     ammo: 65 + save.permStats.ammoMax,
     ammoMax: 100 + save.permStats.ammoMax,
     shootSpeed: 4 + save.permStats.shootSpeed,
-	ammoRefillRate: 1 + save.permStats.ammoRefillRate,
+    ammoRefillRate: 1 + save.permStats.ammoRefillRate,
     reserveMax: 3,
     powerups: [],
-    inventory:
-	{
-    _upgradeSlot: null // NewRun+ upgrade
-    },
+    inventory: { _upgradeSlot: null },
     bulletType: 'standard',
+    // Passive state flags & timers
+    aquilineUsed: false,      // Axorite extra life
+    warpStabTriggered: false, // Deltalite threshold
+    fluxTriggered: false,     // PhiOmega threshold
+    octaneTimer: 0,           // Nitrokalium fire boost
+    gammiteActiveTimer: 0     // Gammite infinite ammo window
   };
+  applyUpgradePassive(r);
+  return r;
+}
+function applyUpgradePassive(targetRun) {
+  if (!targetRun || !targetRun.upgrade) return;
+  const up = targetRun.upgrade;
+  switch (up) {
+    case 'AZOLITHION': 
+      targetRun.bulletType = '3spread'; 
+      break;
+}
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -593,38 +608,35 @@ function newRun() {
 const Game = (() => {
   let canvas, ctx, W, H;
   let animId = null;
-  let state = 'playing'; // playing | dead | clear
+  let state = 'playing'; 
   let lastTime = 0;
-
-  // Game objects
   let ship = { x:0, y:0, w:22, h:18, targetX:0, invincible:0 };
-  let invincibleTimer = 0;   // Titane timer
-  let piercingBullets = false; // Alkalium flag
-  let timeDilationTimer = 0;   // Deltalite timer
-  let noAmmoCostTimer = 0;     // Gammite timer
+  let invincibleTimer = 0;   
+  let piercingBullets = false; 
+  let timeDilationTimer = 0;   
+  let noAmmoCostTimer = 0;     
   let bullets = [];
   let enemies  = [];
+  let subEnemies   = [];
   let mines    = [];
   let particles= [];
   let drops    = [];
+  let pods     = [];
   let shootTimer = 0;
   let waveOffset = 0;
-  let waveDir = 1;
   let waveT = 0;
   let levelTimer = 0;
   let spawnTimer = 0;
-  let levelDuration = 45; // seconds
+  let levelDuration = 45; 
   let enemiesSpawned = 0;
   let maxEnemies = 0;
-  let touchX = -1;                      // touch drag
-  let waveLeft = [], waveRight = [];    // waveform bkg
-  let pods = [];                        // powerup pods
+  let touchX = -1;                      
+  let ammoRefillTimer = 0;              
+  const AMMO_REFILL_INTERVAL = 5;      
+  let endSweepFired = false;            
+  let shakeIntensity = 0;               
+  let shakeDuration  = 0;
   let podSpawnTimer = 0;
-  let ammoRefillTimer = 0;              // time-based ammo refill
-  const AMMO_REFILL_INTERVAL = 5;      // seconds between refill ticks
-  let endSweepFired = false;            // end level sweep
-  let shakeIntensity = 0;               // current shake magnitude in px
-  let shakeDuration  = 0;               // seconds remaining
 
   // ═══════════════════════════════════════════════════════════════
   // TESSERACT — 4D → 2D PROJECTION
@@ -686,7 +698,6 @@ const Game = (() => {
 
   let bossActive   = false;
   let bossDefeated = false;
-  let subEnemies   = [];
   let elementAttackTimer = 0;
   let bossT        = 0; // independent time counter for boss (mirrors waveT usage in boss.html)
 
@@ -866,7 +877,6 @@ const Game = (() => {
     ctx = canvas.getContext('2d');
     resize();
     window.addEventListener('resize', resize);
-
     canvas.addEventListener('touchstart', onTouchStart, { passive:false });
     canvas.addEventListener('touchmove',  onTouchMove,  { passive:false });
     canvas.addEventListener('touchend',   onTouchEnd,   { passive:false });
@@ -917,38 +927,16 @@ const Game = (() => {
   if (run) { ship.x = W / 2; ship.y = H - 130; ship.targetX = ship.x; }
 }
 
-function applyUpgradePassive() {
-    if (!run || !run.upgrade) return;
-    
-    switch (run.upgrade) {
-      case 'AZOLITHION': 
-        run.bulletType = '3spread'; 
-        break;
-      case 'PHIOMEGA': 
-        // Logic for this is defined later in the Sprint doc (Part 4.10)
-        break;
-      case 'GAMMITE':
-        // Gammite's passive is handled in newRun initialization or here
-        break;
-    }
-  }
-	
   function startLevel() {
     state = 'playing';
-    bullets   = [];
-    enemies   = [];
-    mines     = [];
-    particles = [];
-    drops     = [];
-    pods      = [];
-    podSpawnTimer = 8 + Math.random() * 6; // first pod after 8-14s
-    ammoRefillTimer = AMMO_REFILL_INTERVAL;   // reset timer each level
+    bullets = []; enemies = []; mines = []; particles = []; drops = []; pods = [];
+    podSpawnTimer = 8 + Math.random() * 6;
+    ammoRefillTimer = AMMO_REFILL_INTERVAL;
     ship.x = ship.targetX = W / 2;
     ship.y = H - 130;
     ship.invincible = 0;
     shootTimer = 0;
     waveOffset = 0;
-	waveDir = 1;
     waveT = 0;
     levelTimer = 0;
     spawnTimer = 0;
@@ -958,17 +946,21 @@ function applyUpgradePassive() {
     piercingBullets = false;
     timeDilationTimer = 0;
     noAmmoCostTimer = 0;
-	shakeIntensity = 0;
+    shakeIntensity = 0;
     shakeDuration  = 0;
-    run.bulletType = 'standard';
-    maxEnemies = 24 + run.level * 8;          // enemy increase per level
-    levelDuration = 45 + run.level * 4;       // time increase per level
-	applyUpgradePassive();                    // for newRun+
+    sweepCountdown = 7;
+    if (run) {
+      run.warpStabTriggered = false;
+      run.fluxTriggered = false;
+      run.octaneTimer = 0;
+      run.gammiteActiveTimer = 0;
+      applyUpgradePassive(run);
+    }
+    maxEnemies = 24 + run.level * 8;
+    levelDuration = 45 + run.level * 4;
     updateHUD();
-    document.getElementById('powerup-bar').style.pointerEvents = 'all';
     document.getElementById('overlay-death').classList.remove('active');
     document.getElementById('overlay-clear').classList.remove('active');
-    if (animId) cancelAnimationFrame(animId);
     lastTime = performance.now();
     animId = requestAnimationFrame(loop);
   }
@@ -1009,7 +1001,6 @@ function applyUpgradePassive() {
     noAmmoCostTimer   = 0;
 	shakeIntensity = 0;
     shakeDuration  = 0;
-	applyUpgradePassive();
 
     // Boss HUD — show and reset
     document.getElementById('boss-hud').classList.add('active');
@@ -1021,8 +1012,8 @@ function applyUpgradePassive() {
     document.getElementById('overlay-death').classList.remove('active');
     document.getElementById('overlay-clear').classList.remove('active');
     document.getElementById('overlay-boss-clear').classList.remove('active');
-    
-	applyUpgradePassive();
+
+    applyUpgradePassive(run);
     updateHUD();
     if (animId) cancelAnimationFrame(animId);
     lastTime = performance.now();
@@ -1056,8 +1047,18 @@ function applyUpgradePassive() {
   // ── UPDATE ────────────────────────────────────────────────────
   function update(dt) {
     levelTimer += dt;
+    run.totalTime += dt; // Cumulative debrief tracking
 
-    // Ship movement
+    // Passive: Reactive Plating (Lithebryl)
+    if (run.upgrade === 'LITHEBRYL' && run.shield < run.shieldMax) {
+      run.shield = Math.min(run.shieldMax, run.shield + 0.5 * dt);
+      updateShieldBar();
+    }
+
+    // Passive Ticks
+    if (run.octaneTimer > 0) run.octaneTimer -= dt;
+    if (run.gammiteActiveTimer > 0) run.gammiteActiveTimer -= dt;
+
     if (touchX >= 0) {
       const relX = touchX - (window.innerWidth - W) / 2;
       ship.targetX = Math.max(28, Math.min(W - 28, relX));
@@ -1066,21 +1067,19 @@ function applyUpgradePassive() {
     if (ship.invincible > 0) ship.invincible -= dt;
     if (invincibleTimer > 0) invincibleTimer = Math.max(0, invincibleTimer - dt);
 
-    // Shooting
     shootTimer -= dt;
-	if (shootTimer <= 0 && run.ammo > 0 && !endSweepFired) {
- 	 fireBullet();
-	 shootTimer = 1 / run.shootSpeed;
-  	 if (noAmmoCostTimer <= 0) {
-      const prevAmmo = run.ammo;
-      run.ammo = Math.max(0, run.ammo - 1);
-      updateAmmoBar();
-      // Show "RELOADING" text when ammo hits 0
-   	  if (prevAmmo > 0 && run.ammo === 0) {
-      	spawnFloatingText(ship.x, ship.y - 30, 'RELOADING', '#ff6b35');
+    if (shootTimer <= 0 && run.ammo > 0 && !endSweepFired) {
+      fireBullet();
+      // Octane Atomizer passive or standard shoot speed
+      const speedMod = (run.upgrade === 'NITROKALIUM' && run.octaneTimer > 0) ? 1.6 : 1.0;
+      shootTimer = (1 / (run.shootSpeed * speedMod));
+      
+      // Gammite Passive: No cost for 5s after refill vs standard cost
+      if (noAmmoCostTimer <= 0 && run.gammiteActiveTimer <= 0) {
+        run.ammo = Math.max(0, run.ammo - 1);
+        updateAmmoBar();
+      }
     }
-  }
-}
 
     // Spawn powerup pods
     podSpawnTimer -= dt;
@@ -1089,21 +1088,22 @@ function applyUpgradePassive() {
       podSpawnTimer = 18 + Math.random() * 12; // pod every 18-30s
     }
 
-    // Time-based ammo refill — wired to ammoRefillRate, capped at ammoMax
-ammoRefillTimer -= dt;
-if (ammoRefillTimer <= 0) {
-  ammoRefillTimer = AMMO_REFILL_INTERVAL;
-  const refill = Math.min(
-    run.ammoRefillRate * 10,
-    run.ammoMax - run.ammo
-  );
-  if (refill > 0) {
-    run.ammo += refill;
-    updateAmmoBar();
-    spawnFloatingText(W * 0.5, H - 160, '+ AMMO', '#00f5ff');
-    logPickup('AMMO REFILL +' + refill);
-  }
-}
+    ammoRefillTimer -= dt;
+    if (ammoRefillTimer <= 0) {
+      ammoRefillTimer = AMMO_REFILL_INTERVAL;
+      const refill = Math.min(run.ammoRefillRate * 10, run.ammoMax - run.ammo);
+      if (refill > 0) {
+        run.ammo += refill;
+        updateAmmoBar();
+        spawnFloatingText(W * 0.5, H - 160, '+ AMMO', '#00f5ff');
+        
+        // Gammite trigger: Firing doesn't consume ammo for 5s after refill
+        if (run.upgrade === 'GAMMITE') {
+          run.gammiteActiveTimer = 5;
+          logPickup('GAMMITE: INFINITE AMMO');
+        }
+      }
+    }
 
     // Spawn enemies / mines
     spawnTimer -= dt;
@@ -1114,11 +1114,26 @@ if (ammoRefillTimer <= 0) {
       enemiesSpawned++;
     }
 
-    // Ship bullets
+    // Ship bullets filter with Ricochet (Part 4 α - Ionic Deflector)
     bullets = bullets.filter(b => {
-      if (b.enemy) return true; // enemy bullets below
+      if (b.enemy) return true;
       b.x += b.vx * dt;
       b.y += b.vy * dt;
+
+      // Alkalium Passive: Piercing bullets bounce once off edges
+      if (run.upgrade === 'ALKALIUM' && piercingBullets && !b.bounced) {
+        if (b.x < 0 || b.x > W) {
+          b.vx *= -1;
+          b.x = Math.max(0, Math.min(W, b.x));
+          b.bounced = true;
+        }
+        if (b.y < 0) {
+          b.vy *= -1;
+          b.y = 0;
+          b.bounced = true;
+        }
+      }
+
       return b.x > -20 && b.x < W + 20 && b.y > -20 && b.y < H + 20;
     });
 
@@ -1132,10 +1147,10 @@ if (ammoRefillTimer <= 0) {
     waveOffset = (waveOffset + eDt * 60 * (1 + run.level * 0.08)) % (H * 2);
     waveT += eDt;
 
-    // Enemies
+    // Enemies filter with Deathtouch (Part 4 Ω - Fission Core)
     enemies = enemies.filter(e => {
       updateEnemy(e, eDt);
-      // enemy hit collision
+      
       for (let i = bullets.length - 1; i >= 0; i--) {
         const b = bullets[i];
         if (b.enemy) continue;
@@ -1143,18 +1158,23 @@ if (ammoRefillTimer <= 0) {
           e.hp -= b.dmg;
           if (!piercingBullets) bullets.splice(i, 1);
           spawnParticles(e.x, e.y, e.color, 4);
-          if (e.hp <= 0) {
-            killEnemy(e);
-            return false;
-          }
+          if (e.hp <= 0) { killEnemy(e); return false; }
         }
       }
-      // Ship collision
-      if (ship.invincible <= 0 && invincibleTimer <= 0 && dist(ship.x, ship.y, e.x, e.y) < e.r + 12) {
-        takeDamage(2);
-        spawnParticles(ship.x, ship.y, '#d42b6a', 8);
-        ship.invincible = 1.5;
-        return false;
+
+      // Ship collision with Deathtouch logic
+      if (dist(ship.x, ship.y, e.x, e.y) < e.r + 12) {
+        if (run.upgrade === 'OMEGITE') {
+          // Destroy enemy on contact regardless of invincibility
+          killEnemy(e);
+          takeDamage(2); // Still take damage per Fission Core rules
+          return false;
+        } else if (ship.invincible <= 0 && invincibleTimer <= 0) {
+          takeDamage(2);
+          spawnParticles(ship.x, ship.y, '#d42b6a', 8);
+          ship.invincible = hitInvincDuration(1.5); // Part 4 Θ
+          return false;
+        }
       }
       return e.y < H + 60;
     });
@@ -1166,25 +1186,32 @@ if (ammoRefillTimer <= 0) {
       b.y += (b.vy !== undefined ? b.vy : b.speed) * eDt;
       if (ship.invincible <= 0 && invincibleTimer <= 0 && dist(b.x, b.y, ship.x, ship.y) < 14) {
         takeDamage(1);
-        ship.invincible = 0.8;
+        ship.invincible = hitInvincDuration(0.8); // Part 4 Θ
         spawnParticles(ship.x, ship.y, '#d42b6a', 5);
         return false;
       }
       return b.x > -20 && b.x < W + 20 && b.y > -20 && b.y < H + 20;
     });
 
-    // Mines
+    // Mines filter with Deathtouch
     mines = mines.filter(m => {
       m.y += eDt * 40;
       if (m.drifting) m.x += Math.sin(m.t * 1.4) * 35 * eDt;
       m.t += eDt;
       m.x = Math.max(24, Math.min(W - 24, m.x));
-      if (ship.invincible <= 0 && invincibleTimer <= 0 && dist(ship.x, ship.y, m.x, m.y) < m.r + 12) {
-        takeDamage(run.shieldMax * 0.4);
-        ship.invincible = 2;
-        spawnParticles(ship.x, ship.y, '#ffd700', 12);
-        run.noHitKills = 0; run.combo = 1;
-        updateCombo();
+      
+      if (dist(ship.x, ship.y, m.x, m.y) < m.r + 12) {
+        if (run.upgrade === 'OMEGITE') {
+          spawnParticles(m.x, m.y, "#ff2020", 6);
+          takeDamage(run.shieldMax * 0.4);
+          return false;
+        } else if (ship.invincible <= 0 && invincibleTimer <= 0) {
+          takeDamage(run.shieldMax * 0.4);
+          ship.invincible = hitInvincDuration(2.0); // Part 4 Θ
+          spawnParticles(ship.x, ship.y, '#ffd700', 12);
+          run.noHitKills = 0; run.combo = 1;
+          updateCombo();
+        }
       }
       return m.y < H + 40;
     });
@@ -1549,7 +1576,13 @@ if (ammoRefillTimer <= 0) {
     bullets.push({ x:e.x, y:e.y, speed:120, vx: dx/d*120, vy: dy/d*120, dmg:1, enemy:true, aimed:true, color:'#a855f7' });
   }
 
+  // Helper for Titane (Phase Fuselage)
+  function hitInvincDuration(base) {
+    return base * (run.upgrade === 'TITANE' ? 1.8 : 1);
+  }
+
   function killEnemy(e) {
+    run.kills++; // Debrief tracking
     const base = e.type === 'elite' ? 200 : e.type === 'armored' ? 150 : 100;
     run.noHitKills++;
     if (run.noHitKills >= 10) { run.noHitKills = 0; run.combo = Math.min(run.combo + 1, 5); }
@@ -1561,7 +1594,9 @@ if (ammoRefillTimer <= 0) {
     // Paycheck
     run.credits += Math.floor(pts * 0.02);
     // Drop chance
-    if (Math.random() < 0.42 + run.level * 0.025) spawnDrop(e.x, e.y, e.type === 'elite');
+    // Part 3.2 Drop Rebalance
+    const dropChance = (0.18 + run.level * 0.012) * (run.upgrade === 'CARBOSILICUM' ? 1.5 : 1);
+    if (Math.random() < dropChance) spawnDrop(e.x, e.y, e.type === 'elite');
     spawnParticles(e.x, e.y, e.color, 10);
   }
 
@@ -1596,6 +1631,11 @@ if (ammoRefillTimer <= 0) {
       run.inventory[d.key] = Math.min(99, (run.inventory[d.key] || 0) + 1);
       const item = STRINGS.items[d.key];
       logPickup(`${item.sym} ${item.name}`);
+      // Part 4 Π Octane Atomizer: Picking up ammo drop boosts fire rate
+      if (run.upgrade === 'NITROKALIUM') {
+        run.octaneTimer = 4;
+        logPickup('OCTANE ATOMIZER: FIRE RATE BOOST');
+      }
     }
     spawnParticles(d.x, d.y, d.isPowerup ? '#a855f7' : '#00f5ff', 6);
   }
@@ -1683,15 +1723,47 @@ function spawnPod() {
     run.shield = Math.max(0, run.shield - amt);
     run.noHitKills = 0; run.combo = 1;
     updateShieldBar(); updateCombo();
-    if (run.shield <= 0) { state = 'dead'; onDeath(); }
+    // Last Stand Triggers (Part 4 ∂ and Φ)
+    const threshold = Math.ceil(run.shieldMax * 0.08);
+    if (run.shield <= threshold && run.shield > 0) {
+      if (run.upgrade === 'DELTALITE' && !run.warpStabTriggered) {
+        run.warpStabTriggered = true;
+        timeDilationTimer = 10;
+        run.octaneTimer = 10; // Reuse octaneTimer for fire rate boost
+        noAmmoCostTimer = 0; 
+        spawnFloatingText(W/2, H/2 - 30, 'WARP STABILIZER', '#22c55e');
+        logPickup('WARP STABILIZER ENGAGED');
+      } else if (run.upgrade === 'PHIOMEGA' && !run.fluxTriggered) {
+        run.fluxTriggered = true;
+        run.bulletType = '12spread';
+        noAmmoCostTimer = 10;
+        invincibleTimer = 10;
+        spawnFloatingText(W/2, H/2 - 30, 'FLUX CANNON', '#a855f7');
+        logPickup('FLUX CANNON ACTIVE');
+      }
+    }
+    if (run.shield <= 0) onDeath();
   }
 
   function onDeath() {
+    state = 'dead';
+    // Part 4 X Aquiline Manifold: Extra Life Intercept
+    if (run.upgrade === 'AXORITE' && !run.aquilineUsed) {
+        run.aquilineUsed = true;
+        run.shield = Math.ceil(run.shieldMax * 0.5);
+        updateShieldBar();
+        ship.invincible = 2.5;
+        spawnFloatingText(W/2, H/2 - 30, 'AQUILINE MANIFOLD', '#ec4899');
+        logPickup('EXTRA LIFE — SHIELDS AT 50%');
+        state = "playing"; 
+        lastTime = performance.now();
+        animId = requestAnimationFrame(loop);
+        return;
+    }
     cancelAnimationFrame(animId);
     if (run.score > save.highScore) { save.highScore = run.score; writeSave(); }
     document.getElementById('death-score').textContent = 'SCORE  ' + run.score.toLocaleString();
     document.getElementById('overlay-death').classList.add('active');
-    document.getElementById('hud-best').textContent = save.highScore.toLocaleString();
   }
 
   function levelClear() {
@@ -1728,15 +1800,23 @@ function spawnPod() {
     // Hide boss HUD
     document.getElementById('boss-hud').classList.remove('active');
 
-    // Populate and show win overlay — after cascade finishes
-    document.getElementById('boss-clear-score').textContent =
-      'FINAL SCORE  ' + run.score.toLocaleString();
+    // Part 1.5 Debrief Stats
+    document.getElementById('boss-clear-kills').textContent = 'KILLS ' + run.kills;
+    document.getElementById('boss-clear-time').textContent = 'TIME ' + formatTime(run.totalTime);
+    document.getElementById('boss-clear-credits').textContent = 'CREDITS ' + run.credits;
+    document.getElementById('boss-clear-score').textContent = 'FINAL SCORE ' + run.score.toLocaleString();
     setTimeout(() => {
       document.getElementById('overlay-boss-clear').classList.add('active');
       cancelAnimationFrame(animId); // now safe to stop the loop
     }, 1800);
 
     updateScoreHUD();
+  }
+
+  function formatTime(seconds) {
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return m + ":" + String(s).padStart(2, "0");
   }
 
   // ── SWEEP ───────────────────────────────────────────────────────
@@ -1760,7 +1840,9 @@ function spawnPod() {
   drops.forEach(d => { if (d.isPowerup) collectDrop(d); });
 	  
   if (bossActive && boss && boss.alive) {
-    const bombDmg = opts.bossDmg || 30;
+      // Part 4 M - Combustion Oxidizer: Magnium adds +10 to boss sweep damage
+      const baseDmg = opts.bossDmg || 30;
+      const bombDmg = baseDmg + (run.upgrade === 'MAGNIUM' ? 10 : 0);
     boss.hp -= bombDmg;
     boss.hitFlash = 0.3; 
     spawnParticles(boss.x, boss.y, '#ffd700', 40);
@@ -1800,7 +1882,7 @@ function screenShake(magnitude, duration) {
 	  logPickup('OMEGITE DEPLOYED');
     } else if (pu === 'MAGNIUM') {
  	 // Screen-wide AOE — 5 damage to all enemies, no effect on mines or pods
-  	const MAG_DMG = 5;
+  	const MAG_DMG = (run.upgrade === 'MAGNIUM') ? 6 : 5;
   	enemies.forEach(e => {
     e.hp -= MAG_DMG;
     spawnParticles(e.x, e.y, e.color, 8);
@@ -1819,11 +1901,11 @@ function screenShake(magnitude, duration) {
     } else if (pu === 'LITHEBRYL') {
       run.shield = run.shieldMax; updateShieldBar(); logPickup('SHIELD RESTORED');
     } else if (pu === 'NITROKALIUM') {
-      run.ammoRefillRate *= 2;
-      const capturedRun = run;
-  	  setTimeout(() => { capturedRun.ammoRefillRate = Math.round(capturedRun.ammoRefillRate / 2); }, 10000);
-  	  spawnFloatingText(W / 2, H / 2 - 30, 'NITROKALIUM', '#00f5ff');
-  	  logPickup('DOUBLE AMMO REFILL');
+      // User Instruction: Nitrokalium Powerup is now Full Ammo Refill
+      run.ammo = run.ammoMax; 
+      updateAmmoBar();
+      spawnFloatingText(W / 2, H / 2 - 30, 'NITROKALIUM', '#00f5ff');
+      logPickup('FULL AMMO REFILL');
 	} else if (pu === 'CARBOSILICUM') {
       run.combo = Math.max(run.combo, 2); logPickup('×2 ACTIVE');
     } else if (pu === 'TITANE') {
@@ -1875,6 +1957,45 @@ function screenShake(magnitude, duration) {
   }
   floaters = [];
 
+  // ── HUD: END-SWEEP PROGRESS GAUGE (Feature 1) ─────────────────
+  function drawSweepGauge() {
+    if (endSweepFired || bossActive) return;
+    // Progress Calculation: reflect the weaker of time or enemy spawn
+    const timeProg = Math.min(1, levelTimer / (levelDuration - 3));
+    const enemyProg = Math.min(1, enemiesSpawned / maxEnemies);
+    const progress = Math.min(timeProg, enemyProg);
+    const cx = W / 2, cy = 36, r = 22, lineW = 3;
+    const startAngle = Math.PI * 0.75; // ~210 deg
+    const endAngle = Math.PI * 2.25;   // ~405 deg (330 deg sweep)
+    const fillEnd = startAngle + (endAngle - startAngle) * progress;
+    // Track (Dim background)
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, startAngle, endAngle);
+    ctx.strokeStyle = "rgba(0,245,255,0.15)";
+    ctx.lineWidth = lineW;
+    ctx.lineCap = "round";
+    ctx.stroke();
+    // Fill (Brightens as it fills)
+    if (progress > 0) {
+      const alpha = 0.5 + progress * 0.5;
+      ctx.beginPath();
+      ctx.arc(cx, cy, r, startAngle, fillEnd);
+      ctx.strokeStyle = `rgba(0,245,255,${alpha.toFixed(2)})`;
+      ctx.lineWidth = lineW;
+      ctx.stroke();
+    }
+  }
+  // ── HUD: COUNTDOWN TOAST (Feature 2) ──────────────────────────
+  let sweepCountdown = 7; 
+  function updateCountdown() {
+    if (endSweepFired || sweepCountdown < 5) return;
+    const threshold = levelDuration - sweepCountdown;
+    if (levelTimer >= threshold) {
+      spawnFloatingText(W * 0.5, H * 0.38, sweepCountdown.toString(), '#00f5ff');
+      sweepCountdown--;
+    }
+  }
+
   // ── RENDER ────────────────────────────────────────────────────
  function render(dt) {
   ctx.clearRect(0, 0, W, H);
@@ -1892,6 +2013,8 @@ function screenShake(magnitude, duration) {
   }
 
   drawWaveform();
+  drawSweepGauge(); // Feature 1
+  updateCountdown(); // Feature 2
   drawPods();
   drawDrops();
   drawMines();
@@ -1987,18 +2110,6 @@ function screenShake(magnitude, duration) {
     }
   }
 
-  // Keep getWaveY for any legacy callers (not used in new renderer)
-  function getWaveY(x, row, offset) {
-    const lvl = run ? run.level : 1;
-    const amp  = 8 + row * 2.8 + lvl * 1.2;
-    const freq = 0.015 + row * 0.0012;
-    const ph   = (waveT * 0.5 + row * 0.28);
-    const ph2  = (waveT * 0.3 + row * 0.18);
-    return  Math.sin(x * freq + ph) * amp
-          + Math.sin(x * freq * 2.1 + ph2) * amp * 0.4
-          + Math.sin(x * freq * 0.5 + ph * 0.7) * amp * 0.2;
-  }
-
   function drawWaveform() {
     drawSynthwaveScene();
   }
@@ -2010,17 +2121,36 @@ function screenShake(magnitude, duration) {
     return {r,g,b};
   }
 
+  // ── SHIP VISUAL REFACTOR (Part 5.3) ──────────────────────────
   function drawShip() {
     const x = ship.x, y = ship.y;
     const blink = ship.invincible > 0 && Math.sin(Date.now() * 0.02) > 0;
     if (blink) return;
+    // ── Upgrade color palette lookup (Sprint Doc Page 17) ──
+    const UPGRADE_COLORS = {
+      LITHEBRYL:    { body:'#ff6b35', fill:null,      fin:'#a855f7', eng:'#d42b6a' },
+      TITANE:       { body:'#a855f7', fill:null,      fin:'#a855f7', eng:'#d42b6a' },
+      CARBOSILICUM: { body:'#ec4899', fill:null,      fin:'#a855f7', eng:'#d42b6a' },
+      NITROKALIUM:  { body:'#00f5ff', fill:null,      fin:'#ec4899', eng:'#ffd700' },
+      ALKALIUM:     { body:'#00f5ff', fill:null,      fin:'#ffd700', eng:'#ff6b35' },
+      AZOLITHION:   { body:'#00f5ff', fill:null,      fin:'#ff6b35', eng:'#ffffff' },
+      MAGNIUM:      { body:'#ff6b35', fill:'#ff6b35', fin:'#a855f7', eng:'#d42b6a' },
+      GAMMITE:      { body:'#a855f7', fill:'#a855f7', fin:'#a855f7', eng:'#d42b6a' },
+      DELTALITE:    { body:'#22c55e', fill:'#22c55e', fin:'#00f5ff', eng:'#ff6b35' },
+      PHIOMEGA:     { body:'#a855f7', fill:'#a855f7', fin:'#ffd700', eng:'#00f5ff' },
+      AXORITE:      { body:'#ec4899', fill:'#ec4899', fin:'#00f5ff', eng:'#ffd700' },
+      OMEGITE:      { body:'#ef4444', fill:'#ef4444', fin:'#ef4444', eng:'#ffd700' },
+    };
+    const col = (run && run.upgrade && UPGRADE_COLORS[run.upgrade])
+      ? UPGRADE_COLORS[run.upgrade]
+      : { body:'#00f5ff', fill:null, fin:'#a855f7', eng:'#d42b6a' }; // Default
     ctx.save();
     ctx.translate(x, y);
-    // Rotate entire ship so nose points in fire direction
     ctx.rotate(aimAngle);
-    ctx.shadowColor = '#00f5ff'; ctx.shadowBlur = 16;
-
-    // Main body
+    // Glow and Body
+    ctx.shadowColor = col.body;
+    ctx.shadowBlur = 16;
+    // Main hull
     ctx.beginPath();
     ctx.moveTo(0, -18);
     ctx.lineTo(-12, 8);
@@ -2029,21 +2159,26 @@ function screenShake(magnitude, duration) {
     ctx.lineTo(5, 4);
     ctx.lineTo(12, 8);
     ctx.closePath();
-    ctx.strokeStyle = '#00f5ff'; ctx.lineWidth = 1.5; ctx.stroke();
-
-    // Wing accents
+    
+    if (col.fill) {
+      ctx.fillStyle = col.fill;
+      ctx.fill();
+    }
+    ctx.strokeStyle = col.body;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    // Wing accents / tailfins
     ctx.beginPath();
     ctx.moveTo(-12, 8); ctx.lineTo(-18, 2); ctx.lineTo(-10, -2);
-    ctx.strokeStyle = '#a855f7'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.strokeStyle = col.fin; ctx.lineWidth = 1; ctx.stroke();
     ctx.beginPath();
     ctx.moveTo(12, 8); ctx.lineTo(18, 2); ctx.lineTo(10, -2);
     ctx.stroke();
-
     // Engine glow
     ctx.beginPath();
-    ctx.arc(0, 10, 3 + Math.sin(Date.now()*0.01)*1, 0, Math.PI*2);
-    ctx.fillStyle = '#d42b6a'; ctx.fill();
-
+    ctx.arc(0, 10, 3 + Math.sin(Date.now() * 0.01) * 1, 0, Math.PI * 2);
+    ctx.fillStyle = col.eng;
+    ctx.fill();
     ctx.restore();
 
     // Titane invincibility ring
@@ -2406,6 +2541,23 @@ function screenShake(magnitude, duration) {
 })();
 
 // ═══════════════════════════════════════════════════════════════
+// ANIMATED COUNT-UP (Part 3.3)
+// ═══════════════════════════════════════════════════════════════
+function countUp(el, target, durationMs = 1200, prefix = "", suffix = "") {
+  const start = performance.now();
+  const startVal = 0;
+  function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+  function tick(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / durationMs, 1);
+    const current = Math.round(startVal + (target - startVal) * easeOut(progress));
+    el.textContent = prefix + current.toLocaleString() + suffix;
+    if (progress < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+// ═══════════════════════════════════════════════════════════════
 // SHOP
 // ═══════════════════════════════════════════════════════════════
 let shopMode = 'buy';
@@ -2659,14 +2811,14 @@ function commitStaging() {
 const COMPOUND_VARIANTS = {
   // Mixed recipes listed first so early drops don't lock out the other ingredient.
   // Doubled recipes (same element twice) come last as the most restrictive path.
-  LITHEBRYL:    [ ['Be','Ti'], ['Li','Ti'], ['Be','Be'] ],
+  LITHEBRYL:    [ ['Be','Ti'], ['Li','Be'], ['Be','Be'] ],
   NITROKALIUM:  [ ['N','K'],   ['N','N'],   ['K','K']   ],
   CARBOSILICUM: [ ['Si','C'],  ['Si','Si'], ['C','C']   ],
   MAGNIUM:      [ ['Li','Mg'], ['Mg','K'],  ['Mg','Mg'] ],
   TITANE:       [ ['Ti','N'],  ['Ti','Ti']              ],
-  ALKALIUM:     [ ['Si','K']                            ],
+  ALKALIUM:     [ ['Si','K'],  ['Si','N']               ],
   AZOLITHION:   [ ['Li','N'],  ['Li','Li']              ],
-  GAMMITE:      [ ['Si','Ti']                           ],
+  GAMMITE:      [ ['Si','Ti'], ['Si','Be']              ],
 };
 
 const ALLOY_VARIANTS = {
@@ -3448,11 +3600,9 @@ function shopContinue() {
   run.level++;
   run.shootSpeed++; 
   if (run.level === 9) {
-    // Final shop visit done — route to boss fight
-    run.ammo = run.ammoMax; // refill ammo before boss
-    showScreen('game');
-	stopShopDeco();
-    Game.startBoss();
+    // If we are heading into Level 9, show the story screen first (Fixes narrative skip)
+    stopShopDeco();
+    showStory(9);
     return;
   }
   run.ammo = run.ammoMax; // refill ammo
@@ -3611,6 +3761,15 @@ document.getElementById('btn-new-run-plus').onclick = () => {
       Game.startLevel();
       return;
     }
+
+    // Handle Boss Launch (Gate check)
+    if (run.level === 9) {
+      run.ammo = run.ammoMax;
+      showScreen('game');
+      Game.startBoss();
+      return;
+    }
+
     shopContinue();
   };
 
@@ -3782,7 +3941,8 @@ function setupShopDrag() {
 
   // ── Hit testing ──────────────────────────────────────────────
   function reserveSlotAt(x, y) {
-    const slots = document.querySelectorAll('#shop-reserve-slots .shop-reserve-slot');
+    const selector = isUpgradeSession ? '#upgrade-drop-zone' : '.shop-reserve-slot';
+    const slots = document.querySelectorAll(selector);
     for (const s of slots) {
       const r = s.getBoundingClientRect();
       if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return s;
@@ -3795,6 +3955,7 @@ function setupShopDrag() {
     const r = box.getBoundingClientRect();
     return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
   }
+  function onActionBoxAt(x, y) { return actionBoxAt(x, y); }
   function statsBlockAt(x, y) {
     const block = document.getElementById('shop-stats-block');
     if (!block) return false;
