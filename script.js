@@ -563,6 +563,8 @@ function screenCollapse(el, opts = {}) {
 let run = null;
 let isUpgradeSession = false; 
 function newRun() {
+  save.storyFlags = 0;
+  writeSave();
   const r = {
     upgrade: save.upgrade, 
     level: 1,
@@ -929,6 +931,9 @@ const Game = (() => {
 
   function startLevel() {
     state = 'playing';
+    bossActive   = false;
+    bossDefeated = false;
+    boss         = null;
     bullets = []; enemies = []; mines = []; particles = []; drops = []; pods = [];
     podSpawnTimer = 8 + Math.random() * 6;
     ammoRefillTimer = AMMO_REFILL_INTERVAL;
@@ -954,6 +959,7 @@ const Game = (() => {
       run.fluxTriggered = false;
       run.octaneTimer = 0;
       run.gammiteActiveTimer = 0;
+      run.bulletType = 'standard';
       applyUpgradePassive(run);
     }
     maxEnemies = 24 + run.level * 8;
@@ -1999,7 +2005,7 @@ function screenShake(magnitude, duration) {
   // ── HUD: COUNTDOWN TOAST (Feature 2) ──────────────────────────
   let sweepCountdown = 7; 
   function updateCountdown() {
-    if (endSweepFired || sweepCountdown < 5) return;
+    if (endSweepFired || sweepCountdown <= 0) return;
     const threshold = levelDuration - sweepCountdown;
     if (levelTimer >= threshold) {
       spawnFloatingText(W * 0.5, H * 0.38, sweepCountdown.toString(), '#00f5ff');
@@ -3680,6 +3686,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('btn-start').onclick = () => {
     AudioManager.init();
+    save.storyFlags = 0;
     run = newRun();
     showScreen('game');
     Game.startLevel();
