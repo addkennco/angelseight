@@ -730,20 +730,15 @@
         <button class="btn-pause tut-tap" data-tut="pause">⏸︎</button>
       </div>
       <div class="hud-center">
-        <div class="hud-label tut-tap" id="tap-level">LEVEL
+        <div class="tut-tap" id="tap-level" style="pointer-events:all; cursor:pointer;">
           <div style="position:relative; width:72px; height:72px; margin:0 auto;">
-            <!-- Sweep gauge — mirrors drawSweepGauge() in script.js.
-                 cx=36 cy=36 r=22, startAngle=PI*0.75 (135°), sweep=270°.
-                 Fill shown at ~65% to illustrate a mid-level state. -->
             <svg width="72" height="72" viewBox="0 0 72 72" style="display:block;">
-              <!-- dim track: 135° → 405° (270° sweep) -->
               <path
                 d="M 20.44 51.56 A 22 22 0 1 1 51.56 51.56"
                 fill="none"
                 stroke="rgba(28,199,76,0.15)"
                 stroke-width="3"
                 stroke-linecap="round"/>
-              <!-- bright fill: 135° → ~310.5° (~65% of 270°) -->
               <path
                 d="M 20.44 51.56 A 22 22 0 1 1 50.29 19.27"
                 fill="none"

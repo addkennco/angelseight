@@ -959,6 +959,7 @@ const Game = (() => {
     maxEnemies = 24 + run.level * 8;
     levelDuration = 45 + run.level * 4;
     updateHUD();
+    document.getElementById('powerup-bar').style.pointerEvents = 'all';
     document.getElementById('overlay-death').classList.remove('active');
     document.getElementById('overlay-clear').classList.remove('active');
     lastTime = performance.now();
@@ -1965,8 +1966,8 @@ function screenShake(magnitude, duration) {
     const enemyProg = Math.min(1, enemiesSpawned / maxEnemies);
     const progress = Math.min(timeProg, enemyProg);
     const cx = W / 2, cy = 36, r = 22, lineW = 3;
-    const startAngle = Math.PI * 0.75; // ~210 deg
-    const endAngle = Math.PI * 2.25;   // ~405 deg (330 deg sweep)
+    const startAngle = Math.PI * 0.75;
+    const endAngle = Math.PI * 2.25;
     const fillEnd = startAngle + (endAngle - startAngle) * progress;
     // Track (Dim background)
     ctx.beginPath();
@@ -1984,6 +1985,16 @@ function screenShake(magnitude, duration) {
       ctx.lineWidth = lineW;
       ctx.stroke();
     }
+    // Level number — centred inside the arc
+    ctx.save();
+    ctx.font = 'bold 18px "Nova Square", monospace';
+    ctx.fillStyle = '#00f5ff';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = '#00f5ff';
+    ctx.shadowBlur = 8;
+    ctx.fillText(run ? run.level : 1, cx, cy);
+    ctx.restore();
   }
   // ── HUD: COUNTDOWN TOAST (Feature 2) ──────────────────────────
   let sweepCountdown = 7; 
