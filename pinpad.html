@@ -2,74 +2,198 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Nova+Square&display=swap');
   :root {
-    --bg: #050510; --bg2: #0a0a20;
+    --bg: #050510;
+    --bg2: #0a0a20;
     --green: #1CC74C;
+    --green-dim: #0e7a2e;
+    --green-dark: #083d17;
   }
-    html, body {
-    width:100%; height:100%;
-    color: var(--green);
-    font-family: Nova Square;
-	font-size: 12px;
-    overflow: hidden;
-    touch-action: none;
-  }
-  
   .pinpad-wrap {
-    display: flex; justify-content: center; align-items: center; padding: 2rem 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem 0;
+    background: var(--bg);
+    min-height: 420px;
+    font-family: 'Nova Square', sans-serif;
+    color: var(--green);
+    font-size: 12px;
   }
   .pinpad {
     background: var(--bg2);
-	color: var(--green);
+    color: var(--green);
     border: 1px solid var(--green);
     border-radius: 12px;
     padding: 1.25rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: fit-content;
+  }
+  .pin-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+  }
+  .pin-label {
+    font-family: 'Nova Square', sans-serif;
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: var(--green);
+    opacity: 0.85;
+  }
+  .entry {
+    background: transparent;
+    color: var(--green);
+    border: 1px solid var(--green);
+    border-radius: 8px;
+    width: 192px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Nova Square', sans-serif;
+    font-size: 22px;
+    letter-spacing: 8px;
+    transition: border-color 0.2s;
+  }
+  .entry.error {
+    border-color: #ff2244;
+    color: #ff2244;
+    animation: shake 0.35s ease;
+  }
+  @keyframes shake {
+    0%   { transform: translateX(0); }
+    20%  { transform: translateX(-6px); }
+    40%  { transform: translateX(6px); }
+    60%  { transform: translateX(-4px); }
+    80%  { transform: translateX(4px); }
+    100% { transform: translateX(0); }
+  }
+  .key-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 5px;
-    width: fit-content;
+    gap: 6px;
   }
   .key {
     font-family: 'Nova Square', sans-serif;
-    font-size: 32px;
-    background: transparent;
-    border: 6px double solid double solid var(--green);
-	border-radius: 12px;
-    width: 64px; height: 64px;
-    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    color: var(--green);
+    background: #0d1a10;
+    border: none;
+    border-radius: 8px 8px 6px 6px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    transition: transform 0.1s, opacity 0.1s;
     line-height: 1;
-    opacity: 0.85;
+    opacity: 0.9;
+    position: relative;
+    box-shadow:
+      0 1px 0 0 #3aff6a,
+      0 -1px 0 0 #083d17,
+      1px 0 0 0 #1aaa3a,
+      -1px 0 0 0 #0a4a1a,
+      0 4px 0 0 #051008,
+      inset 0 1px 0 0 rgba(80,255,120,0.18),
+      inset 0 -1px 0 0 rgba(0,0,0,0.5);
+    transition: transform 0.08s, box-shadow 0.08s, opacity 0.08s;
+    user-select: none;
+  }
+  .key:hover {
+    opacity: 1;
+    box-shadow:
+      0 1px 0 0 #5dffaa,
+      0 -1px 0 0 #083d17,
+      1px 0 0 0 #2ecc55,
+      -1px 0 0 0 #0a4a1a,
+      0 4px 0 0 #051008,
+      inset 0 1px 0 0 rgba(80,255,120,0.28),
+      inset 0 -1px 0 0 rgba(0,0,0,0.5);
   }
   .key:active {
-    transform: scale(0.88);
+    transform: translateY(3px);
     opacity: 1;
+    box-shadow:
+      0 1px 0 0 #1aaa3a,
+      0 -1px 0 0 #083d17,
+      1px 0 0 0 #1aaa3a,
+      -1px 0 0 0 #0a4a1a,
+      0 1px 0 0 #051008,
+      inset 0 1px 0 0 rgba(0,0,0,0.4),
+      inset 0 -1px 0 0 rgba(80,255,120,0.1);
   }
-  .entry
-    background: transparent;
-	color: var(--green);
-    border: 1px solid var(--green);
-    border-radius: 12px;
-    width: 240px; height: 64px;
-    display: flex; align-items: center; justify-content: center;
-	}
-  
 </style>
+
 <div class="pinpad-wrap">
   <div class="pinpad">
-	ENTER PIN<br>
-	<div class="entry">****</div>
-    <div class="key">1</div>
-    <div class="key">2</div>
-    <div class="key">3</div>
-    <div class="key">4</div>
-    <div class="key">5</div>
-    <div class="key">6</div>
-    <div class="key">7</div>
-    <div class="key">8</div>
-    <div class="key">9</div>
-    <div class="key">*</div>
-    <div class="key">0</div>
-    <div class="key">#</div>
+    <div class="pin-header">
+      <div class="pin-label">ENTER PIN</div>
+      <div class="entry" id="entry"></div>
+    </div>
+    <div class="key-grid">
+      <div class="key" data-key="1">1</div>
+      <div class="key" data-key="2">2</div>
+      <div class="key" data-key="3">3</div>
+      <div class="key" data-key="4">4</div>
+      <div class="key" data-key="5">5</div>
+      <div class="key" data-key="6">6</div>
+      <div class="key" data-key="7">7</div>
+      <div class="key" data-key="8">8</div>
+      <div class="key" data-key="9">9</div>
+      <div class="key" data-key="*">✱</div>
+      <div class="key" data-key="0">0</div>
+      <div class="key" data-key="#">#</div>
+    </div>
   </div>
 </div>
+
+<script>
+  const CORRECT = '8888';
+  const MAX = 4;
+  let digits = '';
+
+  const entry = document.getElementById('entry');
+
+  function render() {
+    entry.textContent = '✦'.repeat(digits.length) || '';
+  }
+
+  function onKey(k) {
+    if (k === '*') { digits = ''; render(); return; }
+    if (k === '#' || digits.length >= MAX) return;
+    digits += k;
+    render();
+    if (digits.length === MAX) {
+      setTimeout(() => {
+        if (digits === CORRECT) {
+          entry.textContent = '✓ OK';
+          entry.style.borderColor = '#1CC74C';
+          entry.style.color = '#1CC74C';
+          setTimeout(() => { window.location.href = 'https://example.com'; }, 600);
+        } else {
+          entry.classList.add('error');
+          entry.textContent = '✗ ERR';
+          setTimeout(() => {
+            entry.classList.remove('error');
+            entry.style.borderColor = '';
+            entry.style.color = '';
+            digits = '';
+            render();
+          }, 800);
+        }
+      }, 120);
+    }
+  }
+
+  document.querySelectorAll('.key').forEach(btn => {
+    btn.addEventListener('click', () => onKey(btn.dataset.key));
+  });
+
+  render();
+</script>
