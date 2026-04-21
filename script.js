@@ -1083,6 +1083,10 @@ const Game = (() => {
       if (noAmmoCostTimer <= 0 && run.gammiteActiveTimer <= 0) {
         run.ammo = Math.max(0, run.ammo - 1);
         updateAmmoBar();
+        // Show RELOADING text when ammo depletes
+        if (run.ammo === 0) {
+          spawnFloatingText(W * 0.5, H - 160, 'RELOADING', '#ff2020');
+        }
       }
     }
 
@@ -1805,11 +1809,38 @@ function spawnPod() {
     // Hide boss HUD
     document.getElementById('boss-hud').classList.remove('active');
 
-    // Part 1.5 Debrief Stats
-    document.getElementById('boss-clear-kills').textContent = 'KILLS ' + run.kills;
+    // Part 1.5 Debrief Stats - Animated count-up
+    function animateDebrief() {
+      const targetKills = run.kills;
+      const targetCredits = run.credits;
+      const targetScore = run.score;
+      
+      let currentKills = 0, currentCredits = 0, currentScore = 0;
+      const duration = 1500; // 1.5 seconds
+      const startTime = Date.now();
+      
+      function update() {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(1, elapsed / duration);
+        // Ease-in-out cubic for smooth animation
+        const ease = progress < 0.5 ? 4 * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+        
+        currentKills = Math.floor(targetKills * ease);
+        currentCredits = Math.floor(targetCredits * ease);
+        currentScore = Math.floor(targetScore * ease);
+        
+        document.getElementById('boss-clear-kills').textContent = 'KILLS ' + currentKills;
+        document.getElementById('boss-clear-credits').textContent = 'CREDITS ' + currentCredits;
+        document.getElementById('boss-clear-score').textContent = 'FINAL SCORE ' + currentScore.toLocaleString();
+        
+        if (progress < 1) requestAnimationFrame(update);
+      }
+      update();
+    }
+    
     document.getElementById('boss-clear-time').textContent = 'TIME ' + formatTime(run.totalTime);
-    document.getElementById('boss-clear-credits').textContent = 'CREDITS ' + run.credits;
-    document.getElementById('boss-clear-score').textContent = 'FINAL SCORE ' + run.score.toLocaleString();
+    animateDebrief();
+    
     setTimeout(() => {
       document.getElementById('overlay-boss-clear').classList.add('active');
       cancelAnimationFrame(animId); // now safe to stop the loop
@@ -2001,12 +2032,16 @@ function screenShake(magnitude, duration) {
     ctx.restore();
   }
   // ── HUD: COUNTDOWN TOAST (Feature 2) ──────────────────────────
-  let sweepCountdown = 7; 
+  let sweepCountdown = 4; // Adjusted from 7 to better match sweep timing
   function updateCountdown() {
     if (endSweepFired || sweepCountdown <= 0) return;
     const threshold = levelDuration - sweepCountdown;
     if (levelTimer >= threshold) {
-      spawnFloatingText(W * 0.5, H * 0.38, sweepCountdown.toString(), '#00f5ff');
+      if (sweepCountdown === 1) {
+        spawnFloatingText(W * 0.5, H * 0.38, 'READYING SECTOR SWEEP', '#00f5ff');
+      } else {
+        spawnFloatingText(W * 0.5, H * 0.38, sweepCountdown.toString(), '#00f5ff');
+      }
       sweepCountdown--;
     }
   }
@@ -3726,6 +3761,15 @@ document.addEventListener('DOMContentLoaded', () => {
 document.getElementById('btn-new-run-plus').onclick = () => {
   document.getElementById('overlay-boss-clear').classList.remove('active');
   document.getElementById('boss-hud').classList.remove('active');
+  
+  // Return all reserves to inventory before opening shop
+  if (run && run.powerups) {
+    run.powerups.forEach(key => {
+      if (key) run.inventory[key] = Math.min(99, (run.inventory[key] || 0) + 1);
+    });
+    run.powerups = []; // Clear reserves
+  }
+  
   isUpgradeSession = true; 
   shopMode = 'stash'; 
   document.getElementById('shop-level-badge').textContent = 'MODE: STATIONARY';
@@ -3780,6 +3824,23 @@ document.getElementById('btn-new-run-plus').onclick = () => {
     }
 
     shopContinue();
+  };
+
+  // Shop LAUNCH button — needs to check if we're in an upgrade session
+  document.getElementById('btn-shop-launch').onclick = () => {
+    stopShopDeco();
+    if (isUpgradeSession) {
+      // Same logic as btn-story-launch for upgrade sessions
+      isUpgradeSession = false;
+      save.upgrade = run.inventory._upgradeSlot || null;
+      save.storyFlags = 0;
+      writeSave();
+      run = newRun();
+      showScreen('game');
+      Game.startLevel();
+    } else {
+      shopContinue();
+    }
   };
 
   // ── POWERUP SLOT INTERACTIONS ────────────────────────────────
