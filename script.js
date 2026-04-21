@@ -931,9 +931,7 @@ const Game = (() => {
 
   function startLevel() {
     state = 'playing';
-    bossActive   = false;
-    bossDefeated = false;
-    boss         = null;
+    if (run && run.level === 1) { bossActive = false; bossDefeated = false; boss = null; }
     bullets = []; enemies = []; mines = []; particles = []; drops = []; pods = [];
     podSpawnTimer = 8 + Math.random() * 6;
     ammoRefillTimer = AMMO_REFILL_INTERVAL;
@@ -3615,11 +3613,12 @@ function renderShopBody() {
 
 function shopContinue() {
   run.level++;
-  run.shootSpeed++; 
+  run.shootSpeed++;
   if (run.level === 9) {
-    // If we are heading into Level 9, show the story screen first (Fixes narrative skip)
+    run.ammo = run.ammoMax;
     stopShopDeco();
-    showStory(9);
+    showScreen('game');
+    Game.startBoss();
     return;
   }
   run.ammo = run.ammoMax; // refill ammo
@@ -3777,14 +3776,6 @@ document.getElementById('btn-new-run-plus').onclick = () => {
       run = newRun();
       showScreen('game');
       Game.startLevel();
-      return;
-    }
-
-    // Handle Boss Launch (Gate check)
-    if (run.level === 9) {
-      run.ammo = run.ammoMax;
-      showScreen('game');
-      Game.startBoss();
       return;
     }
 
