@@ -1274,12 +1274,7 @@ const Game = (() => {
       return d.y < H + 40 && d.t < 8; // expire after 8s
     });
 
-    // Update particles
-    particles = particles.filter(p => {
-      p.x += p.vx * dt; p.y += p.vy * dt;
-      p.life -= dt; p.vy += 60 * dt;
-      return p.life > 0;
-    });
+   updateParticles(dt);
 
     // ── BOSS FIGHT UPDATE ─────────────────────────────────────────
     if (bossActive) {
@@ -1967,13 +1962,101 @@ function screenShake(magnitude, duration) {
   }
 
   // ── PARTICLES & FLOATERS ─────────────────────────────────────
-  function spawnParticles(x, y, color, n) {
-    for (let i = 0; i < n; i++) {
-      const a = Math.random() * Math.PI * 2;
-      const spd = 40 + Math.random() * 120;
-      particles.push({ x, y, vx:Math.cos(a)*spd, vy:Math.sin(a)*spd, life:0.4+Math.random()*0.4, color, size:1.5+Math.random()*2 });
-    }
+function spawnParticles(x, y, color, n) {
+  // Convert hex color to RGB for glow effects
+  const hexToRgb = (hex) => {
+    const r = parseInt(hex.slice(1,3), 16);
+    const g = parseInt(hex.slice(3,5), 16);
+    const b = parseInt(hex.slice(5,7), 16);
+    return { r, g, b };
+  };
+  
+  const rgb = hexToRgb(color);
+  
+  for (let i = 0; i < n; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = 40 + Math.random() * 120;
+    particles.push({
+      x, 
+      y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
+      life: 0.4 + Math.random() * 0.4,
+      born: performance.now(),
+      color: rgb,
+      size: 1.5 + Math.random() * 2,
+      trail: [],
+      trailLife: 80  // ms each trail point lives
+    });
   }
+}
+
+function updateParticles(dt) {
+  particles = particles.filter(p => {
+    // Apply physics
+    p.vy += 60 * dt;           // gravity
+    p.vx *= (1 - dt * 1.5);    // drag
+    p.vy *= (1 - dt * 1.5);    // drag
+    
+    // Add current position to trail
+    p.trail.push({ x: p.x, y: p.y, born: performance.now() });
+    
+    // Clean up old trail points
+    const now = performance.now();
+    p.trail = p.trail.filter(pt => now - pt.born < p.trailLife);
+    
+    // Move particle
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    
+    // Age and remove if dead
+    p.life -= dt;
+    return p.life > 0;
+  });
+}
+
+// Draw particles
+function drawParticles() {
+  const now = performance.now();
+  
+  particles.forEach(p => {
+    const { r, g, b } = p.color;
+    const lifePct = Math.max(0, p.life / 0.8);  // normalize to original max life
+    const alpha = Math.pow(lifePct, 1.2) * 0.95;
+    
+    if (alpha <= 0) return;
+    
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';  // additive blending for glow
+    
+    // Draw trail
+    for (let i = 1; i < p.trail.length; i++) {
+      const pt = p.trail[i];
+      const prevPt = p.trail[i - 1];
+      const ptAge = (now - pt.born) / p.trailLife;
+      const trailAlpha = Math.max(0, (1 - ptAge) * alpha * 0.5);
+      const trailWidth = Math.max(0.1, (1 - ptAge) * p.size * 0.6);
+      
+      ctx.strokeStyle = `rgba(${r},${g},${b},${trailAlpha})`;
+      ctx.lineWidth = trailWidth;
+      ctx.beginPath();
+      ctx.moveTo(prevPt.x, prevPt.y);
+      ctx.lineTo(pt.x, pt.y);
+      ctx.stroke();
+    }
+    
+    // Draw particle head with glow
+    const headSize = Math.max(0.1, p.size * lifePct);
+    ctx.fillStyle = `rgba(${r},${g},${b},${alpha})`;
+    ctx.shadowColor = `rgba(${r},${g},${b},${alpha * 0.6})`;
+    ctx.shadowBlur = p.size * 3;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, headSize, 0, Math.PI * 2);
+    ctx.fill();
+    
+    ctx.restore();
+  });
+}
 
   let floaters = [];
   function spawnFloatingText(x, y, text, color) {
@@ -2480,17 +2563,6 @@ function screenShake(magnitude, duration) {
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.shadowColor = '#00f5ff'; ctx.shadowBlur = 8;
       ctx.fillText(pu ? pu.sym : '?', 0, 0);
-      ctx.restore();
-    });
-  }
-
-  function drawParticles() {
-    particles.forEach(p => {
-      const a = p.life / 0.8;
-      ctx.save();
-      ctx.globalAlpha = Math.min(1, a);
-      ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
-      ctx.fillStyle = p.color; ctx.fill();
       ctx.restore();
     });
   }
