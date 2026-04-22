@@ -1,7 +1,7 @@
 'use strict';
 
 // ═══════════════════════════════════════════════════════════════
-// STRINGS (i18n layer — all player-visible text lives here)
+// STRINGS
 // ═══════════════════════════════════════════════════════════════
 const STRINGS = {
   ui: {
@@ -45,16 +45,16 @@ const STRINGS = {
   },
   powerups: {
       LITHEBRYL:   { sym:'Β',  name:'Lithebryl',     effect:'Shield Max +20, Ammo Max +8',           	   power:'Shield Restore',           puKey:'LITHEBRYL',    desc:  'An alloy of Lithium and Beryllium that absorbs and dissipates energy blasts.' },
-      NITROKALIUM: { sym:'Π',  name:'Nitrokalium',   effect:'Ammo Refill +1, Shield Max +6',       		   power:'Double Ammo Refill',       puKey:'NITROKALIUM',  desc:  'A Potassium-Nitrogen gas mixture used to puah the engines to run at dangerous but hyper-efficient levels.'},
-      CARBOSILICUM:{ sym:'Ξ',  name:'Carbosilicium', effect:'Ammo Max +18, Ammo Refill +1',       		   power:'Double Points',            puKey:'CARBOSILICUM', desc:  'A highly efficient superconductor, allowing fire-control systems to process at lightning speeds.'},
+      NITROKALIUM: { sym:'Π',  name:'Nitrokalium',   effect:'Ammo Refill +1, Shield Max +6',       		   power:'Instant Reload',           puKey:'NITROKALIUM',  desc:  'A Potassium-Nitrogen gas mixture used to puah the engines to run at dangerous but hyper-efficient levels.'},
+      CARBOSILICUM:{ sym:'Ξ',  name:'Carbosilicium', effect:'Ammo Max +18, Ammo Refill +1',       		   power:'Combo Up',                 puKey:'CARBOSILICUM', desc:  'A highly efficient superconductor, allowing fire-control systems to process at lightning speeds.'},
       MAGNIUM:     { sym:'Μ',  name:'Magnium',       effect:'Reserve +2, Ammo Refill +1',         		   power:'Bomb',                     puKey:'MAGNIUM',      desc:  'A Magnesium-based unstable isotope that is highly volatile when impacted.'},
       TITANE:      { sym:'Θ',  name:'Titane',        effect:'Shield Max +30, Ammo Refill +1',      		   power:'Invincibility',            puKey:'TITANE',       desc:  'A low-density, Titanium-based metal that provides near-indestructible hull integrity without adding significant mass.'},
-      ALKALIUM:    { sym:'α',  name:'Alkalium',      effect:'Ammo Max +22, Ammo Refill +1',        		   power:'Piercing Bullets',         puKey:'ALKALIUM',     desc:  'A Silicon-Potassium compound that uses ionized energy to give shots piercing capabilities.'},
+      ALKALIUM:    { sym:'α',  name:'Alkalium',      effect:'Ammo Max +22, Ammo Refill +1',        		   power:'Piercing Ammo',         puKey:'ALKALIUM',     desc:  'A Silicon-Potassium compound that uses ionized energy to give shots piercing capabilities.'},
 	  AZOLITHION:  { sym:'Λ',  name:'Azolithion',    effect: 'Ammo Max +20, Shield Max +8',                power:'Multishot',                puKey: 'AZOLITHION',  desc:  'A Lithium-Nitrogen composite used for cooling during high-velocity maneuvers.'},
 	  GAMMITE:     { sym:'Γ',  name:'Gammite',       effect: 'Ammo Max +8, Shield Max +8, Ammo Refill +1', power:'No Ammo Cost',             puKey: 'GAMMITE',     desc:  'A complex superconductor used to synchronize ammo and shield frequencies for balanced performance.'},
 	  OMEGITE: {
         sym: 'Ω', name: 'Omegite', puKey: 'OMEGITE',
-        power:'Super Bomb',
+        power:'Irradiation',
 		desc: 'A terrifyingly unstable material that exists in a state of constant decay.',
       },
       AXORITE: {
@@ -158,7 +158,7 @@ function showScreen(id) {
 
     screenExpand(inEl, {
       delayMs:   0,    // no waveform delay mid-session
-      expandMs:  320,  // snappier than the boot expand (was 550)
+      expandMs:  320,  // snappier than the boot expand
       flickerMs: 260,  // snappier flicker too
       onDone: () => { _transitioning = false; },
     });
@@ -203,7 +203,7 @@ function openTutorial() {
     setTimeout(() => {
       loader.style.opacity = '0';
       loader.style.pointerEvents = 'none';
-    }, 3000);
+    }, 1000);
   } else {
     // First load — wait for iframe, then fade out loader
     iframe.addEventListener('load', function onLoad() {
@@ -250,12 +250,11 @@ const AudioManager = (() => {
     playTrack(currentIdx);
   }
 
-  // Generative music — procedural synth per track so we don't need files
+  // Generative music — to be replaced
   function playTrack(idx) {
     stopCurrent();
     currentIdx = idx;
     const track = MANIFEST[idx];
-    // Each track has a distinct tonal character
     const configs = [
       { notes:[110,138.6,165,220], wave:'sawtooth', lfoRate:0.3, filterFreq:800 },
       { notes:[82.4,110,164.8,196], wave:'square',   lfoRate:0.15, filterFreq:600 },
@@ -351,7 +350,7 @@ const AudioManager = (() => {
     if (needle) needle.style.transform = `translateX(-50%) rotate(${angle}deg)`;
     document.getElementById('radio-track-name').textContent = AudioManager.getTrackName();
   });
-  // Mouse fallback for desktop dev
+  // Mouse fallback for desktop debug
   tuner.addEventListener('mousedown', e => { dragging=true; startX=e.clientX; accumulated=0; AudioManager.resume(); });
   window.addEventListener('mousemove', e => {
     if (!dragging) return;
@@ -378,7 +377,7 @@ const AudioManager = (() => {
   const ctx = canvas.getContext('2d');
   let t = 0;
   let startTs = null;
-  const WAVE_FADE_MS = 800; // waveform fades in over this window
+  const WAVE_FADE_MS = 800;
 
   function resize() {
   const dpr = window.devicePixelRatio || 1;
@@ -431,7 +430,7 @@ resize(); window.addEventListener('resize', resize);
 })();
 
 // ═══════════════════════════════════════════════════════════════
-// SCREEN EXPAND — reusable expand+flicker boot animation
+// SCREEN EXPAND 
 //
 // screenExpand(el, opts) animates any element with the three-phase
 // CRT power-on: delay → scaleY expand → sin-gate flicker to full.
@@ -461,7 +460,7 @@ function screenExpand(el, opts = {}) {
     if (!startTs) startTs = ts;
     const elapsed = ts - startTs;
 
-    // ── Phase 1: silence — waveform gets a head start ──
+    // ── Phase 1: waveform gets a head start ──
     if (elapsed < delayMs) {
       requestAnimationFrame(tick);
       return;
@@ -469,7 +468,7 @@ function screenExpand(el, opts = {}) {
 
     const afterDelay = elapsed - delayMs;
 
-    // ── Phase 2: vertical expand, ease-out cubic ──
+    // ── Phase 2: vexpand, ease-out cubic ──
     if (afterDelay < expandMs) {
       let t = afterDelay / expandMs;
       t = 1 - Math.pow(1 - t, 3);
@@ -501,7 +500,7 @@ function screenExpand(el, opts = {}) {
   requestAnimationFrame(tick);
 }
 
-// Boot the menu on page load — same timings as before
+// Boot the menu on page load
 screenExpand(
   document.getElementById('screen-menu')?.querySelector('.menu-content'),
   { delayMs: 380, expandMs: 550, flickerMs: 380 }
@@ -534,7 +533,7 @@ function screenCollapse(el, opts = {}) {
     const elapsed = ts - startTs;
     const raw = Math.min(elapsed / collapseMs, 1);
 
-    // ease-in cubic — slow start, fast finish (mirror of expand's ease-out)
+    // ease-in cubic
     const t = raw * raw * raw;
 
     const scale   = 1 - 0.94 * t;          // 1 → 0.06
@@ -572,8 +571,8 @@ function newRun() {
     credits: 0,
     combo: 1,
     noHitKills: 0,
-    kills: 0,             // total enemies killed (Part 1.3)
-    totalTime: 0,         // cumulative seconds (Part 1.3)
+    kills: 0,             // total enemies killed
+    totalTime: 0,         // cumulative seconds
     shield: 10 + save.permStats.shieldMax,
     shieldMax: 10 + save.permStats.shieldMax,
     ammo: 65 + save.permStats.ammoMax,
@@ -643,7 +642,7 @@ const Game = (() => {
   // ═══════════════════════════════════════════════════════════════
   // TESSERACT — 4D → 2D PROJECTION
   // ═══════════════════════════════════════════════════════════════
-  // 16 vertices: all combinations of (±1, ±1, ±1, ±1)
+  // 16 vertices
   const BASE_VERTS = Array.from({ length: 16 }, (_, i) => [
     (i & 1) ? 1 : -1,
     (i & 2) ? 1 : -1,
@@ -701,16 +700,16 @@ const Game = (() => {
   let bossActive   = false;
   let bossDefeated = false;
   let elementAttackTimer = 0;
-  let bossT        = 0; // independent time counter for boss (mirrors waveT usage in boss.html)
+  let bossT        = 0; 
 
-  // Boss object — null until startBoss() initialises it
+  // Boss object
   let boss = null;
 
   function makeBoss() {
     return {
       hp:    BOSS_MAX_HP,
       phase: 1,
-      x: 0, y: 0,   // set in startBoss() once W/H are known
+      x: 0, y: 0,   // set in startBoss()
       scale: 90,
       rot:      { xy:0, xz:0, xw:0, yz:0, yw:0, zw:0 },
       rotSpeed: { xy:0.003, xz:0.005, xw:0.008, yz:0.004, yw:0.007, zw:0.006 },
@@ -759,7 +758,7 @@ const Game = (() => {
   // SUB-ENEMIES (scouts spawned by boss)
   // ═══════════════════════════════════════════════════════════════
   const SUB_TYPES = [
-    // Orbital — circles the boss
+    // Orbitals
     {
       type: 'orbital', r: 8, hp: 2, color: '#e8600a',
       init(e) {
@@ -773,7 +772,7 @@ const Game = (() => {
         e.y = boss.y + Math.sin(e.orbitAngle) * e.orbitR;
       },
     },
-    // Diver — homes toward ship
+    // Divers
     {
       type: 'diver', r: 9, hp: 1, color: '#a855f7',
       init(e) { e.vy = 80 + Math.random() * 60; },
@@ -871,7 +870,7 @@ const Game = (() => {
     const key = pool[Math.floor(Math.random() * pool.length)];
     ELEMENT_ATTACKS[key]();
     spawnFloatingText(boss.x, boss.y - 30, key, '#ffffff');
-    logPickup('BOSS — ' + key + ' SEQUENCE');
+    logPickup('ASTERISM — ' + key + ' SEQUENCE');
   }
 
   function init(gameCanvas) {
@@ -980,7 +979,7 @@ const Game = (() => {
     boss.y       = H * 0.28;
 	document.getElementById('powerup-bar').style.pointerEvents = 'all';
 
-    // Clear the field — carry over run stats, wipe combat objects
+    // Clear the field
     bullets    = [];
     enemies    = [];
     subEnemies = [];
@@ -990,7 +989,7 @@ const Game = (() => {
     pods       = [];
     elementAttackTimer = ELEMENT_ATTACK_INTERVAL[0]; // first attack after phase-1 interval
 
-    // Ship stays at bottom centre
+    // Ship
     ship.x = ship.targetX = W / 2;
     ship.y = H - 130;
     ship.invincible = 0;
@@ -998,7 +997,7 @@ const Game = (() => {
     shootTimer = 0;
 	ammoRefillTimer = AMMO_REFILL_INTERVAL;
 
-    // Reset per-level power timers (run stats carry over untouched)
+    // Reset per-level timers
     invincibleTimer   = 0;
     piercingBullets   = false;
 	run.bulletType = 'standard';
@@ -1007,13 +1006,13 @@ const Game = (() => {
 	shakeIntensity = 0;
     shakeDuration  = 0;
 
-    // Boss HUD — show and reset
+    // Boss HUD 
     document.getElementById('boss-hud').classList.add('active');
     document.getElementById('boss-bar').style.width = '100%';
     document.getElementById('boss-phase').textContent = PHASE_NAMES[0];
     document.getElementById('boss-phase').style.color = PHASE_COLORS[0];
 
-    // Clear any lingering overlays
+    // Clear anything else
     document.getElementById('overlay-death').classList.remove('active');
     document.getElementById('overlay-clear').classList.remove('active');
     document.getElementById('overlay-boss-clear').classList.remove('active');
@@ -1052,15 +1051,14 @@ const Game = (() => {
   // ── UPDATE ────────────────────────────────────────────────────
   function update(dt) {
     levelTimer += dt;
-    run.totalTime += dt; // Cumulative debrief tracking
+    run.totalTime += dt; // Cumulative tracking
 
-    // Passive: Reactive Plating (Lithebryl)
+    // Reactive Plating (Lithebryl)
     if (run.upgrade === 'LITHEBRYL' && run.shield < run.shieldMax) {
       run.shield = Math.min(run.shieldMax, run.shield + 0.5 * dt);
       updateShieldBar();
     }
 
-    // Passive Ticks
     if (run.octaneTimer > 0) run.octaneTimer -= dt;
     if (run.gammiteActiveTimer > 0) run.gammiteActiveTimer -= dt;
 
@@ -1075,15 +1073,15 @@ const Game = (() => {
     shootTimer -= dt;
     if (shootTimer <= 0 && run.ammo > 0 && !endSweepFired) {
       fireBullet();
-      // Octane Atomizer passive or standard shoot speed
+      // Octane Atomizer (Nitrokalium)
       const speedMod = (run.upgrade === 'NITROKALIUM' && run.octaneTimer > 0) ? 1.6 : 1.0;
       shootTimer = (1 / (run.shootSpeed * speedMod));
       
-      // Gammite Passive: No cost for 5s after refill vs standard cost
+      // Sync Capacitor (Gammite)
       if (noAmmoCostTimer <= 0 && run.gammiteActiveTimer <= 0) {
         run.ammo = Math.max(0, run.ammo - 1);
         updateAmmoBar();
-        // Show RELOADING text when ammo depletes
+        // Show RELOADING
         if (run.ammo === 0) {
           spawnFloatingText(W * 0.5, H - 160, 'RELOADING', '#ff2020');
         }
@@ -1106,10 +1104,10 @@ const Game = (() => {
         updateAmmoBar();
         spawnFloatingText(W * 0.5, H - 160, '+ AMMO', '#00f5ff');
         
-        // Gammite trigger: Firing doesn't consume ammo for 5s after refill
+        // Sync Capacitor (Gammite)
         if (run.upgrade === 'GAMMITE') {
           run.gammiteActiveTimer = 5;
-          logPickup('GAMMITE: INFINITE AMMO');
+          logPickup('RELOAD SYNC');
         }
       }
     }
@@ -1123,13 +1121,12 @@ const Game = (() => {
       enemiesSpawned++;
     }
 
-    // Ship bullets filter with Ricochet (Part 4 α - Ionic Deflector)
+    // Ionic Deflector (Alkalium)
     bullets = bullets.filter(b => {
       if (b.enemy) return true;
       b.x += b.vx * dt;
       b.y += b.vy * dt;
 
-      // Alkalium Passive: Piercing bullets bounce once off edges
       if (run.upgrade === 'ALKALIUM' && piercingBullets && !b.bounced) {
         if (b.x < 0 || b.x > W) {
           b.vx *= -1;
@@ -1146,17 +1143,16 @@ const Game = (() => {
       return b.x > -20 && b.x < W + 20 && b.y > -20 && b.y < H + 20;
     });
 
-    // Deltalite Time Dilation
+    // Deltalite Trigger (Time Dilation)
     if (timeDilationTimer > 0) timeDilationTimer = Math.max(0, timeDilationTimer - dt);
     if (noAmmoCostTimer  > 0) noAmmoCostTimer  = Math.max(0, noAmmoCostTimer  - dt);
     const eDt = timeDilationTimer > 0 ? dt * 0.4 : dt;
 
     // Scroll waveform — driven by eDt so Deltalite time dilation slows it with enemies
-    // Wrap over 2H so the second half is the palindromic mirror of the first
     waveOffset = (waveOffset + eDt * 60 * (1 + run.level * 0.08)) % (H * 2);
     waveT += eDt;
 
-    // Enemies filter with Deathtouch (Part 4 Ω - Fission Core)
+    // Fission Core (Omegite)
     enemies = enemies.filter(e => {
       updateEnemy(e, eDt);
       
@@ -1171,17 +1167,16 @@ const Game = (() => {
         }
       }
 
-      // Ship collision with Deathtouch logic
+      // Ship collision
       if (dist(ship.x, ship.y, e.x, e.y) < e.r + 12) {
         if (run.upgrade === 'OMEGITE') {
-          // Destroy enemy on contact regardless of invincibility
           killEnemy(e);
-          takeDamage(2); // Still take damage per Fission Core rules
+          takeDamage(2);
           return false;
         } else if (ship.invincible <= 0 && invincibleTimer <= 0) {
           takeDamage(2);
           spawnParticles(ship.x, ship.y, '#d42b6a', 8);
-          ship.invincible = hitInvincDuration(1.5); // Part 4 Θ
+          ship.invincible = hitInvincDuration(1.5); // Phase Fuselage (Titane)
           return false;
         }
       }
@@ -1320,7 +1315,7 @@ const Game = (() => {
           spawnSubEnemy();
         }
 
-        // Mine drops (phase 2+)
+        // Mine drops
         if (boss.phase >= 2) {
           boss.mineTimer -= dt;
           if (boss.mineTimer <= 0) {
@@ -1585,7 +1580,7 @@ const Game = (() => {
     bullets.push({ x:e.x, y:e.y, speed:120, vx: dx/d*120, vy: dy/d*120, dmg:1, enemy:true, aimed:true, color:'#a855f7' });
   }
 
-  // Helper for Titane (Phase Fuselage)
+  // Phase Fuselage (Titane)
   function hitInvincDuration(base) {
     return base * (run.upgrade === 'TITANE' ? 1.8 : 1);
   }
@@ -1640,10 +1635,10 @@ const Game = (() => {
       run.inventory[d.key] = Math.min(99, (run.inventory[d.key] || 0) + 1);
       const item = STRINGS.items[d.key];
       logPickup(`${item.sym} ${item.name}`);
-      // Part 4 Π Octane Atomizer: Picking up ammo drop boosts fire rate
+      // Π Octane Atomizer
       if (run.upgrade === 'NITROKALIUM') {
         run.octaneTimer = 4;
-        logPickup('OCTANE ATOMIZER: FIRE RATE BOOST');
+        logPickup('FIRE RATE UP');
       }
     }
     spawnParticles(d.x, d.y, d.isPowerup ? '#a855f7' : '#00f5ff', 6);
@@ -1671,9 +1666,9 @@ function spawnPod() {
     function add(key, weight) { for (let i = 0; i < weight; i++) pool.push(key); }
     // Compounds
     add('MAGNIUM',      6);
-    add('LITHEBRYL',    6);
-    add('NITROKALIUM',  6);
-    add('CARBOSILICUM', 6);
+    add('LITHEBRYL',    8);
+    add('NITROKALIUM',  8);
+    add('CARBOSILICUM', 2);
     // More Compounds
     if (lvl >= 2) { add('TITANE', 4); add('ALKALIUM', 4); add('AZOLITHION', 4); add('GAMMITE', 4); }
     // Alloys
@@ -1700,9 +1695,6 @@ function spawnPod() {
 
   function fireBullet() {
     const bx = ship.x, by = ship.y - 10;
-    // aimAngle: 0 = straight up, negative = left, positive = right
-    // Convert to canvas direction: straight up is -PI/2 in standard coords,
-    // so bullet direction = aimAngle - PI/2  (i.e. adx=sin(aimAngle), ady=-cos(aimAngle))
     const adx = Math.sin(aimAngle);
     const ady = -Math.cos(aimAngle);
     if (run.bulletType === '3spread') {
@@ -1712,8 +1704,7 @@ function spawnPod() {
         bullets.push({ x:bx, y:by, speed:spd, vx:Math.cos(a)*spd, vy:Math.sin(a)*spd, dmg:1, enemy:false, color:'#a855f7' });
       });
     } else if (run.bulletType === '12spread') {
-      // PHIOMEGA — 7-shot bloom fan. Wide forward arc (±0.35 rad, ~2.5× the 3spread),
-      // outer shots travel faster so the pattern blooms open as it travels — GW feel.
+      // PhiOmega (BurstShot)
       const base = Math.atan2(ady, adx);
       const offsets = [-0.35, -0.23, -0.11, 0, 0.11, 0.23, 0.35];
       offsets.forEach((offset, i) => {
@@ -1732,13 +1723,13 @@ function spawnPod() {
     run.shield = Math.max(0, run.shield - amt);
     run.noHitKills = 0; run.combo = 1;
     updateShieldBar(); updateCombo();
-    // Last Stand Triggers (Part 4 ∂ and Φ)
+    // Warp Stabilizer (Deltalite) Flux Cannon (PhiOmega) Last Stands
     const threshold = Math.ceil(run.shieldMax * 0.08);
     if (run.shield <= threshold && run.shield > 0) {
       if (run.upgrade === 'DELTALITE' && !run.warpStabTriggered) {
         run.warpStabTriggered = true;
         timeDilationTimer = 10;
-        run.octaneTimer = 10; // Reuse octaneTimer for fire rate boost
+        run.octaneTimer = 10;
         noAmmoCostTimer = 0; 
         spawnFloatingText(W/2, H/2 - 30, 'WARP STABILIZER', '#22c55e');
         logPickup('WARP STABILIZER ENGAGED');
@@ -1756,14 +1747,14 @@ function spawnPod() {
 
   function onDeath() {
     state = 'dead';
-    // Part 4 X Aquiline Manifold: Extra Life Intercept
+    // Aquiline Manifold (Axorite)
     if (run.upgrade === 'AXORITE' && !run.aquilineUsed) {
         run.aquilineUsed = true;
         run.shield = Math.ceil(run.shieldMax * 0.5);
         updateShieldBar();
         ship.invincible = 2.5;
-        spawnFloatingText(W/2, H/2 - 30, 'AQUILINE MANIFOLD', '#ec4899');
-        logPickup('EXTRA LIFE — SHIELDS AT 50%');
+        spawnFloatingText(W/2, H/2 - 30, 'REPRISAL', '#ec4899');
+        logPickup('SHIELD REPAIR');
         state = "playing"; 
         lastTime = performance.now();
         animId = requestAnimationFrame(loop);
@@ -1791,7 +1782,6 @@ function spawnPod() {
     bossActive   = false;
     state        = 'clear'; // stops update() from running, render() still ticks
 
-    // Explosion cascade — fires over 1.44s while render loop is still alive
     for (let i = 0; i < 12; i++) {
       setTimeout(() => {
         spawnParticles(
@@ -1809,7 +1799,7 @@ function spawnPod() {
     // Hide boss HUD
     document.getElementById('boss-hud').classList.remove('active');
 
-    // Part 1.5 Debrief Stats - Animated count-up
+    // Animated count-up
     function animateDebrief() {
       const targetKills = run.kills;
       const targetCredits = run.credits;
@@ -1865,18 +1855,18 @@ function spawnPod() {
   enemies.forEach(e => spawnParticles(e.x, e.y, e.color, 8));
   mines.forEach(m => spawnParticles(m.x, m.y, '#ff2020', 6));
 
-  // Crack pods into collectable drops rather than destroying them
+  // Crack pods
   pods.forEach(pod => {
     drops.push({ x: pod.x, y: pod.y, key: pod.puKey, isPowerup: true, r: 13, t: 0 });
     spawnParticles(pod.x, pod.y, '#a855f7', 10);
   });
   pods = [];
 
-  // Collect any already-cracked in-flight drops
+  // Collect
   drops.forEach(d => { if (d.isPowerup) collectDrop(d); });
 	  
   if (bossActive && boss && boss.alive) {
-      // Part 4 M - Combustion Oxidizer: Magnium adds +10 to boss sweep damage
+      // Combustion Oxidizer (Magnium)
       const baseDmg = opts.bossDmg || 30;
       const bombDmg = baseDmg + (run.upgrade === 'MAGNIUM' ? 10 : 0);
     boss.hp -= bombDmg;
@@ -1899,7 +1889,7 @@ function spawnPod() {
     logPickup('SECTOR SWEPT');
   }
 }
- // ── BOMB SHAKE ───────────────────────────────────────────────────
+ // ── SCREEN SHAKE ───────────────────────────────────────────────────
 function screenShake(magnitude, duration) {
   shakeIntensity = magnitude;
   shakeDuration  = duration;
@@ -1917,7 +1907,6 @@ function screenShake(magnitude, duration) {
 	  screenShake(10, 0.6);
 	  logPickup('OMEGITE DEPLOYED');
     } else if (pu === 'MAGNIUM') {
- 	 // Screen-wide AOE — 5 damage to all enemies, no effect on mines or pods
   	const MAG_DMG = (run.upgrade === 'MAGNIUM') ? 6 : 5;
   	enemies.forEach(e => {
     e.hp -= MAG_DMG;
@@ -1937,13 +1926,12 @@ function screenShake(magnitude, duration) {
     } else if (pu === 'LITHEBRYL') {
       run.shield = run.shieldMax; updateShieldBar(); logPickup('SHIELD RESTORED');
     } else if (pu === 'NITROKALIUM') {
-      // User Instruction: Nitrokalium Powerup is now Full Ammo Refill
       run.ammo = run.ammoMax; 
       updateAmmoBar();
       spawnFloatingText(W / 2, H / 2 - 30, 'NITROKALIUM', '#00f5ff');
-      logPickup('FULL AMMO REFILL');
+      logPickup('INSTANT RELOAD');
 	} else if (pu === 'CARBOSILICUM') {
-      run.combo = Math.max(run.combo, 2); logPickup('×2 ACTIVE');
+      run.combo = Math.max(run.combo * 2, 2); logPickup('COMBO UP');
     } else if (pu === 'TITANE') {
       invincibleTimer = 10;
       spawnFloatingText(W / 2, H / 2 - 30, 'TITANE', '#5eead4');
@@ -1993,7 +1981,7 @@ function screenShake(magnitude, duration) {
   }
   floaters = [];
 
-  // ── HUD: END-SWEEP PROGRESS GAUGE (Feature 1) ─────────────────
+  // ── END-SWEEP PROGRESS GAUGE ─────────────────
   function drawSweepGauge() {
     if (endSweepFired || bossActive) return;
     // Progress Calculation: reflect the weaker of time or enemy spawn
@@ -2004,14 +1992,14 @@ function screenShake(magnitude, duration) {
     const startAngle = Math.PI * 0.75;
     const endAngle = Math.PI * 2.25;
     const fillEnd = startAngle + (endAngle - startAngle) * progress;
-    // Track (Dim background)
+    // Track
     ctx.beginPath();
     ctx.arc(cx, cy, r, startAngle, endAngle);
     ctx.strokeStyle = "rgba(0,245,255,0.15)";
     ctx.lineWidth = lineW;
     ctx.lineCap = "round";
     ctx.stroke();
-    // Fill (Brightens as it fills)
+    // Fill
     if (progress > 0) {
       const alpha = 0.5 + progress * 0.5;
       ctx.beginPath();
@@ -2020,7 +2008,7 @@ function screenShake(magnitude, duration) {
       ctx.lineWidth = lineW;
       ctx.stroke();
     }
-    // Level number — centred inside the arc
+    // Sector Level
     ctx.save();
     ctx.font = 'bold 18px "Nova Square", monospace';
     ctx.fillStyle = '#00f5ff';
@@ -2031,8 +2019,8 @@ function screenShake(magnitude, duration) {
     ctx.fillText(run ? run.level : 1, cx, cy);
     ctx.restore();
   }
-  // ── HUD: COUNTDOWN TOAST (Feature 2) ──────────────────────────
-  let sweepCountdown = 4; // Adjusted from 7 to better match sweep timing
+  // ── COUNTDOWN TOAST  ──────────────────────────
+  let sweepCountdown = 4; 
   function updateCountdown() {
     if (endSweepFired || sweepCountdown <= 0) return;
     const threshold = levelDuration - sweepCountdown;
@@ -2063,8 +2051,8 @@ function screenShake(magnitude, duration) {
   }
 
   drawWaveform();
-  drawSweepGauge(); // Feature 1
-  updateCountdown(); // Feature 2
+  drawSweepGauge();
+  updateCountdown();
   drawPods();
   drawDrops();
   drawMines();
@@ -2079,7 +2067,7 @@ function screenShake(magnitude, duration) {
   ctx.restore();
 }
 
-  // Per-level scene config: [skyTop, skyBottom, sunColor, sunGlow, gridColor, mountainColor]
+  // Palettes (some parts depreciated)
   const LEVEL_PALETTES = [
     { skyT:'#0d0020', skyB:'#1a0040', sun:'#ff6ec7', sunG:'#d42b6a', grid:'#2255ff', mtn:'#1133cc' }, // 1
     { skyT:'#0a0025', skyB:'#1e0050', sun:'#ff8c42', sunG:'#ff4500', grid:'#00ccff', mtn:'#0066cc' }, // 2
@@ -2091,7 +2079,7 @@ function screenShake(magnitude, duration) {
     { skyT:'#1a0000', skyB:'#400000', sun:'#ffffff', sunG:'#ff0040', grid:'#ff0040', mtn:'#990020' }, // 8
   ];
 
-  // Seeded terrain heights so they don't shift every frame
+  // Seeded terrain heights
   let terrainSeed = [];
   function initTerrain() {
     terrainSeed = [];
@@ -2100,7 +2088,7 @@ function screenShake(magnitude, duration) {
   initTerrain();
 
   function terrainHeight(xi, lvl) {
-    // Multi-octave height from seed array — stable per session
+    // Multi-octave height from seed array
     const s = terrainSeed;
     const base = s[xi % 64] * 0.5 + s[(xi * 7) % 64] * 0.3 + s[(xi * 13) % 64] * 0.2;
     const amp = 0.28 + lvl * 0.055; // peaks grow with level
@@ -2111,7 +2099,7 @@ function screenShake(magnitude, duration) {
     const lvl  = run ? run.level : 1;
     const pal  = LEVEL_PALETTES[(lvl - 1) % LEVEL_PALETTES.length];
 
-    // ── WAVEFORM — full canvas, flat centre, wavy sides ─
+    // ── WAVEFORM ────────────────────────────────────
     const rows    = 38;
     const rowSpan = H / rows;
     const sideW   = W * 0.30;
@@ -2120,10 +2108,7 @@ function screenShake(magnitude, duration) {
 
     for (let r = 0; r < rows; r++) {
       const baseY = (r * rowSpan + rowSpan * 0.5 + waveOffset) % H;
-      const screenPct = baseY / H;  // 0=top, 1=bottom — drives ALL visual properties
-      // amp/freq/phase use screenPct (actual Y on screen), NOT row index r.
-      // This makes lines near each other on screen always look similar,
-      // so the wrap seam is seamless — no jump from flat to wavy rows.
+      const screenPct = baseY / H; 
       const amp   = (4 + screenPct * rows * 1.4 + lvl * 0.8) * (0.4 + screenPct * 0.6);
       const freq  = 0.022 + screenPct * rows * 0.001;
       const cycle  = waveOffset / H;
@@ -2171,12 +2156,11 @@ function screenShake(magnitude, duration) {
     return {r,g,b};
   }
 
-  // ── SHIP VISUAL REFACTOR (Part 5.3) ──────────────────────────
+  // ── SHIP DRAWING SPECS ──────────────────────────
   function drawShip() {
     const x = ship.x, y = ship.y;
     const blink = ship.invincible > 0 && Math.sin(Date.now() * 0.02) > 0;
     if (blink) return;
-    // ── Upgrade color palette lookup (Sprint Doc Page 17) ──
     const UPGRADE_COLORS = {
       LITHEBRYL:    { body:'#ff6b35', fill:null,      fin:'#a855f7', eng:'#d42b6a' },
       TITANE:       { body:'#a855f7', fill:null,      fin:'#a855f7', eng:'#d42b6a' },
@@ -2350,7 +2334,7 @@ function screenShake(magnitude, duration) {
       ctx.fill();
     });
 
-    // Phase 3: destabilising ghost tesseract, offset and counter-rotating
+    // Phase 3 ghosty tesseract
     if (boss.phase === 3) {
       const ghostVerts = BASE_VERTS.map(v => {
         let p = [...v];
@@ -2391,7 +2375,7 @@ function screenShake(magnitude, duration) {
         ctx.closePath();
         ctx.strokeStyle = e.color; ctx.lineWidth = 1.5; ctx.stroke();
       } else {
-        // Diver — downward-pointing triangle
+        // Diver
         ctx.beginPath();
         ctx.moveTo(0, e.r);
         ctx.lineTo(-e.r * 0.8, -e.r);
@@ -2408,10 +2392,10 @@ function screenShake(magnitude, duration) {
     mines.forEach(m => {
       ctx.save(); ctx.translate(m.x, m.y);
       ctx.shadowColor = '#ff0000'; ctx.shadowBlur = 18;
-      // Black filled circle
+      // Body
       ctx.beginPath(); ctx.arc(0,0,m.r,0,Math.PI*2);
       ctx.fillStyle = '#000'; ctx.fill();
-      // Red crosshair outline
+      // Red crosshair
       ctx.strokeStyle = '#ff2020'; ctx.lineWidth = 1.2;
       ctx.beginPath(); ctx.arc(0,0,m.r,0,Math.PI*2); ctx.stroke();
       ctx.beginPath();
@@ -2432,7 +2416,6 @@ function screenShake(magnitude, duration) {
     drops.forEach(d => {
       ctx.save(); ctx.translate(d.x, d.y + Math.sin(d.t * 2) * 3);
       if (d.isPowerup) {
-        // Pulsing purple hexagon for powerup drops
         const pulse = 0.7 + 0.3 * Math.sin(d.t * 6);
         ctx.shadowColor = '#a855f7'; ctx.shadowBlur = 14 * pulse;
         ctx.strokeStyle = `rgba(168,85,247,${0.7 + 0.3 * pulse})`;
@@ -2451,7 +2434,7 @@ function screenShake(magnitude, duration) {
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
         ctx.fillText(pu ? pu.sym : '?', 0, 0);
       } else {
-        // Cyan circle for element items
+        // elements
         ctx.shadowColor = '#00f5ff'; ctx.shadowBlur = 10;
         ctx.beginPath(); ctx.arc(0, 0, d.r, 0, Math.PI * 2);
         ctx.strokeStyle = '#00f5ff'; ctx.lineWidth = 1; ctx.stroke();
@@ -2469,7 +2452,7 @@ function screenShake(magnitude, duration) {
       ctx.save();
       ctx.translate(pod.x, pod.y);
       const pulse = 0.6 + 0.4 * Math.sin(pod.t * 3);
-      // Outer hex — cyan glow
+      // Outer hex
       ctx.shadowColor = '#00f5ff'; ctx.shadowBlur = 18 * pulse;
       ctx.strokeStyle = `rgba(0,245,255,${0.6 + 0.4 * pulse})`;
       ctx.lineWidth = 1.8;
@@ -2480,7 +2463,7 @@ function screenShake(magnitude, duration) {
         i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
       }
       ctx.closePath(); ctx.stroke();
-      // Inner hex (smaller, rotated 30°)
+      // Inner hex
       ctx.strokeStyle = `rgba(0,245,255,0.3)`;
       ctx.lineWidth = 0.8;
       ctx.beginPath();
@@ -2490,7 +2473,7 @@ function screenShake(magnitude, duration) {
         i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
       }
       ctx.closePath(); ctx.stroke();
-      // Powerup symbol
+      // Symbol
       const pu = STRINGS.powerups[pod.puKey];
       ctx.font = 'bold 13px Nova Square, monospace';
       ctx.fillStyle = `rgba(0,245,255,${0.8 + 0.2 * pulse})`;
@@ -2591,7 +2574,7 @@ function screenShake(magnitude, duration) {
 })();
 
 // ═══════════════════════════════════════════════════════════════
-// ANIMATED COUNT-UP (Part 3.3)
+// ANIMATED COUNT-UP
 // ═══════════════════════════════════════════════════════════════
 function countUp(el, target, durationMs = 1200, prefix = "", suffix = "") {
   const start = performance.now();
@@ -3138,7 +3121,7 @@ function updateShopReserves() {
   const el = document.getElementById('shop-reserve-slots');
   if (!el) return;
 
-  // NEW: If in an evolution session, show the large upgrade slot instead of 8 small ones
+  //  Upgrade Action Box
   if (isUpgradeSession) {
     const key = run.inventory._upgradeSlot;
     const pu = key ? STRINGS.powerups[key] : null;
@@ -3149,7 +3132,7 @@ function updateShopReserves() {
            <span class="shop-reserve-sym" style="font-size:22px;">${pu ? pu.sym : 'Ω'}</span>
            <div style="display:flex; flex-direction:column; align-items:flex-start;">
              <span class="shop-reserve-name" style="color:#fff; font-size:10px;">${pu ? pu.name : 'EMPTY'}</span>
-             <span style="font-size:7px; color:rgba(255,255,255,0.4);">${pu ? 'PASSIVE EFFECT FOR NEXT RUN' : 'DRAG FUSION HERE'}</span>
+             <span style="font-size:7px; color:rgba(255,255,255,0.4);">${pu ? 'EQUIPPED' : 'EQUIP UPGRADE'}</span>
            </div>
         </div>
       </div>
@@ -3160,7 +3143,7 @@ function updateShopReserves() {
   el.innerHTML = '';
   for (let i = 0; i < run.reserveMax; i++) {
     const slot = document.createElement('div');
-    const key = run.powerups[i] || null;  // null-safe: undefined/null both treated as empty
+    const key = run.powerups[i] || null; 
     slot.className = 'shop-reserve-slot' + (key ? ' filled' : '');
     slot.dataset.slot = i;
     slot.dataset.key = key || '';
@@ -3174,7 +3157,7 @@ function updateShopReserves() {
   }
 }
 
-// ── Shop decoration: orbiting star ───────────────────────────
+// ── Shop deco ───────────────────────────
 (function() {
   const DECO_SIZE   = 60;   // canvas dimensions (px)
   const CX          = 30;   // centre x
@@ -3234,8 +3217,6 @@ function updateShopReserves() {
     }
 
     function drawMainStar() {
-      // Glow ring pass — shadow only, no fill, so body stays transparent
-      // (page background #050510 shows through, avoiding the inward-bleed snafu)
       decoCtx.save();
       decoCtx.shadowColor = 'white';
       decoCtx.shadowBlur  = 8;
@@ -3243,10 +3224,10 @@ function updateShopReserves() {
       decoCtx.lineWidth   = 1;
       decoCtx.beginPath();
       decoCtx.arc(CX, CY, BODY_R, 0, Math.PI * 2);
-      decoCtx.stroke();  // ← stroke only, no fill — glow without inward bleed
+      decoCtx.stroke(); 
       decoCtx.restore();
 
-      // Ping ripple
+      // Ping
       const pingProgress = (Date.now() % 1200) / 1200;
       const rippleR      = BODY_R + pingProgress * 18;
       const rippleAlpha  = (1 - pingProgress) * 0.3;
@@ -3283,7 +3264,7 @@ function renderShopBody() {
 
   if (shopMode === 'buy') {
     const label = document.createElement('div');
-    label.className = 'shop-section-label'; label.textContent = 'BASE ELEMENTS';
+    label.className = 'shop-section-label'; label.textContent = 'ELEMENTS';
     body.appendChild(label);
     const grid = document.createElement('div'); grid.className = 'shop-grid';
     Object.entries(STRINGS.items).forEach(([key, item]) => {
@@ -3300,7 +3281,7 @@ function renderShopBody() {
     });
     body.appendChild(grid);
 
-    // Powerups — unlocked after the player has completed level 4
+    // Compounds
     if (save.storyFlags >= 4) {
       const label2 = document.createElement('div');
       label2.className = 'shop-section-label'; label2.style.marginTop='16px'; label2.textContent = 'POWERUPS';
@@ -3324,8 +3305,8 @@ function renderShopBody() {
 
   } else if (shopMode === 'sell') {
 
-    const COMPOUND_KEYS = { LITHEBRYL:90, NITROKALIUM:90, CARBOSILICUM:90, MAGNIUM:90, TITANE:90, ALKALIUM:90, AZOLITHION:90, GAMMITE:90 };
-    const ALLOY_KEYS    = { OMEGITE:250, AXORITE:200, PHIOMEGA:200, DELTALITE:200 };
+    const COMPOUND_KEYS = { LITHEBRYL:90, NITROKALIUM:90, CARBOSILICUM:90, MAGNIUM:90, TITANE:90, ALKALIUM:90, AZOLITHION:90, GAMMITE:90 }; // Shop Pricing
+    const ALLOY_KEYS    = { OMEGITE:250, AXORITE:200, PHIOMEGA:200, DELTALITE:200 }; // More Shop Pricing
 
     function makeSellCard(sym, name, effect, qty, price, key, tier) {
       const card = document.createElement('div'); card.className = 'shop-card obj';
@@ -3401,7 +3382,7 @@ function renderShopBody() {
 
   } else if (shopMode === 'craft') {
 
-    // ── INGREDIENTS — split into collapsible ELEMENTS and COMPOUNDS grids ──
+    // ── INGREDIENTS ──────────────────────────────
     const labelEl = document.createElement('div');
     labelEl.className = 'shop-section-label collapsible';
     labelEl.textContent = 'ELEMENTS ▸';
@@ -3413,7 +3394,7 @@ function renderShopBody() {
     gridEl.dataset.section = 'craft-elements';
     gridEl.style.display = 'none';
 
-    // Elements
+    // Elements ──────────────────────────────
     Object.entries(STRINGS.items).forEach(([key, item]) => {
       const qty = run?.inventory[key] || 0;
       const has = qty > 0;
@@ -3444,7 +3425,7 @@ function renderShopBody() {
     gridCo.dataset.section = 'craft-compounds';
     gridCo.style.display = 'none';
 
-    // Compounds — always shown, draggable only when owned
+    // Compounds ──────────────────────────────
     Object.keys(COMPOUND_VARIANTS).forEach(key => {
       const pu = STRINGS.powerups[key];
       if (!pu) return;
@@ -3467,7 +3448,7 @@ function renderShopBody() {
     });
     body.appendChild(gridCo);
 
-    // ── CRAFT — compound target cards (progress lights) ───────────
+    // ── CRAFT ───────────────────────────────────────
     const labelCraft = document.createElement('div');
     labelCraft.className = 'shop-section-label'; labelCraft.style.marginTop = '4px'; labelCraft.textContent = 'CRAFT';
     body.appendChild(labelCraft);
@@ -3499,7 +3480,7 @@ function renderShopBody() {
     });
     body.appendChild(gridCraft);
 
-    // ── ALLOYS — crafted from compounds (progress lights) ─────────
+    // ── ALLOYS ──────────────────────────────────────────────────────────
     const labelAlloy = document.createElement('div');
     labelAlloy.className = 'shop-section-label';
     labelAlloy.style.marginTop = '4px';
@@ -3514,7 +3495,7 @@ function renderShopBody() {
           { key: 'ALKALIUM', label: 'α Alkalium'  },
           { key: 'TITANE', label: 'Θ Titane'  },
         ],
-        effect: 'Reserve +3, All Stats +3 — Super Bomb',
+        effect: 'Reserve +3, All Stats +3 — Irradiation',
         desc: 'A terrifyingly unstable material that exists in a state of constant decay.',
       },
       {
@@ -3600,11 +3581,11 @@ function renderShopBody() {
     });
     body.appendChild(gridEl);
 
-    // ── POWERUPS (draggable into reserves) ───────────────────────
+    // ── COMPOUNDS ───────────────────────
     const labelPu = document.createElement('div');
     labelPu.className = 'shop-section-label';
     labelPu.style.marginTop = '14px';
-    labelPu.textContent = 'POWERUPS';
+    labelPu.textContent = 'COMPOUNDS';
     body.appendChild(labelPu);
 
     const gridPu = document.createElement('div'); gridPu.className = 'shop-grid';
@@ -3660,9 +3641,6 @@ function shopContinue() {
   showScreen('game');
   Game.startLevel();
 }
-
-// NOTE: gameWin() retired — true run completion is handled by
-// Game.startBoss() → onBossDefeated(), which shows #overlay-boss-clear.
 
 // ═══════════════════════════════════════════════════════════════
 // STORY SCREEN
@@ -3843,10 +3821,7 @@ document.getElementById('btn-new-run-plus').onclick = () => {
     }
   };
 
-  // ── POWERUP SLOT INTERACTIONS ────────────────────────────────
-  // Drag down from a filled slot onto #pu-stash to stash it.
-  // Tap in place on a filled slot to use it immediately.
-  // Drags originating on the powerup bar do NOT move the ship.
+  // ── COMPOUND RESERVES INTERACTIONS ────────────────────────────────
   (function setupPowerupInteractions() {
     const bar       = document.getElementById('powerup-bar');
     const stashEl   = document.getElementById('pu-stash');
@@ -3911,7 +3886,7 @@ document.getElementById('btn-new-run-plus').onclick = () => {
           stashSlot(dragSlot);
         }
       } else {
-        // Tap — use powerup
+        // Tap to trigger
         AudioManager.resume();
         Game.triggerPowerup(dragSlot);
       }
@@ -3953,7 +3928,7 @@ document.getElementById('btn-new-run-plus').onclick = () => {
   setupShopDrag();
 });
 
-// ── Shop refresh — updates all right-panel displays ─────────────
+// ── Shop refresh ──────────────────────────────────────────
 function refresh() {
   updateShopReserves();
   updateShopStats();
@@ -3963,7 +3938,7 @@ function refresh() {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// SHOP DRAG & DROP — powerup stash ↔ reserve slots
+// SHOP DRAG & DROP
 // ═══════════════════════════════════════════════════════════════
 function setupShopDrag() {
   const DRAG_THRESHOLD = 8;
@@ -3984,7 +3959,7 @@ function setupShopDrag() {
 
   // ── Double-tap/drag to apply full stack to stats block ────────
   // Shared by both the tap path (onEnd) and the drag path (commitDrop).
-  // First interaction records key+time; second within DOUBLE_TAP_MS applies the stack.
+  // Currently not fully functional: tap works to apply one at a time until 1 is left in stash, then tap cuts functionality
   let lastStatsKey  = null;
   let lastStatsTime = 0;
 
@@ -4103,9 +4078,9 @@ function applyElementBuff(key) {
        case 'Ti': if (run.shieldMax >= STAT_CAPS.shieldMax) { showShopToast('SHIELD MAXED'); return; }
            run.shieldMax = Math.min(run.shieldMax + 8, STAT_CAPS.shieldMax);
            run.shield = Math.min(run.shield + 8, run.shieldMax); break;
-       case 'N': if (run.ammoRefillRate >= STAT_CAPS.ammoRefillRate) { showShopToast('REFILL MAXED'); return; }
+       case 'N': if (run.ammoRefillRate >= STAT_CAPS.ammoRefillRate) { showShopToast('RELOAD MAXED'); return; }
     	   run.ammoRefillRate = Math.min(run.ammoRefillRate + 1, STAT_CAPS.ammoRefillRate); break;
-	   case 'K': if (run.ammoRefillRate >= STAT_CAPS.ammoRefillRate) { showShopToast('REFILL MAXED'); return; }
+	   case 'K': if (run.ammoRefillRate >= STAT_CAPS.ammoRefillRate) { showShopToast('RELOAD MAXED'); return; }
     	   run.ammoRefillRate = Math.min(run.ammoRefillRate + 1, STAT_CAPS.ammoRefillRate); break;
        case 'Si': if (run.ammoMax >= STAT_CAPS.ammoMax) { showShopToast('AMMO MAXED'); return; }
            run.ammoMax = Math.min(run.ammoMax + 10, STAT_CAPS.ammoMax);
@@ -4135,7 +4110,7 @@ function applyElementBuff(key) {
       case 'NITROKALIUM':
         if (run.ammoRefillRate < STAT_CAPS.ammoRefillRate) {
           run.ammoRefillRate = Math.min(run.ammoRefillRate + 1, STAT_CAPS.ammoRefillRate);
-        } else { showShopToast('REFILL MAXED'); }
+        } else { showShopToast('RELOAD MAXED'); }
         if (run.shieldMax < STAT_CAPS.shieldMax) {
           run.shieldMax = Math.min(run.shieldMax + 6, STAT_CAPS.shieldMax);
         } else { showShopToast('SHIELD MAXED'); }
@@ -4147,7 +4122,7 @@ function applyElementBuff(key) {
         } else { showShopToast('AMMO MAXED'); }
         if (run.ammoRefillRate < STAT_CAPS.ammoRefillRate) {
           run.ammoRefillRate = Math.min(run.ammoRefillRate + 1, STAT_CAPS.ammoRefillRate);
-        } else { showShopToast('REFILL MAXED'); }
+        } else { showShopToast('RELOAD MAXED'); }
          break;
 
       case 'MAGNIUM':
@@ -4156,7 +4131,7 @@ function applyElementBuff(key) {
         } else { showShopToast('RESERVES MAXED'); }
         if (run.ammoRefillRate < STAT_CAPS.ammoRefillRate) {
           run.ammoRefillRate = Math.min(run.ammoRefillRate + 1, STAT_CAPS.ammoRefillRate);
-        } else { showShopToast('REFILL MAXED'); }
+        } else { showShopToast('RELOAD MAXED'); }
         break;
 
       case 'TITANE':
@@ -4165,7 +4140,7 @@ function applyElementBuff(key) {
         } else { showShopToast('SHIELD MAXED'); }
         if (run.ammoRefillRate < STAT_CAPS.ammoRefillRate) {
           run.ammoRefillRate = Math.min(run.ammoRefillRate + 1, STAT_CAPS.ammoRefillRate);
-        } else { showShopToast('REFILL MAXED'); }
+        } else { showShopToast('RELOAD MAXED'); }
          break;
 
       case 'ALKALIUM':
@@ -4174,7 +4149,7 @@ function applyElementBuff(key) {
         } else { showShopToast('AMMO MAXED'); }
         if (run.ammoRefillRate < STAT_CAPS.ammoRefillRate) {
           run.ammoRefillRate = Math.min(run.ammoRefillRate + 1, STAT_CAPS.ammoRefillRate);
-        } else { showShopToast('REFILL MAXED'); }
+        } else { showShopToast('RELOAD MAXED'); }
          break;
 
       case 'AZOLITHION':
@@ -4195,11 +4170,11 @@ function applyElementBuff(key) {
         } else { showShopToast('SHIELD MAXED'); }
         if (run.ammoRefillRate < STAT_CAPS.ammoRefillRate) {
           run.ammoRefillRate = Math.min(run.ammoRefillRate + 1, STAT_CAPS.ammoRefillRate);
-        } else { showShopToast('REFILL MAXED'); }
+        } else { showShopToast('RELOAD MAXED'); }
          break;
 
       default:
-        showShopToast('NO BUFF'); return;
+        showShopToast('INVALID'); return;
     }
     updateShopStats();
   }
@@ -4219,8 +4194,6 @@ function applyElementBuff(key) {
 
   // ── Refresh a single craft card's lights + draggable state ───
   function refreshCraftCard(puKey, tier, recipe) {
-    // Must match the craft target card specifically — it contains .craft-lights
-    // querySelector returns the first match which may be the ingredient source card
     const allCards = document.querySelectorAll(`#shop-body .shop-card[data-card-key="${puKey}"]`);
     const card = Array.from(allCards).find(c => c.querySelector('.craft-lights'));
     if (!card) return;
@@ -4249,7 +4222,7 @@ function applyElementBuff(key) {
   }
 
   function refreshSourceCard(ingredientKey) {
-    // Covers both element and compound ingredient source cards in the INGREDIENTS section
+    // Covers both element and compound ingredient source cards
     const src = document.querySelector(
       `#shop-body .shop-card[data-card-key="${ingredientKey}"]:not([data-card-tier="alloy"]):not(.shop-card-progress)`
     );
@@ -4281,7 +4254,7 @@ function applyElementBuff(key) {
     const targetSlot = reserveSlotAt(x, y);
     const onActionBox = actionBoxAt(x, y);
 
-    // ── Element card → stats block (buff) ─────────────────────
+    // ── Element buffs ─────────────────────
     if (dragSource === 'card' && dragTier === 'element' && statsBlockAt(x, y)) {
       const qty = run?.inventory[dragKey] || 0;
       if (qty > 0) {
@@ -4297,6 +4270,7 @@ function applyElementBuff(key) {
         if (isElementCapped()) { applyElementBuff(dragKey); return; } // show toast, leave inventory intact
 
         // Double-drag: if this key was just dropped onto the stats block, apply the full stack
+		// Currently non-functional.
         const now = Date.now();
         const isDoubleAction = lastStatsKey === dragKey && (now - lastStatsTime) < DOUBLE_TAP_MS;
         lastStatsKey = dragKey; lastStatsTime = now;
@@ -4315,7 +4289,7 @@ function applyElementBuff(key) {
       return;
     }
 
-    // ── Compound card → stats block (buff) ────────────────────
+    // ── Compound buffs ────────────────────
     if (dragSource === 'card' && dragTier === 'compound' && statsBlockAt(x, y)) {
       const qty = run?.inventory[dragKey] || 0;
       if (qty > 0) {
@@ -4339,6 +4313,7 @@ function applyElementBuff(key) {
         if (isCompoundFullyCapped()) { applyCompoundBuff(dragKey); return; } // show toast, leave inventory intact
 
         // Double-drag: if this key was just dropped onto the stats block, apply the full stack
+		// Not currently functional.
         const now = Date.now();
         const isDoubleAction = lastStatsKey === dragKey && (now - lastStatsTime) < DOUBLE_TAP_MS;
         lastStatsKey = dragKey; lastStatsTime = now;
@@ -4357,7 +4332,7 @@ function applyElementBuff(key) {
       return;
     }
 
-    // ── Ingredient → craft card ────────────────────────────────
+    // ── Drag Ingredients ────────────────────────────────
     if (dragSource === 'card' && shopMode === 'craft') {
       const targetCard = craftCardAt(x, y);
       if (targetCard) {
@@ -4386,7 +4361,7 @@ function applyElementBuff(key) {
       }
     }
 
-    // ── Card → action box ──────────────────────────────────────
+    // ── Drag to Action Box ──────────────────────────────────────
     if (dragSource === 'card' && onActionBox) {
       if      (shopMode === 'buy')   stageItem(dragKey, dragTier);
       else if (shopMode === 'sell')  stageItem(dragKey, dragTier);
@@ -4395,12 +4370,12 @@ function applyElementBuff(key) {
       return;
     }
 
-    // ── Stash card → reserve slot / upgrade slot ──────────────────────────────
+    // ── Drag to Reserves/Upgrade Action Boxes ──────────────────────
     if ((dragSource === 'stash' || (dragSource === 'card' && shopMode === 'stash')) && targetSlot) {
       if (isUpgradeSession) {
-        // Only Compounds and Alloys allowed in Upgrade slot
+        // Only Compounds and Alloys
         if (dragTier === 'element') {
-          showShopToast("ONLY FUSIONS CAN BE PERMANENT");
+          showShopToast("INVALID");
           reset();
           return;
         }
@@ -4550,6 +4525,7 @@ function applyElementBuff(key) {
       // Check for double-tap to apply full stack to stats block.
       // Applies to element and compound cards in the buy tab (dragSource === 'card'),
       // NOT reserves/stash. qty > 1 guard: single-item stacks don't need bulk apply.
+	  // Might be the source of Stacks issue, not functional.
       const isStatEligible = dragSource === 'card'
         && (dragTier === 'element' || dragTier === 'compound')
         && (run?.inventory[dragKey] || 0) > 1;
@@ -4557,10 +4533,9 @@ function applyElementBuff(key) {
       if (isStatEligible) {
         const now = Date.now();
         if (lastStatsKey === dragKey && (now - lastStatsTime) < DOUBLE_TAP_MS) {
-          // Double-tap confirmed — apply full stack to stats block
+          // Double-tap confirmed
           lastStatsKey = null; lastStatsTime = 0;
           hideGhost();
-          // Reuse commitDrop machinery: synthesise a drop onto the stats block centre
           const statsBlock = document.getElementById('shop-stats-block');
           if (statsBlock) {
             const r = statsBlock.getBoundingClientRect();
@@ -4569,7 +4544,7 @@ function applyElementBuff(key) {
           reset();
           return;
         }
-        // First tap — record and show ghost anchored to card as affordance
+        // First tap — Ghost currently not showing. Not functional.
         lastStatsKey = dragKey; lastStatsTime = Date.now();
         if (dragEl) {
           const r = dragEl.getBoundingClientRect();
@@ -4578,7 +4553,7 @@ function applyElementBuff(key) {
         }
       }
 
-      // Single tap — show info only, no action
+      // Single tap Show Info
       const tier = dragSource === 'reserve' ? 'compound'
                  : dragTier || 'element';
       showItemInfo(dragKey, tier);
