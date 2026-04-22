@@ -3650,7 +3650,7 @@ function showStory(level) {
   const isBossApproach = level === 9;
 
   document.getElementById('story-level-label').textContent = isBossApproach
-    ? 'APPROACHING THE SOURCE'
+    ? 'APPROACHING THE SOURCE' // DEPRECIATED, REMOVE ENTIRELY -- the null STRINGS that are currently functional are preferred.
     : STRINGS.ui.levelComplete(level);
   document.getElementById('story-text').textContent = s.text;
   document.getElementById('story-coords').innerHTML = renderCoords(s.coords);
