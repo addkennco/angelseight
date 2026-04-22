@@ -4289,47 +4289,57 @@ function applyElementBuff(key) {
     }
 
     // ── Compound buffs ────────────────────
-    if (dragSource === 'card' && dragTier === 'compound' && statsBlockAt(x, y)) {
-      const qty = run?.inventory[dragKey] || 0;
-      if (qty > 0) {
-        const isCompoundFullyCapped = () => run && (() => {
-          const sh = run.shieldMax      >= STAT_CAPS.shieldMax;
-          const am = run.ammoMax        >= STAT_CAPS.ammoMax;
-          const rf = run.ammoRefillRate >= STAT_CAPS.ammoRefillRate;
-          const rv = run.reserveMax     >= STAT_CAPS.reserveMax;
-          switch (dragKey) {
-            case 'LITHEBRYL':    return sh && am;
-            case 'NITROKALIUM':  return rf && sh;
-            case 'CARBOSILICUM': return am && rf;
-            case 'MAGNIUM':      return rv && rf;
-            case 'TITANE':       return sh && rf;
-            case 'ALKALIUM':     return am && rf;
-            case 'AZOLITHION':   return am && sh;
-            case 'GAMMITE':      return am && sh && rf;
-            default:             return false;
-          }
-        })();
-        if (isCompoundFullyCapped()) { applyCompoundBuff(dragKey); return; } // show toast, leave inventory intact
-
-        // Double-drag: if this key was just dropped onto the stats block, apply the full stack
-		// Not currently functional.
-        const now = Date.now();
-        const isDoubleAction = lastStatsKey === dragKey && (now - lastStatsTime) < DOUBLE_TAP_MS;
-        lastStatsKey = dragKey; lastStatsTime = now;
-
-        const applyCount = isDoubleAction ? (run?.inventory[dragKey] || 0) + 1 : 1; // +1 includes current item
-        for (let i = 0; i < applyCount; i++) {
-          if ((run?.inventory[dragKey] || 0) <= 0) break;
-          if (isCompoundFullyCapped()) break; // all stats hit cap mid-stack — stop, leave remainder
-          run.inventory[dragKey]--;
-          applyCompoundBuff(dragKey);
-        }
-        refresh();
-        renderShopBody();
-		updateShopStats();
+if (dragSource === 'card' && dragTier === 'compound' && statsBlockAt(x, y)) {
+  const qty = run?.inventory[dragKey] || 0;
+  if (qty > 0) {
+    const isCompoundFullyCapped = () => run && (() => {
+      const sh = run.shieldMax      >= STAT_CAPS.shieldMax;
+      const am = run.ammoMax        >= STAT_CAPS.ammoMax;
+      const rf = run.ammoRefillRate >= STAT_CAPS.ammoRefillRate;
+      const rv = run.reserveMax     >= STAT_CAPS.reserveMax;
+      switch (dragKey) {
+        case 'LITHEBRYL':    return sh && am;
+        case 'NITROKALIUM':  return rf && sh;
+        case 'CARBOSILICUM': return am && rf;
+        case 'MAGNIUM':      return rv && rf;
+        case 'TITANE':       return sh && rf;
+        case 'ALKALIUM':     return am && rf;
+        case 'AZOLITHION':   return am && sh;
+        case 'GAMMITE':      return am && sh && rf;
+        default:             return false; // ← Invalid items aren't "capped"
       }
-      return;
+    })();
+    
+    // NEW: Reject invalid compounds (alloys, unknown keys)
+    const VALID_COMPOUNDS = ['LITHEBRYL', 'NITROKALIUM', 'CARBOSILICUM', 
+                             'MAGNIUM', 'TITANE', 'ALKALIUM', 'AZOLITHION', 'GAMMITE'];
+    if (!VALID_COMPOUNDS.includes(dragKey)) {
+      showShopToast('INVALID');
+      return; // Exit before consuming
     }
+    
+    if (isCompoundFullyCapped()) { 
+      applyCompoundBuff(dragKey); 
+      return; 
+    }
+
+    const now = Date.now();
+    const isDoubleAction = lastStatsKey === dragKey && (now - lastStatsTime) < DOUBLE_TAP_MS;
+    lastStatsKey = dragKey; lastStatsTime = now;
+
+    const applyCount = isDoubleAction ? (run?.inventory[dragKey] || 0) + 1 : 1;
+    for (let i = 0; i < applyCount; i++) {
+      if ((run?.inventory[dragKey] || 0) <= 0) break;
+      if (isCompoundFullyCapped()) break;
+      run.inventory[dragKey]--; 
+      applyCompoundBuff(dragKey);
+    }
+    refresh();
+    renderShopBody();
+    updateShopStats();
+  }
+  return;
+}
 
     // ── Drag Ingredients ────────────────────────────────
     if (dragSource === 'card' && shopMode === 'craft') {
