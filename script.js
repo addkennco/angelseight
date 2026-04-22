@@ -3127,9 +3127,8 @@ function updateShopReserves() {
     const pu = key ? STRINGS.powerups[key] : null;
     el.innerHTML = `
       <div class="shop-upgrade-container" style="width:100%; padding: 5px 0;">
-        <div class="shop-section-label" style="color:var(--purple); margin-bottom:5px;">PERMANENT UPGRADE SLOT</div>
         <div class="shop-reserve-slot filled" id="upgrade-drop-zone" style="width:100%; height:44px; flex-direction:row; gap:12px; justify-content:flex-start; padding-left:15px;">
-           <span class="shop-reserve-sym" style="font-size:22px;">${pu ? pu.sym : 'Ω'}</span>
+           <span class="shop-reserve-sym" style="font-size:22px;">${pu ? pu.sym : '⇮'}</span>
            <div style="display:flex; flex-direction:column; align-items:flex-start;">
              <span class="shop-reserve-name" style="color:#fff; font-size:10px;">${pu ? pu.name : 'EMPTY'}</span>
              <span style="font-size:7px; color:rgba(255,255,255,0.4);">${pu ? 'EQUIPPED' : 'EQUIP UPGRADE'}</span>
