@@ -870,7 +870,7 @@ const Game = (() => {
     const key = pool[Math.floor(Math.random() * pool.length)];
     ELEMENT_ATTACKS[key]();
     spawnFloatingText(boss.x, boss.y - 30, key, '#ffffff');
-    logPickup('ASTERISM — ' + key + ' SEQUENCE');
+    logPickup(pu.sym + ' SEQUENCE');
   }
 
   function init(gameCanvas) {
