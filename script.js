@@ -4612,20 +4612,6 @@ function onEnd(x, y) {
     }
   }
 
-      // Info Display
-      const tier = dragSource === 'reserve' ? 'compound' : dragTier || 'element';
-      showItemInfo(dragKey, tier);
-      if (dragEl) {
-        document.querySelectorAll('.shop-card.obj.selected').forEach(c => c.classList.remove('selected'));
-        dragEl.classList.add('selected');
-      }
-      
-      dragging = false; 
-      hideGhost();
-      clearHighlights();
-    }
-  }
-
   // ── Touch events ─────────────────────────────────────────────
   const shopScreen = document.getElementById('screen-shop');
 
