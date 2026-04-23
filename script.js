@@ -870,7 +870,7 @@ const Game = (() => {
     const key = pool[Math.floor(Math.random() * pool.length)];
     ELEMENT_ATTACKS[key]();
     spawnFloatingText(boss.x, boss.y - 30, key, '#ffffff');
-    logPickup(pu.sym + ' SEQUENCE');
+    logPickup(symbol + ' SEQUENCE');
   }
 
   function init(gameCanvas) {
@@ -4330,7 +4330,7 @@ function applyElementBuff(key) {
     const targetSlot = reserveSlotAt(x, y);
     const onActionBox = actionBoxAt(x, y);
 
-    // ── 1. Element Buffs (Drop on Stats Block) ──────────────────
+    // ── Element Buffs → Stats Block ──────────────────
     if ((dragSource === 'card' || dragSource === 'stash') && dragTier === 'element' && statsBlockAt(x, y)) {
       const isElementCapped = () => {
         if (!run) return true;
@@ -4364,7 +4364,7 @@ function applyElementBuff(key) {
       return;
     }
 
-    // ── 2. Compound Buffs (Drop on Stats Block) ─────────────────
+    // ── Compound Buffs → Stats Block ─────────────────
     if ((dragSource === 'card' || dragSource === 'stash') && dragTier === 'compound' && statsBlockAt(x, y)) {
       const VALID_COMPOUNDS = ['LITHEBRYL', 'NITROKALIUM', 'CARBOSILICUM', 'MAGNIUM', 'TITANE', 'ALKALIUM', 'AZOLITHION', 'GAMMITE'];
       if (!VALID_COMPOUNDS.includes(dragKey)) {
@@ -4405,7 +4405,7 @@ function applyElementBuff(key) {
       return;
     }
 
-    // ── 3. Crafting Ingredients (Drop on target Card) ───────────
+    // ── Crafting Ingredients → Craft Cards  ───────────
     if (dragSource === 'card' && shopMode === 'craft') {
       const targetCard = craftCardAt(x, y);
       if (targetCard) {
@@ -4427,7 +4427,7 @@ function applyElementBuff(key) {
       }
     }
 
-    // ── 4. Action Box (Buy / Sell / Stage Craft) ────────────────
+    // ── Action Box (Buy / Sell / Stage Craft) ────────────────
     if (dragSource === 'card' && onActionBox) {
       if      (shopMode === 'buy')   stageItem(dragKey, dragTier);
       else if (shopMode === 'sell')  stageItem(dragKey, dragTier);
@@ -4436,8 +4436,8 @@ function applyElementBuff(key) {
       return;
     }
 
-    // ── 5. Drag to Reserves or Upgrade Slot ─────────────────────
-    if ((dragSource === 'stash' || (dragSource === 'card' && shopMode === 'stash')) && targetSlot) {
+    // ── Drag to Reserves & Upgrade Slot ─────────────────────
+    if ((dragSource === 'stash' || dragSource === 'card') && targetSlot) {
       if (isUpgradeSession) {
         if (dragTier === 'element') { showShopToast("INVALID"); return; }
         const oldKey = run.inventory._upgradeSlot;
@@ -4450,19 +4450,22 @@ function applyElementBuff(key) {
       }
 		
       const slotIdx = parseInt(targetSlot.dataset.slot);
-      while (run.powerups.length < run.reserveMax) run.powerups.push(null);
       const existingKey = run.powerups[slotIdx] || null;
       if (existingKey === dragKey) return;
-      if (existingKey) run.inventory[existingKey] = Math.min(99, (run.inventory[existingKey] || 0) + 1);
+
+      // If slot is occupied, return existing item to inventory
+      if (existingKey) {
+        run.inventory[existingKey] = Math.min(99, (run.inventory[existingKey] || 0) + 1);
+      }
       
       run.powerups[slotIdx] = dragKey;
       run.inventory[dragKey] = Math.max(0, (run.inventory[dragKey] || 0) - 1);
-      showShopToast('Equipped!');
+      showShopToast('EQUIPPED');
       refresh();
       return;
     }
 
-    // ── 6. Reserve Movement (Swap or Un-equip) ──────────────────
+    // ── Reserve Movement (Swap & Unequip) ──────────────────
     if (dragSource === 'reserve') {
       if (targetSlot) {
         const toIdx = parseInt(targetSlot.dataset.slot);
@@ -4547,70 +4550,80 @@ function applyElementBuff(key) {
     highlightTarget(x, y);
   }
 
-  function onEnd(x, y) {
+function onEnd(x, y) {
     if (!dragKey) return;
+
     if (dragging) {
       commitDrop(x, y);
+      reset(); 
     } else {
-      // Tap — check for double-tap on a craft card first
-      if (shopMode === 'craft' && dragEl) {
-        const puKey = dragEl.dataset.cardKey;
-        const tier  = dragEl.dataset.cardTier;
-        if (puKey && (tier === 'compound' || tier === 'alloy') && craftProgress[puKey]?.length > 0) {
-          const now = Date.now();
-          if (lastTapCard === dragEl && (now - lastTapTime) < DOUBLE_TAP_MS) {
-            // Double-tap confirmed — clear the card
-            lastTapCard = null; lastTapTime = 0;
-            clearCraftCard(puKey, tier);
-            reset();
-            return;
-          }
-          lastTapCard = dragEl;
-          lastTapTime = Date.now();
-        }
-      }
-      // Check for double-tap to apply full stack to stats block.
-      // Applies to element and compound cards in the buy tab (dragSource === 'card'),
-      // NOT reserves/stash. qty > 1 guard: single-item stacks don't need bulk apply.
-	  // Might be the source of Stacks issue, not functional.
-      const isStatEligible = dragSource === 'card'
-        && (dragTier === 'element' || dragTier === 'compound')
-        && (run?.inventory[dragKey] || 0) > 1;
-
-      if (isStatEligible) {
-        const now = Date.now();
-        if (lastStatsKey === dragKey && (now - lastStatsTime) < DOUBLE_TAP_MS) {
-          // Double-tap confirmed
-          lastStatsKey = null; lastStatsTime = 0;
-          hideGhost();
-          const statsBlock = document.getElementById('shop-stats-block');
-          if (statsBlock) {
-            const r = statsBlock.getBoundingClientRect();
-            commitDrop(r.left + r.width / 2, r.top + r.height / 2);
-          }
-          reset();
-          return;
-        }
-        // First tap — Ghost currently not showing. Not functional.
-        lastStatsKey = dragKey; lastStatsTime = Date.now();
-        if (dragEl) {
-          const r = dragEl.getBoundingClientRect();
-          showGhost(r.left + r.width / 2, r.top - 10, dragKey, dragTier);
-          setTimeout(() => hideGhost(), 600); // ghost fades after 600ms
-        }
-      }
-
-      // Single tap Show Info
-      const tier = dragSource === 'reserve' ? 'compound'
-                 : dragTier || 'element';
+      const now = Date.now();
+      
+      // 1. Handle Info Display (Always happens on tap)
+      const tier = dragSource === 'reserve' ? 'compound' : dragTier || 'element';
       showItemInfo(dragKey, tier);
-      // Keep selection highlight on the source card
       if (dragEl) {
         document.querySelectorAll('.shop-card.obj.selected').forEach(c => c.classList.remove('selected'));
         dragEl.classList.add('selected');
       }
+
+      // 2. Craft Card Double-Tap (Clear ingredients)
+      if (shopMode === 'craft' && dragEl) {
+        const puKey = dragEl.dataset.cardKey;
+        if (puKey && craftProgress[puKey]?.length > 0) {
+          if (lastTapCard === dragEl && (now - lastTapTime) < DOUBLE_TAP_MS) {
+            clearCraftCard(puKey, dragEl.dataset.cardTier);
+            lastTapCard = null; reset(); return;
+          }
+          lastTapCard = dragEl; lastTapTime = now;
+        }
+      }
+
+      // 3. Stats Buff Double-Tap (Bulk Apply)
+      const isStatEligible = (dragSource === 'card' || dragSource === 'stash')
+        && (dragTier === 'element' || dragTier === 'compound')
+        && (run?.inventory[dragKey] || 0) >= 1;
+
+      if (isStatEligible) {
+        if (lastStatsKey === dragKey && (now - lastStatsTime) < DOUBLE_TAP_MS) {
+          // --- SUCCESSFUL DOUBLE TAP ---
+          const statsBlock = document.getElementById('shop-stats-block');
+          if (statsBlock) {
+            const r = statsBlock.getBoundingClientRect();
+            // This triggers the bulk logic inside commitDrop
+            commitDrop(r.left + r.width / 2, r.top + r.height / 2); 
+            
+            // Visual feedback for bulk action
+            showGhost(r.left + r.width / 2, r.top + r.height / 2, dragKey, dragTier);
+            setTimeout(() => hideGhost(), 500);
+          }
+          lastStatsKey = null; // Clear so 3rd tap doesn't bulk again
+        } else {
+          // --- FIRST TAP ---
+          // Do NOT consume. Just save the key and time.
+          lastStatsKey = dragKey;
+          lastStatsTime = now;
+        }
+      }
+
+      // Cleanup tap state but keep dragKey alive for the double-tap window
+      dragging = false;
+      clearHighlights();
     }
-    reset();
+  }
+
+      // Info Display
+      const tier = dragSource === 'reserve' ? 'compound' : dragTier || 'element';
+      showItemInfo(dragKey, tier);
+      if (dragEl) {
+        document.querySelectorAll('.shop-card.obj.selected').forEach(c => c.classList.remove('selected'));
+        dragEl.classList.add('selected');
+      }
+      
+      dragging = false; 
+      hideGhost();
+      clearHighlights();
+    }
   }
 
   // ── Touch events ─────────────────────────────────────────────
