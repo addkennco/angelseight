@@ -4568,8 +4568,9 @@ function onEnd(x, y) {
         }
       }
 
-      // 3. Stats Buff Double-Tap (Bulk Apply)
-      const isStatEligible = (dragSource === 'card' || dragSource === 'stash')
+      // 3. Stats Buff Double-Tap (Bulk Apply) — stash tab only
+      const isStatEligible = shopMode === 'stash'
+        && (dragSource === 'card' || dragSource === 'stash')
         && (dragTier === 'element' || dragTier === 'compound')
         && (run?.inventory[dragKey] || 0) >= 1;
 
