@@ -1715,20 +1715,29 @@ function spawnPod() {
 
   function takeDamage(amt) {
     if (ship.invincible > 0 || invincibleTimer > 0) return;
+    
+    const prevShield = run.shield;
     run.shield = Math.max(0, run.shield - amt);
-    run.noHitKills = 0; run.combo = 1;
-    updateShieldBar(); updateCombo();
-    // Warp Stabilizer (Deltalite) Flux Cannon (PhiOmega) Last Stands
-    const threshold = Math.ceil(run.shieldMax * 0.08);
+    
+    // Reset combo on hit
+    run.noHitKills = 0; 
+    run.combo = 1;
+    updateShieldBar(); 
+    updateCombo();
+
+    // Check for Last Stand Passives (Deltalite / PhiOmega)
+    // Trigger if we are now at or below 20% health (more reliable than 8%)
+    const threshold = Math.max(2, run.shieldMax * 0.2); 
+    
     if (run.shield <= threshold && run.shield > 0) {
       if (run.upgrade === 'DELTALITE' && !run.warpStabTriggered) {
         run.warpStabTriggered = true;
-        timeDilationTimer = 10;
-        run.octaneTimer = 10;
-        noAmmoCostTimer = 0; 
+        timeDilationTimer = 12; // 12 seconds of slow-mo
+        run.octaneTimer = 12;
         spawnFloatingText(W/2, H/2 - 30, 'WARP STABILIZER', '#22c55e');
         logPickup('WARP STABILIZER ENGAGED');
-      } else if (run.upgrade === 'PHIOMEGA' && !run.fluxTriggered) {
+      } 
+      else if (run.upgrade === 'PHIOMEGA' && !run.fluxTriggered) {
         run.fluxTriggered = true;
         run.bulletType = '12spread';
         noAmmoCostTimer = 10;
@@ -1737,24 +1746,24 @@ function spawnPod() {
         logPickup('FLUX CANNON ACTIVE');
       }
     }
+
     if (run.shield <= 0) onDeath();
   }
 
   function onDeath() {
-    state = 'dead';
     // Aquiline Manifold (Axorite)
     if (run.upgrade === 'AXORITE' && !run.aquilineUsed) {
         run.aquilineUsed = true;
         run.shield = Math.ceil(run.shieldMax * 0.5);
         updateShieldBar();
-        ship.invincible = 2.5;
+        ship.invincible = 3.0; // 3 seconds of safety
         spawnFloatingText(W/2, H/2 - 30, 'REPRISAL', '#ec4899');
         logPickup('SHIELD REPAIR');
         state = "playing"; 
-        lastTime = performance.now();
-        animId = requestAnimationFrame(loop);
         return;
     }
+
+    state = 'dead';
     cancelAnimationFrame(animId);
     if (run.score > save.highScore) { save.highScore = run.score; writeSave(); }
     document.getElementById('death-score').textContent = 'SCORE  ' + run.score.toLocaleString();
@@ -4320,98 +4329,168 @@ function applyElementBuff(key) {
     });
   }
 
-  // ── Commit drop ──────────────────────────────────────────────
+// ── Commit drop ──────────────────────────────────────────────
   function commitDrop(x, y) {
     const targetSlot = reserveSlotAt(x, y);
     const onActionBox = actionBoxAt(x, y);
 
-    // ── Element buffs ─────────────────────
+    // ── Element Buffs ─────────────────────
     if (dragSource === 'card' && dragTier === 'element' && statsBlockAt(x, y)) {
-      const qty = run?.inventory[dragKey] || 0;
-      if (qty > 0) {
-        const isElementCapped = () => run && (() => {
-          switch (dragKey) {
-            case 'Be': case 'Li': case 'Ti': return run.shieldMax >= STAT_CAPS.shieldMax;
-            case 'N':  case 'K':             return run.ammoRefillRate >= STAT_CAPS.ammoRefillRate;
-            case 'Si': case 'C':             return run.ammoMax >= STAT_CAPS.ammoMax;
-            case 'Mg':                       return run.reserveMax >= STAT_CAPS.reserveMax;
-            default:                         return false;
-          }
-        })();
-        if (isElementCapped()) { applyElementBuff(dragKey); return; } // show toast, leave inventory intact
-
-        // Double-drag: if this key was just dropped onto the stats block, apply the full stack
-		// Currently non-functional.
-        const now = Date.now();
-        const isDoubleAction = lastStatsKey === dragKey && (now - lastStatsTime) < DOUBLE_TAP_MS;
-        lastStatsKey = dragKey; lastStatsTime = now;
-
-        const applyCount = isDoubleAction ? (run?.inventory[dragKey] || 0) + 1 : 1; // +1 includes current item
-        for (let i = 0; i < applyCount; i++) {
-          if ((run?.inventory[dragKey] || 0) <= 0) break;
-          if (isElementCapped()) break; // stat hit cap mid-stack — stop, leave remainder
-          run.inventory[dragKey]--;
-          applyElementBuff(dragKey);
+      const isElementCapped = () => {
+        if (!run) return true;
+        switch (dragKey) {
+          case 'Be': case 'Li': case 'Ti': return run.shieldMax >= STAT_CAPS.shieldMax;
+          case 'N':  case 'K':             return run.ammoRefillRate >= STAT_CAPS.ammoRefillRate;
+          case 'Si': case 'C':             return run.ammoMax >= STAT_CAPS.ammoMax;
+          case 'Mg':                       return run.reserveMax >= STAT_CAPS.reserveMax;
+          default: return false;
         }
-        refresh();
-        renderShopBody();
-		updateShopStats();
+      };
+
+      const now = Date.now();
+      const isDoubleAction = lastStatsKey === dragKey && (now - lastStatsTime) < DOUBLE_TAP_MS;
+      lastStatsKey = dragKey; lastStatsTime = now;
+
+      let applyCount = isDoubleAction ? (run.inventory[dragKey] || 0) : 1;
+      let appliedAny = false;
+
+      for (let i = 0; i < applyCount; i++) {
+        if ((run.inventory[dragKey] || 0) <= 0) break;
+        if (isElementCapped()) {
+          if (!appliedAny) applyElementBuff(dragKey); 
+          break; 
+        }
+        run.inventory[dragKey]--;
+        applyElementBuff(dragKey); 
+        appliedAny = true;
       }
+      if (appliedAny) refresh();
       return;
     }
 
-    // ── Compound buffs ────────────────────
-if (dragSource === 'card' && dragTier === 'compound' && statsBlockAt(x, y)) {
-  const qty = run?.inventory[dragKey] || 0;
-  if (qty > 0) {
-    const isCompoundFullyCapped = () => run && (() => {
-      const sh = run.shieldMax      >= STAT_CAPS.shieldMax;
-      const am = run.ammoMax        >= STAT_CAPS.ammoMax;
-      const rf = run.ammoRefillRate >= STAT_CAPS.ammoRefillRate;
-      const rv = run.reserveMax     >= STAT_CAPS.reserveMax;
-      switch (dragKey) {
-        case 'LITHEBRYL':    return sh && am;
-        case 'NITROKALIUM':  return rf && sh;
-        case 'CARBOSILICUM': return am && rf;
-        case 'MAGNIUM':      return rv && rf;
-        case 'TITANE':       return sh && rf;
-        case 'ALKALIUM':     return am && rf;
-        case 'AZOLITHION':   return am && sh;
-        case 'GAMMITE':      return am && sh && rf;
-        default:             return false; // ← Invalid items aren't "capped"
+    // ── Compound Buffs ────────────────────
+    if (dragSource === 'card' && dragTier === 'compound' && statsBlockAt(x, y)) {
+      const VALID_COMPOUNDS = ['LITHEBRYL', 'NITROKALIUM', 'CARBOSILICUM', 'MAGNIUM', 'TITANE', 'ALKALIUM', 'AZOLITHION', 'GAMMITE'];
+      if (!VALID_COMPOUNDS.includes(dragKey)) {
+        showShopToast('INVALID');
+        return;
       }
-    })();
-    
-    // NEW: Reject invalid compounds (alloys, unknown keys)
-    const VALID_COMPOUNDS = ['LITHEBRYL', 'NITROKALIUM', 'CARBOSILICUM', 
-                             'MAGNIUM', 'TITANE', 'ALKALIUM', 'AZOLITHION', 'GAMMITE'];
-    if (!VALID_COMPOUNDS.includes(dragKey)) {
-      showShopToast('INVALID');
-      return; // Exit before consuming
-    }
-    
-    if (isCompoundFullyCapped()) { 
-      applyCompoundBuff(dragKey); 
-      return; 
+      const isCompoundFullyCapped = () => {
+        if (!run) return true;
+        const sh = run.shieldMax      >= STAT_CAPS.shieldMax;
+        const am = run.ammoMax        >= STAT_CAPS.ammoMax;
+        const rf = run.ammoRefillRate >= STAT_CAPS.ammoRefillRate;
+        const rv = run.reserveMax     >= STAT_CAPS.reserveMax;
+        switch (dragKey) {
+          case 'LITHEBRYL':    return sh && am;
+          case 'NITROKALIUM':  return rf && sh;
+          case 'CARBOSILICUM': return am && rf;
+          case 'MAGNIUM':      return rv && rf;
+          case 'TITANE':       return sh && rf;
+          case 'ALKALIUM':     return am && rf;
+          case 'AZOLITHION':   return am && sh;
+          case 'GAMMITE':      return am && sh && rf;
+          default: return false;
+        }
+      };
+
+      const now = Date.now();
+      const isDoubleAction = lastStatsKey === dragKey && (now - lastStatsTime) < DOUBLE_TAP_MS;
+      lastStatsKey = dragKey; lastStatsTime = now;
+
+      let applyCount = isDoubleAction ? (run.inventory[dragKey] || 0) : 1;
+      let appliedAny = false;
+
+      for (let i = 0; i < applyCount; i++) {
+        if ((run.inventory[dragKey] || 0) <= 0) break;
+        if (isCompoundFullyCapped()) {
+          if (!appliedAny) applyCompoundBuff(dragKey);
+          break;
+        }
+        run.inventory[dragKey]--;
+        applyCompoundBuff(dragKey);
+        appliedAny = true;
+      }
+      if (appliedAny) refresh();
+      return;
     }
 
-    const now = Date.now();
-    const isDoubleAction = lastStatsKey === dragKey && (now - lastStatsTime) < DOUBLE_TAP_MS;
-    lastStatsKey = dragKey; lastStatsTime = now;
+    // ── Crafting Ingredients → Craft Cards ────────
+    if (dragSource === 'card' && shopMode === 'craft') {
+      const targetCard = craftCardAt(x, y);
+      if (targetCard) {
+        const puKey = targetCard.dataset.cardKey;
+        const tier  = targetCard.dataset.cardTier;
+        if (!craftProgress[puKey]) craftProgress[puKey] = [];
+        const progress = craftProgress[puKey];
+        const isValid = isValidIngredientForAnyVariant(puKey, tier, dragKey, dragTier, progress);
 
-    const applyCount = isDoubleAction ? (run?.inventory[dragKey] || 0) + 1 : 1;
-    for (let i = 0; i < applyCount; i++) {
-      if ((run?.inventory[dragKey] || 0) <= 0) break;
-      if (isCompoundFullyCapped()) break;
-      run.inventory[dragKey]--; 
-      applyCompoundBuff(dragKey);
+        if (isValid && (run.inventory[dragKey] || 0) > 0) {
+          run.inventory[dragKey]--;
+          progress.push(dragKey);
+          const resolved = tier === 'alloy' ? resolveAlloyVariant(puKey, progress) : resolveCompoundVariant(puKey, progress);
+          const recipeKeys = tier === 'alloy' ? resolved.recipe.map(r => r.key) : resolved.recipe;
+          refreshCraftCard(puKey, tier, recipeKeys);
+          refreshSourceCard(dragKey);
+        }
+        return;
+      }
     }
-    refresh();
-    renderShopBody();
-    updateShopStats();
+
+    // ── Action Box (Buy / Sell / Stage Craft) ──────────────
+    if (dragSource === 'card' && onActionBox) {
+      if      (shopMode === 'buy')   stageItem(dragKey, dragTier);
+      else if (shopMode === 'sell')  stageItem(dragKey, dragTier);
+      else if (shopMode === 'craft') stageCraftJob(dragKey, dragTier);
+      renderShopBody();
+      return;
+    }
+
+    // ── Drag to Reserves or Upgrade Slot ────────────────────
+    if ((dragSource === 'stash' || (dragSource === 'card' && shopMode === 'stash')) && targetSlot) {
+      if (isUpgradeSession) {
+        if (dragTier === 'element') {
+          showShopToast("INVALID");
+          return;
+        }
+        const oldKey = run.inventory._upgradeSlot;
+        if (oldKey) run.inventory[oldKey] = (run.inventory[oldKey] || 0) + 1;
+        
+        run.inventory._upgradeSlot = dragKey;
+        run.inventory[dragKey] = Math.max(0, (run.inventory[dragKey] || 0) - 1);
+        showShopToast("UPGRADE EQUIPPED");
+        refresh();
+        return;
+      }
+		
+      const slotIdx = parseInt(targetSlot.dataset.slot);
+      while (run.powerups.length < run.reserveMax) run.powerups.push(null);
+      const existingKey = run.powerups[slotIdx] || null;
+      if (existingKey === dragKey) return;
+      if (existingKey) run.inventory[existingKey] = Math.min(99, (run.inventory[existingKey] || 0) + 1);
+      
+      run.powerups[slotIdx] = dragKey;
+      run.inventory[dragKey] = Math.max(0, (run.inventory[dragKey] || 0) - 1);
+      showShopToast('Equipped: ' + (STRINGS.powerups[dragKey]?.name || dragKey) + '!');
+      refresh();
+
+    // ── Reserve → Reserve (Swap) ──────────
+    } else if (dragSource === 'reserve' && targetSlot) {
+      const toIdx = parseInt(targetSlot.dataset.slot);
+      if (toIdx === dragSlotIdx) return;
+      const toKey = run.powerups[toIdx] || null;
+      run.powerups[dragSlotIdx] = toKey || null;
+      run.powerups[toIdx] = dragKey;
+      run.powerups = run.powerups.filter(k => k != null);
+      refresh();
+
+    // ── Reserve → Outside (Un-equip) ──────
+    } else if (dragSource === 'reserve' && !targetSlot) {
+      run.powerups[dragSlotIdx] = null;
+      run.inventory[dragKey] = Math.min(99, (run.inventory[dragKey] || 0) + 1);
+      refresh();
+    }
   }
-  return;
-}
 
     // ── Drag Ingredients ────────────────────────────────
     if (dragSource === 'card' && shopMode === 'craft') {
