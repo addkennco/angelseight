@@ -12,8 +12,8 @@ const STRINGS = {
     enterShop: 'ENTER SHOP',
     signalLost: 'SIGNAL LOST',
     runTerminated: 'RUN TERMINATED',
-    sectorClear: 'SWEEP DEPLOYED',
-    levelComplete: (n) => `SECTOR ${n} CLEAR`,
+    sectorClear: 'SECTOR CLEAR',
+    levelComplete: (n) => `LEVEL ${n} COMPLETE`,
     radio: 'RADIO',
     empty: 'EMPTY',
     credits: 'CREDITS',
@@ -821,7 +821,7 @@ const Game = (() => {
       document.getElementById('boss-phase').textContent = PHASE_NAMES[boss.phase - 1];
       document.getElementById('boss-phase').style.color = PHASE_COLORS[boss.phase - 1];
       // Particles + floater
-      spawnParticles(boss.x, boss.y, PHASE_COLORS[boss.phase - 1], 80);
+      spawnParticles(boss.x, boss.y, PHASE_COLORS[boss.phase - 1], 30);
       spawnFloatingText(boss.x, boss.y - 60, PHASE_NAMES[boss.phase - 1], PHASE_COLORS[boss.phase - 1]);
       logPickup('⚠ ' + PHASE_NAMES[boss.phase - 1]);
       // Phase 3 surge
@@ -1872,7 +1872,7 @@ function spawnPod() {
       const bombDmg = baseDmg + (run.upgrade === 'MAGNIUM' ? 10 : 0);
     boss.hp -= bombDmg;
     boss.hitFlash = 0.3; 
-    spawnParticles(boss.x, boss.y, '#ffd700', 40);
+    spawnParticles(boss.x, boss.y, '#ffd700', 20);
     document.getElementById('boss-bar').style.width =
       Math.max(0, (boss.hp / BOSS_MAX_HP) * 100) + '%';
     if (boss.hp <= 0) onBossDefeated();
@@ -1885,7 +1885,7 @@ function spawnPod() {
 	  
 
   if (!silent) {
-    spawnParticles(W / 2, H / 2, '#ffd700', 60);
+    spawnParticles(W / 2, H / 2, '#ffd700', 25);
     spawnFloatingText(W / 2, H / 2 - 40, 'SECTOR SWEPT', '#ffd700');
     logPickup('SECTOR SWEPT');
   }
@@ -1901,9 +1901,9 @@ function screenShake(magnitude, duration) {
     if (!pu) return;
     if (pu === 'OMEGITE') {
   	  triggerSweep({ silent: true });
-	  spawnParticles(W / 2, H / 2, '#d42b6a', 40);
- 	  spawnParticles(W / 2, H / 2, '#ffd700', 40);
-	  spawnParticles(W / 2, H / 2, '#a855f7', 40);
+	  spawnParticles(W / 2, H / 2, '#d42b6a', 18);
+ 	  spawnParticles(W / 2, H / 2, '#ffd700', 18);
+	  spawnParticles(W / 2, H / 2, '#a855f7', 18);
 	  spawnFloatingText(W / 2, H / 2 - 50, 'OMEGITE', '#d42b6a');
 	  screenShake(10, 0.6);
 	  logPickup('OMEGITE DEPLOYED');
@@ -1920,7 +1920,7 @@ function screenShake(magnitude, duration) {
   	  }
  	 });
 	  enemies = enemies.filter(e => e.hp > 0);
-	  spawnParticles(W / 2, H / 2, '#a855f7', 50);
+	  spawnParticles(W / 2, H / 2, '#a855f7', 20);
 	  spawnFloatingText(W / 2, H / 2 - 30, 'MAGNIUM', '#a855f7');
 	  screenShake(4, 0.4); 
 	  logPickup('MAGNIUM DEPLOYED');
@@ -1969,99 +1969,74 @@ function screenShake(magnitude, duration) {
 
   // ── PARTICLES & FLOATERS ─────────────────────────────────────
 function spawnParticles(x, y, color, n) {
-  // Convert hex color to RGB for glow effects
-  const hexToRgb = (hex) => {
-    const r = parseInt(hex.slice(1,3), 16);
-    const g = parseInt(hex.slice(3,5), 16);
-    const b = parseInt(hex.slice(5,7), 16);
-    return { r, g, b };
-  };
-  
-  const rgb = hexToRgb(color);
-  
+  const r = parseInt(color.slice(1,3), 16);
+  const g = parseInt(color.slice(3,5), 16);
+  const b = parseInt(color.slice(5,7), 16);
   for (let i = 0; i < n; i++) {
     const angle = Math.random() * Math.PI * 2;
     const speed = 40 + Math.random() * 120;
+    const life  = 0.4 + Math.random() * 0.4;
     particles.push({
-      x, 
-      y,
+      x, y,
       vx: Math.cos(angle) * speed,
       vy: Math.sin(angle) * speed,
-      life: 0.4 + Math.random() * 0.4,
-      born: performance.now(),
-      color: rgb,
+      life,
+      maxLife: life,
+      r, g, b,
       size: 1.5 + Math.random() * 2,
-      trail: [],
-      trailLife: 80  // ms each trail point lives
     });
   }
 }
 
 function updateParticles(dt) {
   particles = particles.filter(p => {
-    // Apply physics
-    p.vy += 60 * dt;           // gravity
-    p.vx *= (1 - dt * 1.5);    // drag
-    p.vy *= (1 - dt * 1.5);    // drag
-    
-    // Add current position to trail
-    p.trail.push({ x: p.x, y: p.y, born: performance.now() });
-    
-    // Clean up old trail points
-    const now = performance.now();
-    p.trail = p.trail.filter(pt => now - pt.born < p.trailLife);
-    
-    // Move particle
-    p.x += p.vx * dt;
-    p.y += p.vy * dt;
-    
-    // Age and remove if dead
+    p.vy += 60 * dt;
+    p.vx *= (1 - dt * 1.5);
+    p.vy *= (1 - dt * 1.5);
+    p.x  += p.vx * dt;
+    p.y  += p.vy * dt;
     p.life -= dt;
     return p.life > 0;
   });
 }
 
-// Draw particles
+// Draw particles  velocity-streak style, one draw call per particle
 function drawParticles() {
-  const now = performance.now();
-  
+  if (!particles.length) return;
+
+  const prev = ctx.globalCompositeOperation;
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.lineCap = 'round';
+
   particles.forEach(p => {
-    const { r, g, b } = p.color;
-    const lifePct = Math.max(0, p.life / 0.8);  // normalize to original max life
-    const alpha = Math.pow(lifePct, 1.2) * 0.95;
-    
+    const lifePct = Math.max(0, p.life / p.maxLife);
+    const alpha   = Math.pow(lifePct, 1.2) * 0.95;
     if (alpha <= 0) return;
-    
-    ctx.save();
-    ctx.globalCompositeOperation = 'lighter';  // additive blending for glow
-    
-    // Draw trail
-    for (let i = 1; i < p.trail.length; i++) {
-      const pt = p.trail[i];
-      const prevPt = p.trail[i - 1];
-      const ptAge = (now - pt.born) / p.trailLife;
-      const trailAlpha = Math.max(0, (1 - ptAge) * alpha * 0.5);
-      const trailWidth = Math.max(0.1, (1 - ptAge) * p.size * 0.6);
-      
-      ctx.strokeStyle = `rgba(${r},${g},${b},${trailAlpha})`;
-      ctx.lineWidth = trailWidth;
-      ctx.beginPath();
-      ctx.moveTo(prevPt.x, prevPt.y);
-      ctx.lineTo(pt.x, pt.y);
-      ctx.stroke();
-    }
-    
-    // Draw particle head with glow
-    const headSize = Math.max(0.1, p.size * lifePct);
-    ctx.fillStyle = `rgba(${r},${g},${b},${alpha})`;
-    ctx.shadowColor = `rgba(${r},${g},${b},${alpha * 0.6})`;
-    ctx.shadowBlur = p.size * 3;
+
+    const { r, g, b, vx, vy, size } = p;
+
+    // Streak: line from current pos back along velocity vector
+    const speed    = Math.sqrt(vx * vx + vy * vy);
+    const trailLen = Math.min(speed * 0.06, 18);
+    const tx = trailLen > 0.5 ? p.x - (vx / speed) * trailLen : p.x;
+    const ty = trailLen > 0.5 ? p.y - (vy / speed) * trailLen : p.y;
+
+    // Faded streak body
+    ctx.strokeStyle = `rgba(${r},${g},${b},${alpha * 0.45})`;
+    ctx.lineWidth   = Math.max(0.5, size * lifePct * 0.7);
     ctx.beginPath();
-    ctx.arc(p.x, p.y, headSize, 0, Math.PI * 2);
+    ctx.moveTo(tx, ty);
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+
+    // Bright head dot
+    ctx.fillStyle = `rgba(${r},${g},${b},${alpha})`;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, Math.max(0.5, size * lifePct * 0.6), 0, Math.PI * 2);
     ctx.fill();
-    
-    ctx.restore();
   });
+
+  ctx.globalCompositeOperation = prev;
 }
 
   let floaters = [];
@@ -4458,6 +4433,8 @@ function applyElementBuff(key) {
         return;
       }
 		
+      if (dragTier === 'element') { showShopToast('INVALID'); return; }
+
       const slotIdx = parseInt(targetSlot.dataset.slot);
       const existingKey = run.powerups[slotIdx] || null;
       if (existingKey === dragKey) return;
