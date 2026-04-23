@@ -4488,6 +4488,9 @@ function applyElementBuff(key) {
 
   // ── Pointer start ────────────────────────────────────────────
   function onStart(x, y, target) {
+    // Clear any stale drag state from a previous tap (dragKey survives taps for double-tap window)
+    reset();
+
     // Any shop card with data-card-key (buy/sell/craft tabs)
     const card = target.closest('[data-card-key]');
     if (card && card.dataset.draggable === '1') {
