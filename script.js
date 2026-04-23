@@ -560,7 +560,8 @@ function screenCollapse(el, opts = {}) {
 // RUN STATE & PASSIVES
 // ═══════════════════════════════════════════════════════════════
 let run = null;
-let isUpgradeSession = false; 
+let isUpgradeSession = false;
+let isMenuSession    = false;
 function newRun() {
   save.storyFlags = 0;
   writeSave();
@@ -870,7 +871,7 @@ const Game = (() => {
     const key = pool[Math.floor(Math.random() * pool.length)];
     ELEMENT_ATTACKS[key]();
     spawnFloatingText(boss.x, boss.y - 30, key, '#ffffff');
-    logPickup(symbol + ' SEQUENCE');
+    logPickup(STRINGS.items[key].sym + ' SEQUENCE');
   }
 
   function init(gameCanvas) {
@@ -3784,7 +3785,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('btn-shop-menu').onclick = () => {
     if (!run) run = newRun();
+    isMenuSession = true;
     document.getElementById('shop-level-badge').textContent = 'MODE: STATIONARY';
+    document.getElementById('btn-shop-launch').textContent = STRINGS.ui.menu;
     showScreen('shop');
 	initShopDeco();
     shopTab('buy');
@@ -3827,6 +3830,7 @@ document.getElementById('btn-new-run-plus').onclick = () => {
   isUpgradeSession = true; 
   shopMode = 'stash'; 
   document.getElementById('shop-level-badge').textContent = 'MODE: STATIONARY';
+  document.getElementById('btn-shop-launch').textContent = STRINGS.ui.launch;
   showScreen('shop');
   initShopDeco();
   shopTab('upgrade'); 
@@ -3857,6 +3861,7 @@ document.getElementById('btn-new-run-plus').onclick = () => {
     shopMode = 'buy';
     document.getElementById('shop-level-badge').textContent = STRINGS.ui.afterLevel(run.level);
     document.getElementById('shop-credits').textContent = run.credits + '¢';
+    document.getElementById('btn-shop-launch').textContent = STRINGS.ui.launch;
     showScreen('shop');
 	initShopDeco();
     shopTab('buy');
@@ -3880,10 +3885,14 @@ document.getElementById('btn-new-run-plus').onclick = () => {
     shopContinue();
   };
 
-  // Shop LAUNCH button — needs to check if we're in an upgrade session
+  // Shop LAUNCH button — needs to check if we're in an upgrade or menu session
   document.getElementById('btn-shop-launch').onclick = () => {
     stopShopDeco();
-    if (isUpgradeSession) {
+    if (isMenuSession) {
+      isMenuSession = false;
+      showScreen('menu');
+      updateMenuUI();
+    } else if (isUpgradeSession) {
       // Same logic as btn-story-launch for upgrade sessions
       isUpgradeSession = false;
       save.upgrade = run.inventory._upgradeSlot || null;
