@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Angel's Eight</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Monoton&family=Nova+Square&family=Carattere&family=Noto+Emoji&display=swap');
+
+  :root {
+    --bg:       #050510;
+    --bg2:      #0a0a20;
+    --pink:     #d42b6a;
+    --cyan:     #00f5ff;
+    --purple:   #a855f7;
+    --gold:     #ffd700;
+    --dim:      #ffffff22;
+    --mono:     'Nova Square', monospace;
+    --display:  'Monoton', sans-serif;
+    --cursive:  'Carattere', cursive;
+    --green:      #1CC74C;
+    --green-dim:  #0e7a2e;
+    --green-dark: #083d17;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+
+  html, body {
+    width:100%; height:100%;
+    background: var(--bg);
+    color: #fff;
+    font-family: var(--mono);
+    overflow: hidden;
+    touch-action: none;
+  }
+
+  /* SCREENS */
+  .screen { position:absolute; inset:0; display:none; flex-direction:column; align-items:center; justify-content:center; overflow:visible; }
+  .screen.active { display:flex; }
+
+  /* MAIN MENU */
+  #screen-menu {
+    background: radial-gradient(ellipse at 50% 30%, #1a0a3a 0%, #050510 70%);
+  }
+
+  .menu-bg-canvas {
+    position: absolute; inset:0; opacity: 0.35;
+  }
+
+  .menu-content {
+    position: relative; z-index:10;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 0;
+    opacity: 0;
+    transform: scaleY(0.06);
+    transform-origin: center center;
+  }
+
+  .menu-eyebrow {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.4em;
+    color: var(--cyan);
+    opacity: 0.7;
+    text-transform: uppercase;
+  }
+
+  .menu-title-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 6px;
+  }
+
+  .menu-title {
+    font-family: var(--display);
+    font-size: clamp(62px, 22vw, 108px);
+    font-weight: 900;
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    text-align: center;
+    background: linear-gradient(135deg, var(--cyan) 0%, var(--purple) 50%, var(--pink) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 40px rgba(168,85,247,0.4));
+    padding: 12px 16px;
+    margin-bottom: 0px;
+  }
+
+  .menu-cursive {
+    font-family: var(--cursive);
+    font-size: clamp(38px, 8.5vw, 72px);
+    color: var(--gold);
+    letter-spacing: 0.01em;
+    text-shadow: 0 0 24px rgba(255,45,120,0.8), 0 0 60px rgba(168,85,247,0.5);
+    line-height: 1;
+    position: absolute;
+    z-index: 2;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  /* PINPAD */
+  .pinpad-wrap {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 36px;
+    font-family: 'Nova Square', sans-serif;
+    color: var(--cyan);
+    font-size: 12px;
+  }
+  .pinpad {
+    background: var(--bg2);
+    color: var(--cyan);
+    border: 1px solid var(--cyan);
+    border-radius: 12px;
+    padding: 1.25rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: fit-content;
+  }
+  .pin-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+  }
+  .pin-label {
+    font-family: 'Nova Square', sans-serif;
+    font-size: 13px;
+    letter-spacing: 2px;
+    color: var(--cyan);
+    opacity: 0.85;
+  }
+  .entry {
+    background: transparent;
+    color: var(--cyan);
+    border: 1px solid var(--cyan);
+    border-radius: 8px;
+    width: 192px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Nova Square', sans-serif;
+    font-size: 22px;
+    letter-spacing: 8px;
+    transition: border-color 0.2s;
+  }
+  .entry.error {
+    border-color: #ff2244;
+    color: #ff2244;
+    animation: shake 0.35s ease;
+  }
+  @keyframes shake {
+    0%   { transform: translateX(0); }
+    20%  { transform: translateX(-8px); }
+    40%  { transform: translateX(8px); }
+    60%  { transform: translateX(-6px); }
+    80%  { transform: translateX(6px); }
+    100% { transform: translateX(0); }
+  }
+  .key-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+  .key {
+    font-family: 'Nova Square', sans-serif;
+    font-size: 18px;
+    color: linear-gradient(135deg, var(--cyan) 0%, var(--purple) 50%, var(--pink) 100%);
+    background: #0d1a10;
+    border: none;
+    border-radius: 8px 8px 6px 6px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    line-height: 1;
+    opacity: 0.9;
+    position: relative;
+    box-shadow:
+    0 1px 0 0 #5de0ff,
+    0 -1px 0 0 #2a0a4a,
+    1px 0 0 0 #a855f7,
+    -1px 0 0 0 #4a1a6a,
+    0 4px 0 0 #050310,
+    inset 0 1px 0 0 rgba(0,245,255,0.18),
+    inset 0 -1px 0 0 rgba(0,0,0,0.5);
+  transition: transform 0.08s, box-shadow 0.08s, opacity 0.08s;
+  user-select: none;
+}
+.key:hover {
+  opacity: 1;
+  box-shadow:
+    0 1px 0 0 #8ff0ff,
+    0 -1px 0 0 #2a0a4a,
+    1px 0 0 0 #c084fc,
+    -1px 0 0 0 #4a1a6a,
+    0 4px 0 0 #050310,
+    inset 0 1px 0 0 rgba(0,245,255,0.28),
+    inset 0 -1px 0 0 rgba(0,0,0,0.5);
+}
+.key:active {
+  transform: translateY(3px);
+  opacity: 1;
+  color: var(--pink);
+  box-shadow:
+    0 1px 0 0 #d42b6a,
+    0 -1px 0 0 #2a0a4a,
+    1px 0 0 0 #a855f7,
+    -1px 0 0 0 #4a1a6a,
+    0 4px 0 0 #050310,
+    inset 0 1px 0 0 rgba(0,0,0,0.4),
+    inset 0 -1px 0 0 rgba(0,245,255,0.1);
+}
+</style>
+</head>
+<body>
+
+<!-- MAIN MENU -->
+<div id="screen-menu" class="screen active">
+  <canvas class="menu-bg-canvas" id="menu-bg"></canvas>
+  <div class="menu-content">
+    <div class="menu-eyebrow">ALPHA LYRAE AEROSPACE DIVISION</div>
+    <div class="menu-title-wrap">
+      <div class="menu-title"><br>OS</div>
+      <div class="menu-cursive">Copeland</div>
+    </div>
+
+    <!-- PINPAD -->
+    <div class="pinpad-wrap">
+      <div class="pinpad">
+        <div class="pin-header">
+          <div class="pin-label">ENTER PIN</div>
+          <div class="entry" id="entry"></div>
+        </div>
+        <div class="key-grid">
+          <div class="key" data-key="1">1</div>
+          <div class="key" data-key="2">2</div>
+          <div class="key" data-key="3">3</div>
+          <div class="key" data-key="4">4</div>
+          <div class="key" data-key="5">5</div>
+          <div class="key" data-key="6">6</div>
+          <div class="key" data-key="7">7</div>
+          <div class="key" data-key="8">8</div>
+          <div class="key" data-key="9">9</div>
+          <div class="key" data-key="*">✱</div>
+          <div class="key" data-key="0">0</div>
+          <div class="key" data-key="#">#</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  
+// WAVEFORM
+(function menuWaveform() {
+  const canvas = document.getElementById('menu-bg');
+  const ctx = canvas.getContext('2d');
+  let t = 0;
+  let startTs = null;
+  const WAVE_FADE_MS = 800;
+
+  function resize() {
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width  = window.innerWidth  * dpr;
+  canvas.height = window.innerHeight * dpr;
+  canvas.style.width  = window.innerWidth  + 'px';
+  canvas.style.height = window.innerHeight + 'px';
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.scale(dpr, dpr);
+}
+resize(); window.addEventListener('resize', resize);
+
+  function draw(ts) {
+    if (!startTs) startTs = ts;
+    const elapsed = ts - startTs;
+    const fadeIn = Math.min(1, elapsed / WAVE_FADE_MS);
+    const masterAlpha = fadeIn * fadeIn * (3 - 2 * fadeIn); // smoothstep
+
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0,0,W,H);
+    const rows = 28;
+    const rowH = H / rows;
+    for (let r = 0; r < rows; r++) {
+      const y = H * 0.8 - r * rowH * 0.9;
+      const amp = 12 + r * 3.5;
+      const freq = 0.018 + r * 0.001;
+      const phase = t * 0.4 + r * 0.3;
+      const pct = r / rows;
+      const rVal = Math.round(0 + pct * 168);
+      const gVal = Math.round(245 - pct * 160);
+      const bVal = Math.round(255 - pct * 8);
+      const lineAlpha = (0.15 + pct * 0.3) * masterAlpha;
+      ctx.beginPath();
+      for (let x = 0; x <= W; x += 3) {
+        const noise = Math.sin(x * freq + phase) * amp
+          + Math.sin(x * freq * 2.3 + phase * 1.7) * amp * 0.4
+          + Math.sin(x * freq * 0.5 + phase * 0.8) * amp * 0.25;
+        const py = y - noise;
+        x === 0 ? ctx.moveTo(x, py) : ctx.lineTo(x, py);
+      }
+      ctx.strokeStyle = `rgba(${rVal},${gVal},${bVal},${lineAlpha})`;
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+    }
+    t += 0.016;
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+})();
+
+// BOOT UP
+function screenExpand(el, opts = {}) {
+  if (!el) return;
+
+  const delayMs   = opts.delayMs   ?? 380;
+  const expandMs  = opts.expandMs  ?? 550;
+  const flickerMs = opts.flickerMs ?? 380;
+  const onDone    = opts.onDone    ?? null;
+
+  let startTs = null;
+  let flickerTimer = 0;
+
+  el.style.opacity   = '0';
+  el.style.transform = 'scaleY(0.06)';
+
+  function tick(ts) {
+    if (!startTs) startTs = ts;
+    const elapsed = ts - startTs;
+
+    if (elapsed < delayMs) {
+      requestAnimationFrame(tick);
+      return;
+    }
+
+    const afterDelay = elapsed - delayMs;
+
+    if (afterDelay < expandMs) {
+      let t = afterDelay / expandMs;
+      t = 1 - Math.pow(1 - t, 3);
+      el.style.transform = `scaleY(${(0.06 + 0.94 * t).toFixed(4)})`;
+      el.style.opacity   = (t * 0.9).toFixed(4);
+      requestAnimationFrame(tick);
+      return;
+    }
+
+    const afterExpand = afterDelay - expandMs;
+
+    if (afterExpand < flickerMs) {
+      flickerTimer += 0.38;
+      const gate      = Math.sin(flickerTimer) > 0.25;
+      const baseAlpha = 0.9 + 0.1 * (afterExpand / flickerMs);
+      el.style.opacity   = (gate ? baseAlpha : baseAlpha * 0.65).toFixed(4);
+      el.style.transform = 'scaleY(1)';
+      requestAnimationFrame(tick);
+      return;
+    }
+
+    el.style.opacity   = '1';
+    el.style.transform = 'scaleY(1)';
+    if (onDone) onDone();
+  }
+
+  requestAnimationFrame(tick);
+}
+
+screenExpand(
+  document.getElementById('screen-menu')?.querySelector('.menu-content'),
+  { delayMs: 380, expandMs: 550, flickerMs: 380 }
+);
+
+// PINPAD + REDIRECT
+(function pinpad() {
+  const CORRECT = '8888';
+  const MAX = 4;
+  let digits = '';
+
+  const entry = document.getElementById('entry');
+
+  function render() {
+    entry.textContent = '✱'.repeat(digits.length) || '';
+  }
+
+  function onKey(k) {
+    if (k === '*') { digits = ''; render(); return; }
+    if (k === '#' || digits.length >= MAX) return;
+    digits += k;
+    render();
+    if (digits.length === MAX) {
+      setTimeout(() => {
+        if (digits === CORRECT) {
+          entry.textContent = 'OK';
+          entry.style.borderColor = '#1CC74C';
+          entry.style.color = '#1CC74C';
+          setTimeout(() => { window.location.href = 'https://wimblyd.github.io/angelseight'; }, 600);
+        } else {
+          entry.classList.add('error');
+          entry.textContent = 'ERR';
+          setTimeout(() => {
+            entry.classList.remove('error');
+            entry.style.borderColor = '';
+            entry.style.color = '';
+            digits = '';
+            render();
+          }, 800);
+        }
+      }, 120);
+    }
+  }
+
+  document.querySelectorAll('.key').forEach(btn => {
+    btn.addEventListener('click', () => onKey(btn.dataset.key));
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
